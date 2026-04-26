@@ -1,6 +1,4 @@
-﻿import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
-
-
+import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
 
 // Tabla de Estudiantes
 export const estudiantes = sqliteTable('estudiantes', {
@@ -16,29 +14,23 @@ export const estudiantes = sqliteTable('estudiantes', {
   fechaRegistro: text('fecha_registro').default(new Date().toISOString()),
 });
 
-// Tabla de Asistencias 
+// Tabla de Asistencias (solo referencia RUT)
 export const asistencias = sqliteTable('asistencias', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   rut: text('rut')
     .notNull()
     .references(() => estudiantes.rut, { onDelete: 'cascade' }),
-  dv: text('dv')
-    .notNull()
-    .references(() => estudiantes.dv, { onDelete: 'cascade' }),
   fecha: text('fecha').notNull(),
   presente: integer('presente', { mode: 'boolean' }).notNull(),
   justificacion: text('justificacion'),
 });
 
-// Tabla de Calificaciones 
+// Tabla de Calificaciones (solo referencia RUT)
 export const calificaciones = sqliteTable('calificaciones', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   rut: text('rut')
     .notNull()
     .references(() => estudiantes.rut, { onDelete: 'cascade' }),
-  dv: text('dv')
-    .notNull()
-    .references(() => estudiantes.dv, { onDelete: 'cascade' }),
   asignatura: text('asignatura').notNull(),
   nota: real('nota').notNull(),
   fecha: text('fecha').notNull(),
