@@ -1,4 +1,4 @@
-import {getDatabaseinstance} from '../utils/data.js';
+import {getDatabaseinstance} from '../models/data.js';
 import {estudiantes} from '../utils/schema.js';
 import {eq} from 'drizzle-orm';
 

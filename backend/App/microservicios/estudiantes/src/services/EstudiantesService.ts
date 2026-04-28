@@ -78,6 +78,4 @@ export class EstudiantesService {
         }
         return await this.repository.obtenerCurso(curso);
     }
-}    
-
-
+}
