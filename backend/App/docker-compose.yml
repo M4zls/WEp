@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Microservicio de Estudiantes
+  estudiantes:
+    build:
+      context: ./backend/App/microservicios/estudiantes
+      dockerfile: Dockerfile
+    container_name: estudiantes-service
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    volumes:
+      - ./backend/App/microservicios/estudiantes/data:/app/data
+    networks:
+      - wep-network
+
+  # Gateway (si lo necesitas)
+  gateway:
+    build:
+      context: ./backend/App/gateway
+      dockerfile: Dockerfile
+    container_name: gateway-service
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ESTUDIANTES_SERVICE=http://estudiantes:3001
+    depends_on:
+      - estudiantes
+    networks:
+      - wep-network
+
+networks:
+  wep-network:
+    driver: bridge

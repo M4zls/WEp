@@ -24,6 +24,31 @@ export class EstudiantesService {
         return estudiante;
     }
 
+    // Login de estudiante
+    async login(email: string, password: string): Promise<IEstudiante | null> {
+        if (!email || email.trim() === '') {
+            throw new Error('El email es obligatorio');
+        }
+        if (!password || password.trim() === '') {
+            throw new Error('La contraseña es obligatoria');
+        }
+
+        // Buscar estudiante por email
+        const estudiante = await this.repository.obtenerPorEmail(email);
+        if (!estudiante) {
+            throw new Error('Estudiante no encontrado');
+        }
+
+        // Validar contraseña (en producción usar bcrypt)
+        if (estudiante.password !== password) {
+            throw new Error('Contraseña incorrecta');
+        }
+
+        // Retornar datos del estudiante sin la contraseña
+        const { password: _, ...estudianteSeguro } = estudiante as any;
+        return estudianteSeguro as IEstudiante;
+    }
+
     // crear nueva Con validacion 
     async crearEstudiante(datos: IEstudiante): Promise<void> {
         if (!datos.rut || datos.rut.trim() === '') {
@@ -38,6 +63,16 @@ export class EstudiantesService {
         //validar curso
         if (!datos.cursos || datos.cursos.trim() === '') {
             throw new Error('El curso es obligatorio');
+        }
+
+        //validar email
+        if (!datos.email || datos.email.trim() === '') {
+            throw new Error('El email es obligatorio');
+        }
+
+        //validar password
+        if (!datos.password || datos.password.trim() === '') {
+            throw new Error('La contraseña es obligatoria');
         }
 
         //verificar que no exista un estudiante con el mismo RUT

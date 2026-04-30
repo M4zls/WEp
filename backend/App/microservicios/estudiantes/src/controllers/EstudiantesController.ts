@@ -4,6 +4,24 @@ import { EstudiantesService } from '../services/EstudiantesService.js';
 const service = new EstudiantesService();
 export const estudianteController = new Hono();
 
+// POST /estudiantes/login - login de estudiante
+estudianteController.post('/login', async (c) => {
+  try {
+    const datos = await c.req.json();
+    const { email, password } = datos;
+
+    if (!email || !password) {
+      return c.json({ error: 'Email y contraseña son requeridos' }, { status: 400 });
+    }
+
+    const estudiante = await service.login(email, password);
+    return c.json(estudiante, { status: 200 });
+  } catch (error) {
+    const mensaje = error instanceof Error ? error.message : 'Error al iniciar sesión';
+    return c.json({ error: mensaje }, { status: 401 });
+  }
+});
+
 // GET /estudiantes - obtener todos
 estudianteController.get('/', async (c) => {
   try {

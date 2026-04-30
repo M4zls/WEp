@@ -9,7 +9,8 @@ export interface IEstudiante {
     nombre: string;
     apellido: string;
     cursos: string;
-    email?: string | null;
+    email: string;
+    password: string;
     telefono?: string | null;
     apoderado?: string | null;
     fechaRegistro?: string | null;
@@ -32,6 +33,15 @@ export class EstudiantesRepository {
         return resultado.length > 0 ? resultado[0] : null;
     }
 
+    async obtenerPorEmail(email: string): Promise<IEstudiante | null> {
+        const resultado = await this.db
+            .select()
+            .from(estudiantes)
+            .where(eq(estudiantes.email, email));
+
+        return resultado.length > 0 ? resultado[0] : null;
+    }
+
     async crear(datos: IEstudiante): Promise<void> {
         await this.db.insert(estudiantes).values({
             rut: datos.rut,
@@ -40,6 +50,7 @@ export class EstudiantesRepository {
             apellido: datos.apellido,
             cursos: datos.cursos,
             email: datos.email,
+            password: datos.password,
             telefono: datos.telefono,
             apoderado: datos.apoderado,
             fechaRegistro: new Date().toISOString(),

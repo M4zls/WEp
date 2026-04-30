@@ -3,13 +3,14 @@
  * Envuelve rutas que requieren autenticación
  */
 
-import { useAuth } from './useAuth';
+import { Navigate } from 'react-router-dom';
+import { useAuthContext } from './useAuthContext';
 
-export function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+export default function ProtectedRoute({ children }) {
+  const { isAuthenticated } = useAuthContext();
 
   if (!isAuthenticated) {
-    return <div>Debes iniciar sesión para acceder a esta página</div>;
+    return <Navigate to="/" replace />;
   }
 
   return children;

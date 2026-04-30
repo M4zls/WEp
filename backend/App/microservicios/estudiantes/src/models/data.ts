@@ -34,6 +34,7 @@ export const getDatabaseinstance = () => {
           apellido TEXT NOT NULL,
           cursos TEXT NOT NULL,
           email TEXT,
+          password TEXT NOT NULL,
           telefono TEXT,
           apoderado TEXT,
           fecha_registro TEXT DEFAULT CURRENT_TIMESTAMP

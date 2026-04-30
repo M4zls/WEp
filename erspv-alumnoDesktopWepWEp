@@ -1,0 +1,18 @@
+[33m35ec3f7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m, [m[1;31morigin/develop[m[33m)[m refactor: migrar frontend de Astro a React con Create React App y agregar servicios de autenticación
+[33m974e150[m readme
+[33m6960d26[m feat: actualizar EstudiantesRepository
+[33m492d68c[m fix: import schema from models instead of utils
+[33mcae1a3a[m feat: estructura nueva de microservicios
+[33m5a2a6e3[m Merge branch 'feature-microservices' into develop
+[33maa83373[m feat: nueva estructura backend
+[33me637742[m docs: actualiza README (Hono + setup backend)
+[33me8f360f[m arreglos
+[33m60e2c1f[m arreglando cosas de schema.ts
+[33m884c224[m Normalize line endings to LF
+[33mccfeec6[m Convert line endings to LF
+[33m9e532dc[m implementacion de estudiante controller
+[33m368b025[m mea vola
+[33m1bbda55[m cambiaso
+[33mb1c431e[m Merge branch 'develop' of https://github.com/M4zls/WEp into develop
+[33m349d928[m Initial commit - Backend with Hono and Frontend with Astro
+[33m764d19b[m Initial commit
