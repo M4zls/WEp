@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "NodeNext",
+    "module": "ESNext",
     "strict": true,
-    "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "types": ["node"],
     "jsx": "react-jsx",
@@ -15,7 +14,8 @@
     "declarationMap": true,
     "sourceMap": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler"
   },
   "include": ["microservicios/*/src/**/*"],
   "exclude": ["node_modules", "dist", "microservicios/*/data"]
