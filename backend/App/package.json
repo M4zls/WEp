@@ -6,7 +6,8 @@
     "microservicios/estudiantes",
     "microservicios/notificaciones",
     "microservicios/profesores",
-    "gateway"
+    "microservicios/bff"
+   
   ],
   "scripts": {
     "postinstall": "node scripts/clean-modules.js",
@@ -17,17 +18,21 @@
     "dev:autentificacion": "npm run -w microservicios/autentificacion dev",
     "dev:notificaciones": "npm run -w microservicios/notificaciones dev",
     "dev:profesores": "npm run -w microservicios/profesores dev",
+    "dev:bff": "npm run -w microservicios/bff dev",
     "dev:gateway": "npm run -w gateway dev"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.14",
+    "@libsql/client": "^0.17.3",
     "better-sqlite3": "^12.9.0",
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.12.16"
+    "hono": "^4.12.16",
+    "pg": "^8.20.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.19.39",
+    "@types/pg": "^8.20.0",
     "drizzle-kit": "^0.18.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
