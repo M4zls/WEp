@@ -1,8 +1,10 @@
-export default function StudentDashboard() {
+import React, { FC, ReactElement } from 'react';
+
+const StudentDashboard: FC = (): ReactElement => {
   const role = sessionStorage.getItem('role');
   const userEmail = sessionStorage.getItem('userEmail');
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     sessionStorage.clear();
     window.location.href = '/';
   };
@@ -51,4 +53,6 @@ export default function StudentDashboard() {
       </div>
     </div>
   );
-}
+};
+
+export default StudentDashboard;

@@ -1,3 +1,4 @@
+import React, { FC, ReactElement } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './authentication/context/AuthContext';
 import RoleSelection from './authentication/components/RoleSelection';
@@ -6,7 +7,7 @@ import ProtectedRoute from './authentication/ProtectedRoute';
 import StudentDashboard from './courses/pages/StudentDashboard';
 import ProfessorDashboard from './courses/pages/ProfessorDashboard';
 
-function Dashboard() {
+const Dashboard: FC = (): ReactElement => {
   const role = sessionStorage.getItem('role');
 
   if (role === 'profesor') {
@@ -14,9 +15,9 @@ function Dashboard() {
   }
 
   return <StudentDashboard />;
-}
+};
 
-function App() {
+const App: FC = (): ReactElement => {
   return (
     <AuthProvider>
       <Router>
@@ -36,6 +37,6 @@ function App() {
       </Router>
     </AuthProvider>
   );
-}
+};
 
 export default App;

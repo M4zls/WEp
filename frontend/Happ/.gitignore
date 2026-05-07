@@ -10,6 +10,12 @@ node_modules/
 /build
 /dist
 
+# Compiled files
+*.js
+*.js.map
+*.d.ts
+*.tsbuildinfo
+
 # Misc
 .DS_Store
 .env.local

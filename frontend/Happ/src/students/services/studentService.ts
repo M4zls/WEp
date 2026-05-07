@@ -1,7 +1,17 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+const API_URL: string = 'http://localhost:3000/api';
+
+interface StudentLoginResponse {
+  rut?: string;
+  email?: string;
+  [key: string]: any;
+}
+
+interface StudentData {
+  [key: string]: any;
+}
 
 class StudentService {
-  async login(email, password) {
+  async login(email: string, password: string): Promise<StudentLoginResponse> {
     try {
       const response = await fetch(`${API_URL}/estudiantes/login`, {
         method: 'POST',
@@ -18,7 +28,6 @@ class StudentService {
 
       const data = await response.json();
       sessionStorage.setItem('studentToken', JSON.stringify(data));
-      
       return data;
     } catch (error) {
       console.error('Error en login de estudiante:', error);
@@ -26,7 +35,7 @@ class StudentService {
     }
   }
 
-  async obtenerTodos() {
+  async obtenerTodos(): Promise<any[]> {
     try {
       const response = await fetch(`${API_URL}/estudiantes/`, {
         method: 'GET',
@@ -46,7 +55,7 @@ class StudentService {
     }
   }
 
-  async obtenerEstudiante(rut) {
+  async obtenerEstudiante(rut: string): Promise<StudentData> {
     try {
       const response = await fetch(`${API_URL}/estudiantes/${rut}`, {
         method: 'GET',
@@ -66,7 +75,7 @@ class StudentService {
     }
   }
 
-  async crearEstudiante(datos) {
+  async crearEstudiante(datos: StudentData): Promise<StudentData> {
     try {
       const response = await fetch(`${API_URL}/estudiantes/`, {
         method: 'POST',
@@ -88,7 +97,7 @@ class StudentService {
     }
   }
 
-  async actualizarEstudiante(rut, datos) {
+  async actualizarEstudiante(rut: string, datos: StudentData): Promise<StudentData> {
     try {
       const response = await fetch(`${API_URL}/estudiantes/${rut}`, {
         method: 'PUT',
@@ -110,7 +119,7 @@ class StudentService {
     }
   }
 
-  async eliminarEstudiante(rut) {
+  async eliminarEstudiante(rut: string): Promise<void> {
     try {
       const response = await fetch(`${API_URL}/estudiantes/${rut}`, {
         method: 'DELETE',
@@ -120,52 +129,12 @@ class StudentService {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error al eliminar estudiante');
+        throw new Error('Error al eliminar estudiante');
       }
-
-      return await response.json();
     } catch (error) {
       console.error('Error al eliminar estudiante:', error);
       throw error;
     }
-  }
-
-  async obtenerEstudiantesPorCurso(curso) {
-    try {
-      const response = await fetch(`${API_URL}/estudiantes/curso/${curso}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error al obtener estudiantes por curso');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error al obtener estudiantes por curso:', error);
-      throw error;
-    }
-  }
-
-  logout() {
-    sessionStorage.removeItem('studentToken');
-    sessionStorage.removeItem('user');
-    sessionStorage.removeItem('userEmail');
-    sessionStorage.removeItem('role');
-  }
-
-  isLoggedIn() {
-    return !!sessionStorage.getItem('studentToken');
-  }
-
-  getCurrentStudent() {
-    const token = sessionStorage.getItem('studentToken');
-    return token ? JSON.parse(token) : null;
   }
 }
 
