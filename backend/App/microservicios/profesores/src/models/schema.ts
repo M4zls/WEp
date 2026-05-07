@@ -8,24 +8,10 @@ export const profesores = sqliteTable('profesores', {
   nombre: text('nombre').notNull(),
   apellido: text('apellido').notNull(),
   email: text('email').notNull().unique(),
+  password: text('password').notNull(),
   telefono: text('telefono'),
-  asignatura: text('asignatura').notNull(),
-  curso: text('curso').notNull(),
-  activo: integer('activo', { mode: 'boolean' }).default(true),
+  materia: text('materia').notNull(),
   fechaIngreso: text('fecha_ingreso').default(new Date().toISOString()),
-});
-
-// Tabla de Horarios
-export const horarios = sqliteTable('horarios', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  profesorId: integer('profesor_id')
-    .notNull()
-    .references(() => profesores.id, { onDelete: 'cascade' }),
-  dia: text('dia').notNull(), // lunes, martes, etc
-  horaInicio: text('hora_inicio').notNull(),
-  horaFin: text('hora_fin').notNull(),
-  sala: text('sala'),
-  cursoId: text('curso_id').notNull(),
 });
 
 // Tabla de Clases
@@ -42,15 +28,3 @@ export const clases = sqliteTable('clases', {
   sala: text('sala'),
 });
 
-// Tabla de Disponibilidad
-export const disponibilidad = sqliteTable('disponibilidad', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  profesorId: integer('profesor_id')
-    .notNull()
-    .references(() => profesores.id, { onDelete: 'cascade' }),
-  dia: text('dia').notNull(),
-  horaInicio: text('hora_inicio').notNull(),
-  horaFin: text('hora_fin').notNull(),
-  tipo: text('tipo').notNull(), // atencion, reunion, libre
-  ubicacion: text('ubicacion'),
-});

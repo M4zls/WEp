@@ -33,10 +33,10 @@ export const getDatabaseinstance = () => {
           nombre TEXT NOT NULL,
           apellido TEXT NOT NULL,
           email TEXT NOT NULL UNIQUE,
+          password TEXT NOT NULL,
           telefono TEXT,
-          asignatura TEXT NOT NULL,
+          materia TEXT NOT NULL,
           curso TEXT NOT NULL,
-          activo INTEGER NOT NULL DEFAULT 1,
           fecha_ingreso TEXT DEFAULT CURRENT_TIMESTAMP
         );
       `);
@@ -59,7 +59,7 @@ export const getDatabaseinstance = () => {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           profesor_id INTEGER NOT NULL,
           curso_id TEXT NOT NULL,
-          asignatura TEXT NOT NULL,
+          materia TEXT NOT NULL,
           fecha TEXT NOT NULL,
           tema TEXT,
           descripcion TEXT,
