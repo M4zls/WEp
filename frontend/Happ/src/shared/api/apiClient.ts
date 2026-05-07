@@ -1,13 +1,20 @@
 import authService from '../../authentication/services/authService';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL: string = 'http://localhost:3000/api';
+
+interface RequestOptions extends RequestInit {
+  headers?: Record<string, string>;
+}
 
 class ApiClient {
-  async request(endpoint, options = {}) {
+  async request(
+    endpoint: string,
+    options: RequestOptions = {}
+  ): Promise<any> {
     const url = `${API_BASE_URL}${endpoint}`;
     const token = authService.getToken();
 
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
@@ -33,11 +40,11 @@ class ApiClient {
     }
   }
 
-  get(endpoint, options) {
+  get(endpoint: string, options?: RequestOptions): Promise<any> {
     return this.request(endpoint, { ...options, method: 'GET' });
   }
 
-  post(endpoint, data, options) {
+  post(endpoint: string, data: any, options?: RequestOptions): Promise<any> {
     return this.request(endpoint, {
       ...options,
       method: 'POST',
@@ -45,7 +52,7 @@ class ApiClient {
     });
   }
 
-  put(endpoint, data, options) {
+  put(endpoint: string, data: any, options?: RequestOptions): Promise<any> {
     return this.request(endpoint, {
       ...options,
       method: 'PUT',
@@ -53,7 +60,7 @@ class ApiClient {
     });
   }
 
-  delete(endpoint, options) {
+  delete(endpoint: string, options?: RequestOptions): Promise<any> {
     return this.request(endpoint, { ...options, method: 'DELETE' });
   }
 }

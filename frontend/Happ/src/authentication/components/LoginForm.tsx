@@ -1,18 +1,28 @@
-import { useState } from 'react';
+import React, { FormEvent, useState, FC, ReactElement } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
 import studentService from '../../students/services/studentService';
 
-export default function LoginForm() {
+type Role = 'estudiante' | 'profesor';
+
+interface LocationState {
+  role?: Role;
+}
+
+const LoginForm: FC = (): ReactElement => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login: loginContext, isLoading, error, setError } = useAuthContext();
-  
-  const role = location.state?.role || sessionStorage.getItem('selectedRole') || 'estudiante';
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  const handleSubmit = async (e) => {
+  const role: Role = 
+    (location.state as LocationState)?.role || 
+    (sessionStorage.getItem('selectedRole') as Role) || 
+    'estudiante';
+  
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError(null);
 
@@ -29,24 +39,25 @@ export default function LoginForm() {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión');
+      const errorMessage = err instanceof Error ? err.message : 'Error al iniciar sesión';
+      setError(errorMessage);
     }
   };
 
-  const handleBack = () => {
+  const handleBack = (): void => {
     sessionStorage.removeItem('selectedRole');
     navigate('/');
   };
 
-  const getRoleColor = () => {
+  const getRoleColor = (): string => {
     return role === 'estudiante' ? 'from-blue-400 to-blue-600' : 'from-green-400 to-green-600';
   };
 
-  const getRoleTitle = () => {
+  const getRoleTitle = (): string => {
     return role === 'estudiante' ? 'Estudiante' : 'Profesor';
   };
 
-  const getBtnColor = () => {
+  const getBtnColor = (): string => {
     return role === 'estudiante' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600';
   };
 
@@ -134,4 +145,6 @@ export default function LoginForm() {
       </div>
     </div>
   );
-}
+};
+
+export default LoginForm;
