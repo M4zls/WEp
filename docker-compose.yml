@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # Backend - Microservicio de Autentificación
+  autentificacion:
+    build:
+      context: ./backend/App/microservicios/autentificacion
+      dockerfile: Dockerfile
+    container_name: autentificacion-service
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+    volumes:
+      - ./backend/App/microservicios/autentificacion/data:/app/data
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Estudiantes
+  estudiantes:
+    build:
+      context: ./backend/App/microservicios/estudiantes
+      dockerfile: Dockerfile
+    container_name: estudiantes-service
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    volumes:
+      - ./backend/App/microservicios/estudiantes/data:/app/data
+    depends_on:
+      - autentificacion
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Profesores
+  profesores:
+    build:
+      context: ./backend/App/microservicios/profesores
+      dockerfile: Dockerfile
+    container_name: profesores-service
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
+    volumes:
+      - ./backend/App/microservicios/profesores/data:/app/data
+    depends_on:
+      - autentificacion
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Notificaciones
+  notificaciones:
+    build:
+      context: ./backend/App/microservicios/notificaciones
+      dockerfile: Dockerfile
+    container_name: notificaciones-service
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+    volumes:
+      - ./backend/App/microservicios/notificaciones/data:/app/data
+    depends_on:
+      - autentificacion
+    networks:
+      - wep-network
+
+  # Backend - BFF (Backend for Frontend)
+  bff:
+    build:
+      context: ./backend/App/microservicios/bff
+      dockerfile: Dockerfile
+    container_name: bff-service
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - AUTENTIFICACION_SERVICE=http://autentificacion:3002
+      - ESTUDIANTES_SERVICE=http://estudiantes:3001
+      - PROFESORES_SERVICE=http://profesores:3004
+      - NOTIFICACIONES_SERVICE=http://notificaciones:3003
+    depends_on:
+      - autentificacion
+      - estudiantes
+      - profesores
+      - notificaciones
+    networks:
+      - wep-network
+
+  # Frontend - React
+  frontend:
+    build:
+      context: ./frontend/Happ
+      dockerfile: Dockerfile
+    container_name: frontend-app
+    ports:
+      - "8080:8080"
+    environment:
+      - REACT_APP_API_URL=http://bff:3000
+    depends_on:
+      - bff
+    networks:
+      - wep-network
+
+networks:
+  wep-network:
+    driver: bridge
