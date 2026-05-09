@@ -15,7 +15,8 @@
     "jsx": "react-jsx",
     "ignoreDeprecations": "6.0",
     "allowJs": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "moduleResolution": "bundler"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

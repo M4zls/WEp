@@ -6,11 +6,10 @@
     "microservicios/estudiantes",
     "microservicios/notificaciones",
     "microservicios/profesores",
-    "microservicios/bff"
-   
+    "microservicios/bff",
+    "microservicios/cursos"
   ],
   "scripts": {
-    "postinstall": "node scripts/clean-modules.js",
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
@@ -19,21 +18,19 @@
     "dev:notificaciones": "npm run -w microservicios/notificaciones dev",
     "dev:profesores": "npm run -w microservicios/profesores dev",
     "dev:bff": "npm run -w microservicios/bff dev",
-    "dev:gateway": "npm run -w gateway dev"
+    "dev:cursos": "npm run -w microservicios/cursos dev"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.14",
-    "@libsql/client": "^0.17.3",
-    "better-sqlite3": "^12.9.0",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.12.16",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "postgres": "^3.4.9"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.19.39",
     "@types/pg": "^8.20.0",
-    "drizzle-kit": "^0.18.1",
+    "drizzle-kit": "^0.31.10",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }

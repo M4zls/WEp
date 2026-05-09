@@ -9,11 +9,6 @@ COPY src ./src
 # Instalar dependencias
 RUN npm install
 
-
-
-# Crear directorio de datos
-RUN mkdir -p ./data
-
 # Exponer el puerto
 EXPOSE 3002
 

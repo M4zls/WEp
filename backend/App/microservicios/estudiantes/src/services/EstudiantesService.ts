@@ -60,6 +60,12 @@ export class EstudiantesService {
             throw new Error('El dígito verificador es obligatorio');
         }
 
+        //validar rut: 7-8 dígitos
+        const rutRegex = /^\d{7,8}$/;
+        if (!rutRegex.test(datos.rut)) {
+            throw new Error('El RUT debe tener entre 7 y 8 dígitos numéricos');
+        }
+
         //validar curso
         if (!datos.cursos || datos.cursos.trim() === '') {
             throw new Error('El curso es obligatorio');

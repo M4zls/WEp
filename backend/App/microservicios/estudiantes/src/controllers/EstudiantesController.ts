@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { EstudiantesService } from '../services/EstudiantesService.js';
+import { loginEstudianteSchema, crearEstudianteSchema, actualizarEstudianteSchema } from '../dtos/EstudianteDto.js';
 
 const service = new EstudiantesService();
 export const estudianteController = new Hono();
@@ -8,12 +9,13 @@ export const estudianteController = new Hono();
 estudianteController.post('/login', async (c) => {
   try {
     const datos = await c.req.json();
-    const { email, password } = datos;
-
-    if (!email || !password) {
-      return c.json({ error: 'Email y contraseña son requeridos' }, { status: 400 });
+    const parsed = loginEstudianteSchema.safeParse(datos);
+    if (!parsed.success) {
+      const msgs = parsed.error.issues.map(i => i.message).join(', ');
+      return c.json({ error: msgs }, { status: 400 });
     }
 
+    const { email, password } = parsed.data;
     const estudiante = await service.login(email, password);
     return c.json(estudiante, { status: 200 });
   } catch (error) {
@@ -49,8 +51,14 @@ estudianteController.get('/:rut', async (c) => {
 estudianteController.post('/', async (c) => {
   try {
     const datos = await c.req.json();
-    await service.crearEstudiante(datos);
-    return c.json({ message: 'Estudiante creado correctamente', datos }, { status: 201 });
+    const parsed = crearEstudianteSchema.safeParse(datos);
+    if (!parsed.success) {
+      const msgs = parsed.error.issues.map(i => i.message).join(', ');
+      return c.json({ error: msgs }, { status: 400 });
+    }
+
+    await service.crearEstudiante(parsed.data);
+    return c.json({ message: 'Estudiante creado correctamente', datos: parsed.data }, { status: 201 });
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error al crear estudiante';
     return c.json({ error: mensaje }, { status: 400 });
@@ -62,8 +70,14 @@ estudianteController.put('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
     const datos = await c.req.json();
-    await service.actualizarEstudiante(rut, datos);
-    return c.json({ message: 'Estudiante actualizado correctamente', datos });
+    const parsed = actualizarEstudianteSchema.safeParse(datos);
+    if (!parsed.success) {
+      const msgs = parsed.error.issues.map(i => i.message).join(', ');
+      return c.json({ error: msgs }, { status: 400 });
+    }
+
+    await service.actualizarEstudiante(rut, parsed.data);
+    return c.json({ message: 'Estudiante actualizado correctamente', datos: parsed.data });
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error al actualizar estudiante';
     return c.json({ error: mensaje }, { status: 400 });

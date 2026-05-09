@@ -1,12 +1,18 @@
 import { Hono } from 'hono';
+import { loginAuthBffSchema } from '../dtos/BffDto.js';
 
 const app = new Hono();
 
-const AUTH_SERVICE = process.env.AUTH_SERVICE || 'http://localhost:3002';
+const AUTH_SERVICE = process.env.AUTENTIFICACION_SERVICE || process.env.AUTH_SERVICE || 'http://localhost:3002';
 
 app.post('/login', async (c) => {
   try {
     const body = await c.req.json();
+    const parsed = loginAuthBffSchema.safeParse(body);
+    if (!parsed.success) {
+      const msgs = parsed.error.issues.map(i => i.message).join(', ');
+      return c.json({ error: msgs }, 400);
+    }
     const response = await fetch(`${AUTH_SERVICE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -15,6 +21,7 @@ app.post('/login', async (c) => {
     const data = await response.json();
     return c.json(data, response.status as any);
   } catch (error) {
+    console.error('Auth login error:', error);
     return c.json({ error: 'Error during login' }, 500);
   }
 });

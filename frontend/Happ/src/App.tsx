@@ -1,14 +1,14 @@
 import React, { FC, ReactElement } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './authentication/context/AuthContext';
-import RoleSelection from './authentication/components/RoleSelection';
-import LoginForm from './authentication/components/LoginForm';
-import ProtectedRoute from './authentication/ProtectedRoute';
-import StudentDashboard from './courses/pages/StudentDashboard';
-import ProfessorDashboard from './courses/pages/ProfessorDashboard';
+import WelcomePage from './features/welcome/WelcomePage';
+import LoginForm from './features/auth/LoginForm';
+import ProtectedRoute from './features/auth/ProtectedRoute';
+import StudentDashboard from './features/student/StudentDashboard';
+import ProfessorDashboard from './features/professor/ProfessorDashboard';
+import { useAuthStore } from './features/auth/auth.store';
 
 const Dashboard: FC = (): ReactElement => {
-  const role = sessionStorage.getItem('role');
+  const role = useAuthStore((s) => s.role);
 
   if (role === 'profesor') {
     return <ProfessorDashboard />;
@@ -19,23 +19,21 @@ const Dashboard: FC = (): ReactElement => {
 
 const App: FC = (): ReactElement => {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<RoleSelection />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<WelcomePage />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </Router>
   );
 };
 
