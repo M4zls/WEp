@@ -10,10 +10,6 @@ COPY src ./src
 # Instalar dependencias
 RUN npm install
 
-
-# Compilar TypeScript
-RUN npm run build
-
 # Exponer el puerto
 EXPOSE 3000
 

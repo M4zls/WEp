@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { loginBffSchema } from '../dtos/BffDto.js';
 
 const app = new Hono();
 
@@ -7,6 +8,11 @@ const ESTUDIANTES_SERVICE = process.env.ESTUDIANTES_SERVICE || 'http://localhost
 app.post('/login', async (c) => {
   try {
     const body = await c.req.json();
+    const parsed = loginBffSchema.safeParse(body);
+    if (!parsed.success) {
+      const msgs = parsed.error.issues.map(i => i.message).join(', ');
+      return c.json({ error: msgs }, 400);
+    }
     const response = await fetch(`${ESTUDIANTES_SERVICE}/estudiantes/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

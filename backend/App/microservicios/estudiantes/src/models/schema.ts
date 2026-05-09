@@ -1,10 +1,11 @@
-import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+import { pgSchema, serial, text } from 'drizzle-orm/pg-core';
 
-// Tabla de Estudiantes
-export const estudiantes = sqliteTable('estudiantes', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  rut: text('rut').notNull().unique(),  
-  dv: text('dv').notNull(),  
+const est = pgSchema('estudiantes');
+
+export const estudiantes = est.table('estudiantes', {
+  id: serial('id').primaryKey(),
+  rut: text('rut').notNull().unique(),
+  dv: text('dv').notNull(),
   nombre: text('nombre').notNull(),
   apellido: text('apellido').notNull(),
   cursos: text('cursos').notNull(),

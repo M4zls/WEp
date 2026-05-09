@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Backend - Microservicio de Autentificación
   autentificacion:
@@ -12,8 +10,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3002
-    volumes:
-      - ./backend/App/microservicios/autentificacion/data:/app/data
+      - DATABASE_URL=${DATABASE_URL}
     networks:
       - wep-network
 
@@ -28,8 +25,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-    volumes:
-      - ./backend/App/microservicios/estudiantes/data:/app/data
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - autentificacion
     networks:
@@ -46,8 +42,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3004
-    volumes:
-      - ./backend/App/microservicios/profesores/data:/app/data
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - autentificacion
     networks:
@@ -64,8 +59,24 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3003
-    volumes:
-      - ./backend/App/microservicios/notificaciones/data:/app/data
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      - autentificacion
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Cursos
+  cursos:
+    build:
+      context: ./backend/App/microservicios/cursos
+      dockerfile: Dockerfile
+    container_name: cursos-service
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - autentificacion
     networks:
@@ -86,11 +97,13 @@ services:
       - ESTUDIANTES_SERVICE=http://estudiantes:3001
       - PROFESORES_SERVICE=http://profesores:3004
       - NOTIFICACIONES_SERVICE=http://notificaciones:3003
+      - CURSOS_SERVICE=http://cursos:3005
     depends_on:
       - autentificacion
       - estudiantes
       - profesores
       - notificaciones
+      - cursos
     networks:
       - wep-network
 
