@@ -2,23 +2,12 @@ import React, { FC, ReactElement, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../auth/auth.store';
 import courseService from '../../shared/courses/course.service';
+import { CursoInfo } from './types/CursoInfo';
+import { UserData } from './types/UserData';
+import { colors } from './common/colors';
 
-interface UserData {
-  id?: number;
-  rut?: string;
-  nombre?: string;
-  apellido?: string;
-  email?: string;
-  rol?: string;
-}
 
-interface CursoInfo {
-  id: number;
-  nombre: string;
-  nivel: string;
-  letra: string;
-  materias: { id: number; asignatura_nombre: string; estudiantes: number }[];
-}
+
 
 const ProfessorDashboard: FC = (): ReactElement => {
   const navigate = useNavigate();
@@ -88,14 +77,7 @@ const ProfessorDashboard: FC = (): ReactElement => {
     return `${first}${last}`;
   };
 
-  const colors = [
-    { bg: 'from-emerald-500 to-teal-600', light: 'bg-emerald-50', text: 'text-emerald-600' },
-    { bg: 'from-sky-500 to-blue-600', light: 'bg-sky-50', text: 'text-sky-600' },
-    { bg: 'from-violet-500 to-purple-600', light: 'bg-violet-50', text: 'text-violet-600' },
-    { bg: 'from-rose-500 to-pink-600', light: 'bg-rose-50', text: 'text-rose-600' },
-    { bg: 'from-amber-500 to-orange-600', light: 'bg-amber-50', text: 'text-amber-600' },
-    { bg: 'from-cyan-500 to-blue-600', light: 'bg-cyan-50', text: 'text-cyan-600' },
-  ];
+  
 
   const totalCursos = cursos.length;
   const totalMaterias = cursos.reduce((acc, c) => acc + c.materias.length, 0);
