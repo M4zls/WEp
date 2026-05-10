@@ -1,14 +1,10 @@
+import { StudentData } from './types/Studendata';
+import { StudentLoginResponse } from './types/StudenResponse';
+
 const API_URL: string = 'http://localhost:3000/api';
 
-interface StudentLoginResponse {
-  rut?: string;
-  email?: string;
-  [key: string]: any;
-}
 
-interface StudentData {
-  [key: string]: any;
-}
+
 
 class StudentService {
   async login(email: string, password: string): Promise<StudentLoginResponse> {

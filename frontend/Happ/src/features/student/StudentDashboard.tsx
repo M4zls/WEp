@@ -2,69 +2,68 @@ import React, { FC, ReactElement, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../auth/auth.store';
 import courseService from '../../shared/courses/course.service';
-
-interface UserData {
-  id?: number;
-  rut?: string;
-  nombre?: string;
-  apellido?: string;
-  email?: string;
-  rol?: string;
-}
-
-interface CursoInfo {
-  id: number;
-  nombre: string;
-  nivel: string;
-  letra: string;
-  materias: {
-    id: number;
-    asignatura_nombre: string;
-    profesor_nombre: string;
-  }[];
-}
+import { CursoInfo } from './types/CursoInfoE';
+import { UserData } from './types/Userdata';
 
 const StudentDashboard: FC = (): ReactElement => {
   const navigate = useNavigate();
   const logout = useAuthStore((s) => s.logout);
 
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [cursos, setCursos] = useState<CursoInfo[]>([]);
+  const [curso, setCurso] = useState<CursoInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
     const stored = sessionStorage.getItem('user');
-    if (stored) {
-      const user = JSON.parse(stored) as UserData;
-      setUserData(user);
-
-      const hour = new Date().getHours();
-      if (hour < 12) setGreeting('Buenos días');
-      else if (hour < 18) setGreeting('Buenas tardes');
-      else setGreeting('Buenas noches');
+    if (!stored) {
+      setLoading(false);
+      return;
     }
 
-    courseService.obtenerCursos().then((lista) => {
-      const promesas = lista.map(async (c: any) => {
-        const materias = await courseService.obtenerMaterias(c.id);
-        return {
-          id: c.id,
-          nombre: c.nombre,
-          nivel: c.nivel || '',
-          letra: c.letra || '',
+    const user = JSON.parse(stored) as UserData;
+    setUserData(user);
+
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Buenos días');
+    else if (hour < 18) setGreeting('Buenas tardes');
+    else setGreeting('Buenas noches');
+
+    const loadCurso = async () => {
+      try {
+        const cursoNombre = user.cursos;
+        if (!cursoNombre) {
+          setLoading(false);
+          return;
+        }
+
+        const lista = await courseService.obtenerCursos();
+        const miCurso = lista.find((c: any) => c.nombre === cursoNombre);
+        if (!miCurso) {
+          setLoading(false);
+          return;
+        }
+
+        const materias = await courseService.obtenerMaterias(miCurso.id);
+        setCurso({
+          id: miCurso.id,
+          nombre: miCurso.nombre,
+          nivel: miCurso.nivel || '',
+          letra: miCurso.letra || '',
           materias: materias.map((m: any) => ({
             id: m.id,
             asignatura_nombre: m.asignaturaNombre,
             profesor_nombre: `${m.profesorNombre || ''} ${m.profesorApellido || ''}`.trim() || 'Sin profesor',
           })),
-        };
-      });
-      return Promise.all(promesas);
-    }).then((result) => {
-      setCursos(result);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+        });
+      } catch {
+        // fallback
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCurso();
   }, []);
 
   const handleLogout = (): void => {
@@ -87,6 +86,9 @@ const StudentDashboard: FC = (): ReactElement => {
     { bg: 'from-amber-500 to-orange-600', light: 'bg-amber-50', text: 'text-amber-600' },
     { bg: 'from-cyan-500 to-blue-600', light: 'bg-cyan-50', text: 'text-cyan-600' },
   ];
+
+  const colorIndex = curso ? curso.id % colors.length : 0;
+  const color = colors[colorIndex];
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -114,7 +116,7 @@ const StudentDashboard: FC = (): ReactElement => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {userData && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
             <div className="flex items-center gap-6">
@@ -138,6 +140,12 @@ const StudentDashboard: FC = (): ReactElement => {
                     </svg>
                     {userData.rut}
                   </span>
+                  <span className="inline-flex items-center gap-1 text-sm bg-purple-50 text-purple-600 px-3 py-1 rounded-full font-medium">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    {userData.cursos}
+                  </span>
                 </div>
               </div>
             </div>
@@ -145,69 +153,55 @@ const StudentDashboard: FC = (): ReactElement => {
         )}
 
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-slate-800">Mis Cursos</h3>
-          <p className="text-sm text-slate-500 mt-1">Vista general de tus cursos y asignaturas</p>
+          <h3 className="text-lg font-semibold text-slate-800">Mis Asignaturas</h3>
+          <p className="text-sm text-slate-500 mt-1">
+            {curso ? `Curso: ${curso.nombre}` : 'Curso no asignado'}
+          </p>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {[1, 2].map((i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 border border-slate-200 animate-pulse">
-                <div className="h-5 bg-slate-200 rounded w-1/3 mb-4"></div>
-                <div className="h-3 bg-slate-100 rounded w-2/3 mb-2"></div>
-                <div className="h-3 bg-slate-100 rounded w-1/2"></div>
-              </div>
-            ))}
+          <div className="bg-white rounded-2xl p-6 border border-slate-200 animate-pulse">
+            <div className="h-5 bg-slate-200 rounded w-1/3 mb-4"></div>
+            <div className="h-3 bg-slate-100 rounded w-2/3 mb-2"></div>
+            <div className="h-3 bg-slate-100 rounded w-1/2"></div>
+          </div>
+        ) : curso ? (
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+            <div className={`bg-gradient-to-r ${color.bg} px-6 py-4`}>
+              <h4 className="text-white font-bold text-lg">{curso.nombre}</h4>
+              <p className="text-white/80 text-sm mt-0.5">{curso.materias.length} asignatura(s)</p>
+            </div>
+            <div className="p-6 space-y-3">
+              {curso.materias.length > 0 ? (
+                curso.materias.map((mat) => (
+                  <div key={mat.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg ${color.light} flex items-center justify-center`}>
+                        <svg className={`w-4 h-4 ${color.text}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <span className="font-medium text-slate-700">{mat.asignatura_nombre}</span>
+                        <p className="text-xs text-slate-400">{mat.profesor_nombre}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-400 text-sm text-center py-4">Sin asignaturas asignadas</p>
+              )}
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {cursos.map((curso, idx) => {
-              const color = colors[idx % colors.length];
-              return (
-                <div
-                  key={curso.id}
-                  className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition-all duration-300"
-                >
-                  <div className={`bg-gradient-to-r ${color.bg} px-6 py-4`}>
-                    <h4 className="text-white font-bold text-lg">{curso.nombre}</h4>
-                    <p className="text-white/80 text-sm mt-0.5">{curso.materias.length} asignatura(s)</p>
-                  </div>
-                  <div className="p-6 space-y-3">
-                    {curso.materias.length > 0 ? (
-                      curso.materias.map((mat) => (
-                        <div key={mat.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-lg ${color.light} flex items-center justify-center`}>
-                              <svg className={`w-4 h-4 ${color.text}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
-                            </div>
-                            <div>
-                              <span className="font-medium text-slate-700">{mat.asignatura_nombre}</span>
-                              <p className="text-xs text-slate-400">{mat.profesor_nombre}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-slate-400 text-sm text-center py-4">Sin asignaturas asignadas</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {!loading && cursos.length === 0 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
             <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p className="text-slate-500 font-medium">No tienes cursos asignados</p>
-            <p className="text-slate-400 text-sm mt-1">Espera a que te asignen cursos</p>
+            <p className="text-slate-500 font-medium">No tienes un curso asignado</p>
+            <p className="text-slate-400 text-sm mt-1">Espera a que te asignen un curso</p>
           </div>
         )}
       </div>
