@@ -1,10 +1,15 @@
-import { StudentData } from './types/Studendata';
-import { StudentLoginResponse } from './types/StudenResponse';
+import { UserData } from './types/Userdata';
+
+export interface StudentLoginResponse {
+  rut: string;
+  nombre?: string;
+  apellido?: string;
+  email?: string;
+  cursos?: string;
+  token?: string;
+}
 
 const API_URL: string = 'http://localhost:3000/api';
-
-
-
 
 class StudentService {
   async login(email: string, password: string): Promise<StudentLoginResponse> {
@@ -51,7 +56,7 @@ class StudentService {
     }
   }
 
-  async obtenerEstudiante(rut: string): Promise<StudentData> {
+  async obtenerEstudiante(rut: string): Promise<UserData> {
     try {
       const response = await fetch(`${API_URL}/estudiantes/${rut}`, {
         method: 'GET',
@@ -71,7 +76,7 @@ class StudentService {
     }
   }
 
-  async crearEstudiante(datos: StudentData): Promise<StudentData> {
+  async crearEstudiante(datos: UserData): Promise<UserData> {
     try {
       const response = await fetch(`${API_URL}/estudiantes/`, {
         method: 'POST',
@@ -93,7 +98,7 @@ class StudentService {
     }
   }
 
-  async actualizarEstudiante(rut: string, datos: StudentData): Promise<StudentData> {
+  async actualizarEstudiante(rut: string, datos: UserData): Promise<UserData> {
     try {
       const response = await fetch(`${API_URL}/estudiantes/${rut}`, {
         method: 'PUT',

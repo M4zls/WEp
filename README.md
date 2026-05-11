@@ -10,7 +10,7 @@ Arquitectura de microservicios con backend en Node.js/Hono, frontend en React, b
 | Tecnología | Versión | Propósito | Justificación |
 |---|---|---|---|
 | **Node.js** | 24-alpine | Runtime del backend | Última LTS con soporte ESM nativo, Web Crypto API estable, imagen Alpine liviana (~50MB) |
-| **React** | ^18.2.0 | Librería UI | Estable, hooks , `createRoot`, ecosistema consolidado |
+| **React** | ^18.2.0 | Librería UI | Estable, hooks, `createRoot`, ecosistema consolidado |
 | **TypeScript** | ^5.9.3 | Lenguaje con tipos | Inferencia mejorada, `satisfies`, ESM estable, tipado estricto completo |
 | **Hono** | ^4.12.15 | Framework web backend | Ultraligero, ESM nativo, integración JWT nativa (`hono/jwt`), middleware simple |
 | **Zod** | ^4.4.3 | Validación DTOs | Schemas declarativos con inferencia automática de tipos, integración OpenAPI directa |
@@ -59,6 +59,7 @@ src/
 ```
 
 - **Screaming Architecture**: la estructura del proyecto grita su propósito de negocio (welcome, auth, student, professor) en lugar de capas técnicas (components, services, pages, store)
+- **Vite**: build tool moderna (~1s build, HMR instantáneo), reemplaza a Create React App (antes ~30s build, recarga completa en desarrollo)
 - **Single Page Application (SPA)**: navegación sin recargar el navegador, React Router v6 con rutas protegidas
 - **Component-Based Architecture (CBA)**: componentes funcionales reutilizables (FC + ReactElement), responsabilidad única
 - **State Management Pattern**: Zustand centraliza el estado global de autenticación con middleware `persist` en sessionStorage, sin providers
@@ -157,7 +158,7 @@ El frontend detecta el rol automáticamente desde el email (sin pantalla de sele
 ```
 
 - Variables de entorno centralizadas en `.env` (`DATABASE_URL`)
-- Frontend: build multi-stage con `node:24-alpine`, sirve con `serve -s build`
+- Frontend: build multi-stage con `node:24-alpine`, compila con Vite (output `dist/`), sirve con `serve -s dist`
 - Backend: cada microservicio corre con `npx tsx` (sin compilar)
 - **Windows + Supabase IPv6**: se usa `netsh interface portproxy` para redirigir IPv4 → IPv6
 
@@ -186,6 +187,7 @@ El frontend detecta el rol automáticamente desde el email (sin pantalla de sele
 | Zustand | ^5.x |
 | tsx | ^4.21.0 |
 | react-router-dom | ^6.30.3 |
-| react-scripts | 5.0.1 |
+| Vite | ^6.4.2 |
+| @vitejs/plugin-react | ^4.7.0 |
 | Drizzle Kit | ^0.31.10 |
 | @hono/node-server | ^2.0.0 |
