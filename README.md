@@ -11,6 +11,7 @@ Arquitectura de microservicios con backend en Node.js/Hono, frontend en React, b
 |---|---|---|---|
 | **Node.js** | 24-alpine | Runtime del backend | Última LTS con soporte ESM nativo, Web Crypto API estable, imagen Alpine liviana (~50MB) |
 | **React** | ^18.2.0 | Librería UI | Estable, hooks, `createRoot`, ecosistema consolidado |
+| **Vite** | ^6.4.2 | Build tool | HMR instantáneo, build ~1s (vs ~30s CRA), 139 dependencias (vs ~2000 CRA), Tree-shaking nativo |
 | **TypeScript** | ^5.9.3 | Lenguaje con tipos | Inferencia mejorada, `satisfies`, ESM estable, tipado estricto completo |
 | **Hono** | ^4.12.15 | Framework web backend | Ultraligero, ESM nativo, integración JWT nativa (`hono/jwt`), middleware simple |
 | **Zod** | ^4.4.3 | Validación DTOs | Schemas declarativos con inferencia automática de tipos, integración OpenAPI directa |
@@ -59,7 +60,7 @@ src/
 ```
 
 - **Screaming Architecture**: la estructura del proyecto grita su propósito de negocio (welcome, auth, student, professor) en lugar de capas técnicas (components, services, pages, store)
-- **Vite**: build tool moderna (~1s build, HMR instantáneo), reemplaza a Create React App (antes ~30s build, recarga completa en desarrollo)
+- **Vite**: build tool moderna (~1s build, HMR instantáneo),
 - **Single Page Application (SPA)**: navegación sin recargar el navegador, React Router v6 con rutas protegidas
 - **Component-Based Architecture (CBA)**: componentes funcionales reutilizables (FC + ReactElement), responsabilidad única
 - **State Management Pattern**: Zustand centraliza el estado global de autenticación con middleware `persist` en sessionStorage, sin providers
