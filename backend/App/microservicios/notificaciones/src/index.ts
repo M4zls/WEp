@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors';
 import { getDatabaseinstance } from './models/data.js';
+import { notificacionesController } from './controllers/NotificacionesController.js';
 
 const app = new Hono()
 
@@ -9,7 +10,8 @@ getDatabaseinstance();
 
 app.use(cors());
 
-// Rutas de notificaciones irán aquí
+app.route('/notificaciones', notificacionesController);
+
 app.get('/health', (c) => c.json({ status: 'ok' }))
 
 serve({

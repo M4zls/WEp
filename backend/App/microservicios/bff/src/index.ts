@@ -5,6 +5,7 @@ import estudiantesRoutes from './routes/estudiantesRoutes';
 import profesoresRoutes from './routes/profesoresRoutes';
 import autentificacionRoutes from './routes/autentificacionRoutes';
 import cursosRoutes from './routes/cursosRoutes';
+import notificacionesRoutes from './routes/notificacionesRoutes';
 import openapiRoutes from './openapi.js';
 
 const app = new Hono();
@@ -19,6 +20,7 @@ app.route('/docs', openapiRoutes);
 app.route('/api/estudiantes', estudiantesRoutes);
 app.route('/api/profesores', profesoresRoutes);
 app.route('/api/auth', autentificacionRoutes);
+app.route('/api/notificaciones', notificacionesRoutes);
 app.route('/api/cursos', cursosRoutes);
 
 // Health check

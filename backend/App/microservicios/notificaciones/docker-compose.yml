@@ -1,0 +1,2 @@
+environment:
+  NOVU_SECRET_KEY=${4584712eea272c97f2344b16b2b28e9d}
