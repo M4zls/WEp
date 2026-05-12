@@ -4,4 +4,4 @@ COPY package*.json ./
 COPY ./drizzle ./drizzle
 COPY seed.ts drizzle.config.ts tsconfig.json ./
 RUN npm install
-CMD ["npx", "tsx", "--env-file=.env", "seed.ts"]
+CMD ["npx", "tsx", "seed.ts"]
