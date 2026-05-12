@@ -22,9 +22,15 @@ export const asignaturas = cursosSchema.table('asignaturas', {
 
 export const profesores = profesoresSchema.table('profesores', {
   id: serial('id').primaryKey(),
-  rut: text('rut').notNull(),
+  rut: text('rut').notNull().unique(),
+  dv: text('dv').notNull(),
   nombre: text('nombre').notNull(),
   apellido: text('apellido').notNull(),
+  email: text('email').notNull().unique(),
+  password: text('password').notNull(),
+  telefono: text('telefono'),
+  materia: text('materia').notNull(),
+  fechaIngreso: text('fecha_ingreso').default(new Date().toISOString()),
 });
 
 export const cursoAsignatura = cursosSchema.table('curso_asignatura', {

@@ -1,4 +1,39 @@
 services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: wep-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: wep
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wep-network
+
+  # Setup - Migraciones + Seed (se ejecuta una vez)
+  setup:
+    build:
+      context: ./backend/App
+      dockerfile: Dockerfile.setup
+    container_name: wep-setup
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - wep-network
+
   # Backend - Microservicio de Autentificación
   autentificacion:
     build:
@@ -10,7 +45,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3002
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - wep-network
 
@@ -25,9 +63,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
     depends_on:
-      - autentificacion
+      db:
+        condition: service_healthy
     networks:
       - wep-network
 
@@ -42,9 +81,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3004
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
     depends_on:
-      - autentificacion
+      db:
+        condition: service_healthy
     networks:
       - wep-network
 
@@ -59,9 +99,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3003
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
     depends_on:
-      - autentificacion
+      db:
+        condition: service_healthy
     networks:
       - wep-network
 
@@ -76,9 +117,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3005
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
     depends_on:
-      - autentificacion
+      db:
+        condition: service_healthy
     networks:
       - wep-network
 
@@ -121,6 +163,9 @@ services:
       - bff
     networks:
       - wep-network
+
+volumes:
+  pgdata:
 
 networks:
   wep-network:

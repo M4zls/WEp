@@ -1,7 +1,7 @@
 # Portal Educativo — Colegio Bernardo O'Higgins
 
 Plataforma web para gestionar estudiantes, profesores, cursos y asignaturas.  
-Arquitectura de microservicios con backend en Node.js/Hono, frontend en React, base de datos PostgreSQL (Supabase), todo contenerizado con Docker.
+Arquitectura de microservicios con backend en Node.js/Hono, frontend en React, base de datos PostgreSQL, todo contenerizado con Docker.
 
 ---
 
@@ -21,7 +21,7 @@ Arquitectura de microservicios con backend en Node.js/Hono, frontend en React, b
 | **Zustand** | ^5.x | Estado global | Store liviano (<1KB), sin context providers, re-renders óptimos, middleware `persist` |
 | **tsx** | ^4.21.0 | Ejecutor TypeScript | Corre TypeScript directo sin compilar, ideal para contenedores y dev |
 | **react-router-dom** | ^6.30.3 | Enrutamiento SPA | Loaders, acciones, navegación declarativa |
-| **Supabase** | — | Hosting PostgreSQL | Base de datos administrada (no se usa auth de Supabase, todo es JWT propio) |
+| **PostgreSQL 16 Alpine** | 16 | Base de datos relacional | Imagen oficial liviana (~80MB), healthcheck nativo, volumen persistente |
 | **Docker Compose** | — | Orquestación | Multi-servicio, red bridge, variables de entorno centralizadas |
 | **JWT (hono/jwt)** | — | Autenticación | Tokens firmados con secret propio, sesiones persistentes en DB, sin depender de terceros |
 | **SHA-256 (Web Crypto)** | — | Hashing passwords | Algoritmo estándar implementado nativamente en Node.js |
@@ -129,10 +129,25 @@ El frontend solo conoce al BFF. Los microservicios internos no son accesibles de
 
 ## Base de Datos
 
-- **Supabase PostgreSQL** usado solo como hosting de base de datos
+- **PostgreSQL 16 Alpine** corriendo en contenedor Docker (servicio `db`)
 - Cada microservicio tiene su propio schema PostgreSQL aislado via `pgSchema('nombre')` en Drizzle
-- Migraciones gestionadas con `drizzle-kit` desde `drizzle.config.ts`
-- Seed ejecutado con `tsx backend/App/seed.ts` — datos de prueba: 6 cursos, 3 asignaturas, 5 profesores, 10 estudiantes, 18 relaciones curso-asignatura-profesor
+- Credenciales locales: `postgres` / `postgres` / base `wep`, expuesto en puerto `5432`
+- Migraciones SQL generadas con `drizzle-kit generate` desde los schemas definidos en `drizzle.config.ts`
+- Las migraciones se ejecutan automáticamente al correr `npm run seed` (via `drizzle-orm/postgres-js/migrator`)
+- Datos de prueba (seed): 6 cursos, 3 asignaturas, 5 profesores, 10 estudiantes, 18 relaciones curso-asignatura-profesor
+
+### Flujo de migración
+
+```bash
+# Iniciar PostgreSQL
+docker compose up -d db
+
+# Ejecutar migraciones (crea schemas + tablas)
+cd backend/App && npm run seed
+
+# O solo migrar sin seed:
+npm run migrate
+```
 
 ### Dominios de email
 
@@ -148,20 +163,38 @@ El frontend detecta el rol automáticamente desde el email (sin pantalla de sele
 ## Docker
 
 ```yaml
-7 servicios en red bridge "wep-network":
+8 servicios en red bridge "wep-network":
+- db            PostgreSQL 16 Alpine (5432)
 - autentificacion (3002)
-- estudiantes (3001)
-- profesores (3004)
-- cursos (3005)
-- notificaciones (3003)
-- bff (3000)
-- frontend (8080)
+- estudiantes      (3001)
+- profesores       (3004)
+- cursos           (3005)
+- notificaciones   (3003)
+- bff              (3000)
+- frontend         (8080)
 ```
 
+- PostgreSQL con healthcheck (`pg_isready`), volumen persistente `pgdata`
+- Todos los microservicios esperan a que PostgreSQL esté healthy antes de iniciar
 - Variables de entorno centralizadas en `.env` (`DATABASE_URL`)
 - Frontend: build multi-stage con `node:24-alpine`, compila con Vite (output `dist/`), sirve con `serve -s dist`
 - Backend: cada microservicio corre con `npx tsx` (sin compilar)
-- **Windows + Supabase IPv6**: se usa `netsh interface portproxy` para redirigir IPv4 → IPv6
+
+---
+
+---
+
+## Quick Start (desde cero)
+
+```bash
+git clone <repo>
+cd Wep
+
+# Iniciar todo (PostgreSQL → setup migra + seed → microservicios → frontend)
+docker compose up -d
+
+# Abrir http://localhost:8080
+```
 
 ---
 
