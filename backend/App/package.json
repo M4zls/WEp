@@ -13,6 +13,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "migrate": "tsx --env-file=.env drizzle/migrate.ts",
+    "seed": "tsx --env-file=.env seed.ts",
     "dev:estudiantes": "npm run -w microservicios/estudiantes dev",
     "dev:autentificacion": "npm run -w microservicios/autentificacion dev",
     "dev:notificaciones": "npm run -w microservicios/notificaciones dev",

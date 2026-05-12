@@ -1,7 +1,21 @@
 import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { createHash } from 'crypto';
 
-const sql = postgres(process.env.DATABASE_URL!, { max: 1 });
+const connectionString = process.env.DATABASE_URL!;
+const sql = postgres(connectionString, { max: 1 });
+const db = drizzle(sql);
+
+// Crear schemas antes de migrar
+await sql`CREATE SCHEMA IF NOT EXISTS autentificacion`;
+await sql`CREATE SCHEMA IF NOT EXISTS estudiantes`;
+await sql`CREATE SCHEMA IF NOT EXISTS profesores`;
+await sql`CREATE SCHEMA IF NOT EXISTS cursos`;
+await sql`CREATE SCHEMA IF NOT EXISTS notificaciones`;
+
+await migrate(db, { migrationsFolder: './drizzle' });
+console.log('Migraciones ejecutadas correctamente.');
 
 function sha256(pass: string): string {
   return createHash('sha256').update(pass).digest('hex');
