@@ -1,24 +1,22 @@
 # Build stage
-FROM node:24-alpine AS builder
+FROM oven/bun:latest AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY package.json ./
+RUN bun install
 
 COPY . .
 
-RUN npm run build
+RUN bun run build
 
 # Runtime stage
-FROM node:24-alpine
+FROM oven/bun:latest
 
 WORKDIR /app
-
-RUN npm install -g serve
 
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 8080
 
-CMD ["serve", "-s", "dist", "-p", "8080"]
+CMD ["bun", "x", "serve", "-s", "dist", "-p", "8080"]

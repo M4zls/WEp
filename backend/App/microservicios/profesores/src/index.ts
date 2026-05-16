@@ -1,19 +1,17 @@
-import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors';
 import { profesoresController } from './controllers/ProfesoresController.js';
-import { getDatabaseinstance } from './models/data.js';
 
 const app = new Hono()
-
-getDatabaseinstance(); 
 
 app.use(cors());
 app.route('/profesores', profesoresController);
 
-serve({
+const port = Number(process.env.PORT ?? '3004');
+
+Bun.serve({
   fetch: app.fetch,
-  port: 3004,
-}, (info) => {
-  console.log(`Microservicio Profesores running on http://localhost:${info.port}`)
-})
+  port,
+});
+
+console.log(`Microservicio Profesores running on http://localhost:${port}`)

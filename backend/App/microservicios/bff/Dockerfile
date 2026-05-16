@@ -1,17 +1,13 @@
-FROM node:24-alpine
+FROM oven/bun:latest
 
 WORKDIR /app
 
-# Copiar package.json y package-lock.json
-COPY package*.json ./
+COPY package.json ./
 COPY tsconfig.json ./
 COPY src ./src
 
-# Instalar dependencias
-RUN npm install
+RUN bun install
 
-# Exponer el puerto
 EXPOSE 3000
 
-# Iniciar el servicio con npx tsx
-CMD ["npx", "tsx", "src/index.ts"]
+CMD ["bun", "src/index.ts"]

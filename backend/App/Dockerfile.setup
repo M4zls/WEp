@@ -1,7 +1,7 @@
-FROM node:24-alpine
+FROM oven/bun:latest
 WORKDIR /app
-COPY package*.json ./
+COPY package.json ./
 COPY ./drizzle ./drizzle
 COPY seed.ts drizzle.config.ts tsconfig.json ./
-RUN npm install
-CMD ["npx", "tsx", "seed.ts"]
+RUN bun install
+CMD ["bun", "seed.ts"]

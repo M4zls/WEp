@@ -1,4 +1,4 @@
-/// <reference types="node" />
+/// <reference types="bun" />
 import { Hono } from 'hono';
 
 const app = new Hono();

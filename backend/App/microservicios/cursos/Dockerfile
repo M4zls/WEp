@@ -1,12 +1,12 @@
-FROM node:24-alpine
+FROM oven/bun:latest
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json ./
 COPY src ./src
 
-RUN npm install
+RUN bun install
 
 EXPOSE 3005
 
-CMD ["npx", "tsx", "src/index.ts"]
+CMD ["bun", "src/index.ts"]
