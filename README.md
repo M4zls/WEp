@@ -30,10 +30,51 @@ Digitalizar y unificar los procesos administrativos y académicos del colegio, r
 
 ## Arquitectura
 
-```
-Frontend (React SPA) → BFF → [autentificacion, estudiantes, profesores, cursos, notificaciones]
-                                                                          │
-                                                                  PostgreSQL 16
+```mermaid
+flowchart TB
+    Browser["Navegador"]
+
+    subgraph Frontend["Frontend - React SPA (8080)"]
+        ReactApp["App.tsx<br/>Router + ErrorBoundary"]
+        Features["features/<br/>auth / student / professor / welcome"]
+        Shared["shared/<br/>apiClient / components"]
+    end
+
+    subgraph BFF["BFF - Hono (3000)"]
+        BFFRoutes["routes/*.ts"]
+        OpenAPI["openapi.ts<br/>Swagger UI"]
+    end
+
+    subgraph Microservices["Microservicios Backend"]
+        Auth["Autentificación<br/>(3002)"]
+        Students["Estudiantes<br/>(3001)"]
+        Teachers["Profesores<br/>(3004)"]
+        Courses["Cursos<br/>(3005)"]
+        Notif["Notificaciones<br/>(3003)"]
+    end
+
+    subgraph DB["PostgreSQL 16 (5432)"]
+        S1["schema: autentificacion"]
+        S2["schema: estudiantes"]
+        S3["schema: profesores"]
+        S4["schema: cursos"]
+        S5["schema: notificaciones"]
+    end
+
+    Browser --> ReactApp
+    ReactApp --> Features
+    Features --> Shared
+    Shared --> BFFRoutes
+    BFFRoutes --> Auth
+    BFFRoutes --> Students
+    BFFRoutes --> Teachers
+    BFFRoutes --> Courses
+    BFFRoutes --> Notif
+    Auth --> S1
+    Students --> S2
+    Teachers --> S3
+    Courses --> S4
+    Notif --> S5
 ```
 
 - **Frontend**: aplicación React de página única (SPA) que consume una sola API (el BFF)
