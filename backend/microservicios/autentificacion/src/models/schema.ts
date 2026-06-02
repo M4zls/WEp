@@ -1,10 +1,11 @@
 
 import { pgSchema,serial,integer,text,boolean }from 'drizzle-orm/pg-core';
+import { User } from './types';
 
 const autentificacion = pgSchema('autentificacion');
 
 // Tabla de Usuarios
-export const usuarios = autentificacion.table('usuarios', {
+export const user = autentificacion.table('usuarios', {
   id: serial('id').primaryKey(),
   rut: text('rut').notNull().unique(),
   dv: text('dv').notNull(),
@@ -15,14 +16,14 @@ export const usuarios = autentificacion.table('usuarios', {
   rol: text('rol').notNull().default('estudiante'), // estudiante, profesor, admin
   activo: boolean('activo').default(true),
   fechaCreacion: text('fecha_creacion').default(new Date().toISOString()),
-});
+}) as User;
 
 // Tabla de Sesiones
 export const sesiones = autentificacion.table('sesiones', {
   id: serial('id').primaryKey(),
   usuarioId: integer('usuario_id')
     .notNull()
-    .references(() => usuarios.id, { onDelete: 'cascade' }),
+    .references(() => user.id, { onDelete: 'cascade' }),
   token: text('token').notNull().unique(),
   expiresAt: text('expires_at').notNull(),
   createdAt: text('created_at').default(new Date().toISOString()),
@@ -40,7 +41,10 @@ export const tokensRecuperacion = autentificacion.table('tokens_recuperacion', {
   createdAt: text('created_at').default(new Date().toISOString()),
 });
 
-// Tabla de Permisos
+/**
+ * Tabla de permisos
+ * Esta entidad sirve para...
+ */
 export const permisos = autentificacion.table('permisos', {
   id: serial('id').primaryKey(),
   usuarioId: integer('usuario_id')

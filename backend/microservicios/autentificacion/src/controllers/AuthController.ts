@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { AuthService } from '../services/AuthService.js';
 import { loginAuthSchema, registerSchema } from '../dtos/AuthDto.js';
+import { ErrorBuilder } from '../common/ErrorBuilder.js';
+import { HTTPStatusCode } from '../common/Consts.js';
 
 const auth = new Hono();
 const service = new AuthService();
@@ -10,13 +12,13 @@ auth.post('/login', async (c) => {
   try {
     const body = await c.req.json();
     const parsed = loginAuthSchema.safeParse(body);
-    if (!parsed.success) {
-      const msgs = parsed.error.issues.map(i => i.message).join(', ');
-      return c.json({ error: msgs }, 400);
+    const { success, data: { identifier, password } } = parsed;
+    if (!success) {
+      return c.json(ErrorBuilder.getEntityFromErrorParsed(parsed), HTTPStatusCode.BAD_REQUEST);
     }
 
-    const result = await service.login(parsed.data.identifier, parsed.data.password);
-    return c.json(result, 200);
+    const result = await service.login(identifier, password);
+    return c.json(result, HTTPStatusCode.SUCCESS);
   } catch (err: any) {
     return c.json({ error: err.message }, 401);
   }
@@ -28,8 +30,7 @@ auth.post('/register', async (c) => {
     const body = await c.req.json();
     const parsed = registerSchema.safeParse(body);
     if (!parsed.success) {
-      const msgs = parsed.error.issues.map(i => i.message).join(', ');
-      return c.json({ error: msgs }, 400);
+      return c.json(ErrorBuilder.getEntityFromErrorParsed(parsed), 400);
     }
 
     const result = await service.register(parsed.data);
