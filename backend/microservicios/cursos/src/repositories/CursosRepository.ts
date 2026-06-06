@@ -1,11 +1,11 @@
 import { eq } from 'drizzle-orm';
-import { getDatabaseinstance } from '../models/data.js';
+import { getDatabaseInstance } from '../models/data.js';
 import { cursos, asignaturas, cursoAsignatura, profesores } from '../models/schema.js';
-import type { Curso, Asignatura, CursoAsignatura } from '../types/index.js';
+import type { Curso, Asignatura, CursoAsignatura } from '../types/CursoTypes.js';
 
 export class CursosRepository {
   private get db() {
-    return getDatabaseinstance();
+    return getDatabaseInstance();
   }
 
   // Cursos

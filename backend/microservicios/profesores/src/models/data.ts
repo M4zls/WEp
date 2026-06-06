@@ -7,4 +7,4 @@ if (!connectionString) throw new Error('DATABASE_URL is required');
 
 const client = postgres(connectionString, { max: 10 });
 
-export const getDatabaseinstance = () => drizzle(client, { schema });
+export const getDatabaseInstance = () => drizzle(client, { schema });

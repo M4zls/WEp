@@ -1,8 +1,9 @@
+import { sql } from 'drizzle-orm';
 import { pgSchema, serial, text } from 'drizzle-orm/pg-core';
 
-const est = pgSchema('estudiantes');
+const estudiantesSchema = pgSchema('estudiantes');
 
-export const estudiantes = est.table('estudiantes', {
+export const estudiantes = estudiantesSchema.table('estudiantes', {
   id: serial('id').primaryKey(),
   rut: text('rut').notNull().unique(),
   dv: text('dv').notNull(),
@@ -13,5 +14,5 @@ export const estudiantes = est.table('estudiantes', {
   password: text('password').notNull(),
   telefono: text('telefono'),
   apoderado: text('apoderado'),
-  fechaRegistro: text('fecha_registro').default(new Date().toISOString()),
+  fechaRegistro: text('fecha_registro').default(sql`now()::text`),
 });

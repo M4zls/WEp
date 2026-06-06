@@ -1,30 +1,29 @@
-import { getDatabaseinstance } from '../models/data.js';
+import { getDatabaseInstance } from '../models/data.js';
 import { estudiantes } from '../models/schema.js';
 import { eq } from 'drizzle-orm';
+import type { IEstudiante } from '../types/Estudiante.js';
 
-export interface IEstudiante {
-    id?: number;
-    rut: string;
-    dv: string;
-    nombre: string;
-    apellido: string;
-    cursos: string;
-    email: string;
-    password: string;
-    telefono?: string | null;
-    apoderado?: string | null;
-    fechaRegistro?: string | null;
-}
-
+/**
+ * Repositorio encargado del acceso a datos de estudiantes.
+ */
 export class EstudiantesRepository {
-    private db = getDatabaseinstance();
+    private db = getDatabaseInstance();
 
-    async obtenerTodos(): Promise<IEstudiante[]> {
+    /**
+     * Obtiene todos los estudiantes almacenados.
+     * @returns {Promise<IEstudiante[]>} Todos los estudiantes en la base de datos.
+     */
+    async getAllStudents(): Promise<IEstudiante[]> {
         const resultado = await this.db.select().from(estudiantes);
         return resultado;
     }
 
-    async obtenerRut(rut: string): Promise<IEstudiante | null> {
+    /**
+     * Busca un estudiante por su RUT.
+     * @param {string} rut - RUT del estudiante a buscar.
+     * @returns {Promise<IEstudiante | null>} El estudiante encontrado o null.
+     */
+    async findStudentByRut(rut: string): Promise<IEstudiante | null> {
         const resultado = await this.db
             .select()
             .from(estudiantes)
@@ -33,7 +32,12 @@ export class EstudiantesRepository {
         return resultado.length > 0 ? resultado[0] : null;
     }
 
-    async obtenerPorEmail(email: string): Promise<IEstudiante | null> {
+    /**
+     * Busca un estudiante por su correo electrónico.
+     * @param {string} email - Email del estudiante a buscar.
+     * @returns {Promise<IEstudiante | null>} El estudiante encontrado o null.
+     */
+    async findStudentByEmail(email: string): Promise<IEstudiante | null> {
         const resultado = await this.db
             .select()
             .from(estudiantes)
@@ -42,7 +46,12 @@ export class EstudiantesRepository {
         return resultado.length > 0 ? resultado[0] : null;
     }
 
-    async crear(datos: IEstudiante): Promise<void> {
+    /**
+     * Crea un nuevo estudiante.
+     * @param {IEstudiante} datos - Datos del estudiante a insertar.
+     * @returns {Promise<void>} Resuelve cuando la inserción termina.
+     */
+    async createStudent(datos: IEstudiante): Promise<void> {
         await this.db.insert(estudiantes).values({
             rut: datos.rut,
             dv: datos.dv,
@@ -53,24 +62,39 @@ export class EstudiantesRepository {
             password: datos.password,
             telefono: datos.telefono,
             apoderado: datos.apoderado,
-            fechaRegistro: new Date().toISOString(),
         });
     }
 
-    async actualizar(rut: string, datos: Partial<IEstudiante>): Promise<void> {
+    /**
+     * Actualiza los datos de un estudiante por su RUT.
+     * @param {string} rut - RUT del estudiante a actualizar.
+     * @param {Partial<IEstudiante>} datos - Campos a actualizar.
+     * @returns {Promise<void>} Resuelve cuando la actualización termina.
+     */
+    async updateStudent(rut: string, datos: Partial<IEstudiante>): Promise<void> {
         await this.db
             .update(estudiantes)
             .set(datos)
             .where(eq(estudiantes.rut, rut));
     }
 
-    async eliminar(rut: string): Promise<void> {
+    /**
+     * Elimina un estudiante por su RUT.
+     * @param {string} rut - RUT del estudiante a eliminar.
+     * @returns {Promise<void>} Resuelve cuando la eliminación termina.
+     */
+    async deleteStudent(rut: string): Promise<void> {
         await this.db
             .delete(estudiantes)
             .where(eq(estudiantes.rut, rut));
     }
 
-    async obtenerCurso(curso: string): Promise<IEstudiante[]> {
+    /**
+     * Obtiene los estudiantes asociados a un curso.
+     * @param {string} curso - Curso por el cual filtrar estudiantes.
+     * @returns {Promise<IEstudiante[]>} Lista de estudiantes en el curso.
+     */
+    async findStudentsByCourse(curso: string): Promise<IEstudiante[]> {
         const resultado = await this.db
             .select()
             .from(estudiantes)

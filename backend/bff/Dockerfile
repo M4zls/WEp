@@ -3,6 +3,7 @@ FROM oven/bun:latest
 WORKDIR /app
 
 COPY package.json ./
+COPY bun.lock ./
 COPY tsconfig.json ./
 COPY src ./src
 

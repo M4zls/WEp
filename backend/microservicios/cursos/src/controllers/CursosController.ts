@@ -3,9 +3,18 @@ import { CursosService } from '../services/CursosService.js';
 import { crearCursoSchema, crearAsignaturaSchema, asignarMateriaSchema } from '../dtos/CursoDto.js';
 
 const service = new CursosService();
+
+/**
+ * Controller HTTP para la gestión de cursos, asignaturas y asignaciones.
+ */
 export const cursosController = new Hono();
 
-// Rutas fijas de asignaturas (deben ir ANTES de /:id)
+/**
+ * Lista todas las asignaturas registradas.
+ * @route GET /cursos/asignaturas
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Lista de asignaturas.
+ */
 cursosController.get('/asignaturas', async (c) => {
   try {
     const asignaturas = await service.listarAsignaturas();
@@ -15,6 +24,12 @@ cursosController.get('/asignaturas', async (c) => {
   }
 });
 
+/**
+ * Crea una nueva asignatura.
+ * @route POST /cursos/asignaturas
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Asignatura creada.
+ */
 cursosController.post('/asignaturas', async (c) => {
   try {
     const data = await c.req.json();
@@ -30,6 +45,12 @@ cursosController.post('/asignaturas', async (c) => {
   }
 });
 
+/**
+ * Actualiza una asignatura existente.
+ * @route PUT /cursos/asignaturas/:id
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Confirmación de actualización.
+ */
 cursosController.put('/asignaturas/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
@@ -46,6 +67,12 @@ cursosController.put('/asignaturas/:id', async (c) => {
   }
 });
 
+/**
+ * Elimina una asignatura por su identificador.
+ * @route DELETE /cursos/asignaturas/:id
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Confirmación de eliminación.
+ */
 cursosController.delete('/asignaturas/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
@@ -56,7 +83,12 @@ cursosController.delete('/asignaturas/:id', async (c) => {
   }
 });
 
-// Rutas fijas de asignar-materia (deben ir ANTES de /:cursoId/materias)
+/**
+ * Asigna una materia a un curso.
+ * @route POST /cursos/asignar-materia
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Resultado de la asignación.
+ */
 cursosController.post('/asignar-materia', async (c) => {
   try {
     const data = await c.req.json();
@@ -72,6 +104,12 @@ cursosController.post('/asignar-materia', async (c) => {
   }
 });
 
+/**
+ * Actualiza una asignación entre curso y materia.
+ * @route PUT /cursos/asignar-materia/:id
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Confirmación de actualización.
+ */
 cursosController.put('/asignar-materia/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
@@ -88,6 +126,12 @@ cursosController.put('/asignar-materia/:id', async (c) => {
   }
 });
 
+/**
+ * Elimina una asignación entre curso y materia.
+ * @route DELETE /cursos/asignar-materia/:id
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Confirmación de eliminación.
+ */
 cursosController.delete('/asignar-materia/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
@@ -98,7 +142,12 @@ cursosController.delete('/asignar-materia/:id', async (c) => {
   }
 });
 
-// Cursos
+/**
+ * Lista todos los cursos.
+ * @route GET /cursos
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Lista de cursos.
+ */
 cursosController.get('/', async (c) => {
   try {
     const cursos = await service.listarCursos();
@@ -108,6 +157,12 @@ cursosController.get('/', async (c) => {
   }
 });
 
+/**
+ * Obtiene un curso por su identificador.
+ * @route GET /cursos/:id
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Curso encontrado con sus materias.
+ */
 cursosController.get('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
@@ -118,6 +173,12 @@ cursosController.get('/:id', async (c) => {
   }
 });
 
+/**
+ * Crea un nuevo curso.
+ * @route POST /cursos
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Curso creado.
+ */
 cursosController.post('/', async (c) => {
   try {
     const data = await c.req.json();
@@ -133,6 +194,12 @@ cursosController.post('/', async (c) => {
   }
 });
 
+/**
+ * Actualiza un curso por su identificador.
+ * @route PUT /cursos/:id
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Confirmación de actualización.
+ */
 cursosController.put('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
@@ -149,6 +216,12 @@ cursosController.put('/:id', async (c) => {
   }
 });
 
+/**
+ * Elimina un curso por su identificador.
+ * @route DELETE /cursos/:id
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Confirmación de eliminación.
+ */
 cursosController.delete('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
@@ -159,7 +232,12 @@ cursosController.delete('/:id', async (c) => {
   }
 });
 
-// Curso-Asignatura (parametrizada, va al final)
+/**
+ * Obtiene las materias asociadas a un curso.
+ * @route GET /cursos/:cursoId/materias
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Lista de materias del curso.
+ */
 cursosController.get('/:cursoId/materias', async (c) => {
   try {
     const cursoId = parseInt(c.req.param('cursoId'));

@@ -1,11 +1,20 @@
 import { novu } from '../common/novu.js';
-import type { AvisoInasistenciaDto } from '../dtos/NotificacionDto.js';
+import { NOTIFICATION_WORKFLOWS } from '../common/Consts.js';
+import type { AvisoInasistenciaDto } from '../types/Notificacion.js';
 
+/**
+ * Servicio encargado de disparar notificaciones externas.
+ */
 export class NotificacionesService {
 
-  async triggerAvisoInasistencia(data: AvisoInasistenciaDto) {
+  /**
+   * Envía un aviso de inasistencia mediante Novu.
+   * @param {AvisoInasistenciaDto} data - Datos del aviso de inasistencia.
+   * @returns {Promise<void>} Resuelve cuando la notificación es enviada.
+   */
+  async sendAttendanceNotice(data: AvisoInasistenciaDto) {
   await novu.trigger({
-    workflowId: 'aviso-inasistencia',
+    workflowId: NOTIFICATION_WORKFLOWS.ATTENDANCE_NOTICE,
     to: {
       subscriberId: data.subscriberId,
       firstName: data.firstName,
@@ -19,8 +28,8 @@ export class NotificacionesService {
       fecha: data.fecha,
     },
   });
-  
-}
+
+  }
 
 
 }

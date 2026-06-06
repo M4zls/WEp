@@ -1,11 +1,10 @@
 
-import { pgSchema,serial,integer,text,boolean }from 'drizzle-orm/pg-core';
-import { User } from './types';
+import { sql } from 'drizzle-orm';
+import { pgSchema, serial, integer, text, boolean } from 'drizzle-orm/pg-core';
 
-const autentificacion = pgSchema('autentificacion');
+const autentificacionSchema = pgSchema('autentificacion');
 
-// Tabla de Usuarios
-export const user = autentificacion.table('usuarios', {
+export const usuarios = autentificacionSchema.table('usuarios', {
   id: serial('id').primaryKey(),
   rut: text('rut').notNull().unique(),
   dv: text('dv').notNull(),
@@ -15,22 +14,20 @@ export const user = autentificacion.table('usuarios', {
   password: text('password').notNull(),
   rol: text('rol').notNull().default('estudiante'), // estudiante, profesor, admin
   activo: boolean('activo').default(true),
-  fechaCreacion: text('fecha_creacion').default(new Date().toISOString()),
-}) as User;
+  fechaCreacion: text('fecha_creacion').default(sql`now()::text`),
+});
 
-// Tabla de Sesiones
-export const sesiones = autentificacion.table('sesiones', {
+export const sesiones = autentificacionSchema.table('sesiones', {
   id: serial('id').primaryKey(),
   usuarioId: integer('usuario_id')
     .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
+    .references(() => usuarios.id, { onDelete: 'cascade' }),
   token: text('token').notNull().unique(),
   expiresAt: text('expires_at').notNull(),
-  createdAt: text('created_at').default(new Date().toISOString()),
+  createdAt: text('created_at').default(sql`now()::text`),
 });
 
-// Tabla de Tokens de Recuperación
-export const tokensRecuperacion = autentificacion.table('tokens_recuperacion', {
+export const tokensRecuperacion = autentificacionSchema.table('tokens_recuperacion', {
   id: serial('id').primaryKey(),
   usuarioId: integer('usuario_id')
     .notNull()
@@ -38,19 +35,15 @@ export const tokensRecuperacion = autentificacion.table('tokens_recuperacion', {
   token: text('token').notNull().unique(),
   expiresAt: text('expires_at').notNull(),
   usado: boolean('usado').default(false),
-  createdAt: text('created_at').default(new Date().toISOString()),
+  createdAt: text('created_at').default(sql`now()::text`),
 });
 
-/**
- * Tabla de permisos
- * Esta entidad sirve para...
- */
-export const permisos = autentificacion.table('permisos', {
+export const permisos = autentificacionSchema.table('permisos', {
   id: serial('id').primaryKey(),
   usuarioId: integer('usuario_id')
     .notNull()
     .references(() => usuarios.id, { onDelete: 'cascade' }),
-  modulo: text('modulo').notNull(), // estudiantes, profesores, etc
+  modulo: text('modulo').notNull(),
   lectura: boolean('lectura').default(false),
   escritura: boolean('escritura').default(false),
   eliminacion: boolean('eliminacion').default(false),

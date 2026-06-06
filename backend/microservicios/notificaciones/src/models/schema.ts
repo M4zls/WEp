@@ -1,8 +1,9 @@
+import { sql } from 'drizzle-orm';
 import { pgSchema, serial, integer, text, boolean } from 'drizzle-orm/pg-core';
 
-const notif = pgSchema('notificaciones');
+const notificacionesSchema = pgSchema('notificaciones');
 
-export const notificaciones = notif.table('notificaciones', {
+export const notificaciones = notificacionesSchema.table('notificaciones', {
   id: serial('id').primaryKey(),
   usuarioId: integer('usuario_id').notNull(),
   titulo: text('titulo').notNull(),
@@ -10,22 +11,22 @@ export const notificaciones = notif.table('notificaciones', {
   tipo: text('tipo').notNull(),
   leida: boolean('leida').default(false),
   url: text('url'),
-  fechaCreacion: text('fecha_creacion').default(new Date().toISOString()),
+  fechaCreacion: text('fecha_creacion').default(sql`now()::text`),
   fechaLectura: text('fecha_lectura'),
 });
 
-export const eventos = notif.table('eventos', {
+export const eventos = notificacionesSchema.table('eventos', {
   id: serial('id').primaryKey(),
   titulo: text('titulo').notNull(),
   descripcion: text('descripcion'),
   tipo: text('tipo').notNull(),
   datos: text('datos'),
   activo: boolean('activo').default(true),
-  fechaCreacion: text('fecha_creacion').default(new Date().toISOString()),
+  fechaCreacion: text('fecha_creacion').default(sql`now()::text`),
   fechaProgramada: text('fecha_programada'),
 });
 
-export const logs = notif.table('logs', {
+export const logs = notificacionesSchema.table('logs', {
   id: serial('id').primaryKey(),
   usuarioId: integer('usuario_id'),
   accion: text('accion').notNull(),
@@ -33,5 +34,5 @@ export const logs = notif.table('logs', {
   detalles: text('detalles'),
   ip: text('ip'),
   estado: text('estado').notNull(),
-  fechaCreacion: text('fecha_creacion').default(new Date().toISOString()),
+  fechaCreacion: text('fecha_creacion').default(sql`now()::text`),
 });

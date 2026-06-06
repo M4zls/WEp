@@ -1,8 +1,9 @@
+import { sql } from 'drizzle-orm';
 import { pgSchema, serial, integer, text } from 'drizzle-orm/pg-core';
 
-const prof = pgSchema('profesores');
+const profesoresSchema = pgSchema('profesores');
 
-export const profesores = prof.table('profesores', {
+export const profesores = profesoresSchema.table('profesores', {
   id: serial('id').primaryKey(),
   rut: text('rut').notNull().unique(),
   dv: text('dv').notNull(),
@@ -12,10 +13,10 @@ export const profesores = prof.table('profesores', {
   password: text('password').notNull(),
   telefono: text('telefono'),
   materia: text('materia').notNull(),
-  fechaIngreso: text('fecha_ingreso').default(new Date().toISOString()),
+  fechaIngreso: text('fecha_ingreso').default(sql`now()::text`),
 });
 
-export const clases = prof.table('clases', {
+export const clases = profesoresSchema.table('clases', {
   id: serial('id').primaryKey(),
   profesorId: integer('profesor_id').notNull().references(() => profesores.id, { onDelete: 'cascade' }),
   cursoId: text('curso_id').notNull(),
@@ -26,7 +27,7 @@ export const clases = prof.table('clases', {
   sala: text('sala'),
 });
 
-export const horarios = prof.table('horarios', {
+export const horarios = profesoresSchema.table('horarios', {
   id: serial('id').primaryKey(),
   profesorId: integer('profesor_id').notNull().references(() => profesores.id, { onDelete: 'cascade' }),
   dia: text('dia').notNull(),
@@ -36,7 +37,7 @@ export const horarios = prof.table('horarios', {
   cursoId: text('curso_id').notNull(),
 });
 
-export const disponibilidad = prof.table('disponibilidad', {
+export const disponibilidad = profesoresSchema.table('disponibilidad', {
   id: serial('id').primaryKey(),
   profesorId: integer('profesor_id').notNull().references(() => profesores.id, { onDelete: 'cascade' }),
   dia: text('dia').notNull(),
