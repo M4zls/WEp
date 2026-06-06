@@ -43,7 +43,7 @@ src/
 │   └── styles/
 ├── config/routes.ts            → Constantes de rutas (ROUTES)
 ├── App.tsx                     → Router principal (React Router v6)
-└── index.tsx                   → Entry point
+└── main.tsx                    → Entry point
 ```
 
 ### Patrones
