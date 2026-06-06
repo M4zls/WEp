@@ -6,7 +6,7 @@ Plataforma web integral para la gestión académica del Colegio Bernardo O'Higgi
 
 ## Objetivo del Negocio
 
-Digitalizar y unificar los procesos administrativos y académicos del colegio, reemplazando planillas manuales y sistemas aislados por una plataforma centralizada que permita:
+Digitalizar y unificar los procesos administrativos y académicos del colegio, reemplazando planillas manuales y sistemas aislados por una plataforma centralizada que permita la:
 
 - **Gestión de estudiantes**: registro, consulta y actualización de datos académicos
 - **Gestión de profesores**: administración del cuerpo docente y asignación de materias
