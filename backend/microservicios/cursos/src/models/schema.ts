@@ -1,0 +1,43 @@
+import { sql } from 'drizzle-orm';
+import { pgSchema, serial, integer, text } from 'drizzle-orm/pg-core';
+
+const cursosSchema = pgSchema('cursos');
+const profesoresSchema = pgSchema('profesores');
+
+export const cursos = cursosSchema.table('cursos', {
+  id: serial('id').primaryKey(),
+  nombre: text('nombre').notNull(),
+  nivel: text('nivel').notNull(),
+  letra: text('letra').notNull(),
+  anio: text('anio').default(new Date().getFullYear().toString()),
+  fechaCreacion: text('fecha_creacion').default(sql`now()::text`),
+});
+
+export const asignaturas = cursosSchema.table('asignaturas', {
+  id: serial('id').primaryKey(),
+  nombre: text('nombre').notNull(),
+  codigo: text('codigo').notNull().unique(),
+  descripcion: text('descripcion'),
+  fechaCreacion: text('fecha_creacion').default(sql`now()::text`),
+});
+
+export const profesores = profesoresSchema.table('profesores', {
+  id: serial('id').primaryKey(),
+  rut: text('rut').notNull().unique(),
+  dv: text('dv').notNull(),
+  nombre: text('nombre').notNull(),
+  apellido: text('apellido').notNull(),
+  email: text('email').notNull().unique(),
+  password: text('password').notNull(),
+  telefono: text('telefono'),
+  materia: text('materia').notNull(),
+  fechaIngreso: text('fecha_ingreso').default(sql`now()::text`),
+});
+
+export const cursoAsignatura = cursosSchema.table('curso_asignatura', {
+  id: serial('id').primaryKey(),
+  cursoId: integer('curso_id').notNull(),
+  asignaturaId: integer('asignatura_id').notNull(),
+  profesorId: integer('profesor_id'),
+  fechaCreacion: text('fecha_creacion').default(sql`now()::text`),
+});

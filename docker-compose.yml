@@ -19,25 +19,10 @@ services:
     networks:
       - wep-network
 
-  # Setup - Migraciones + Seed (se ejecuta una vez)
-  setup:
-    build:
-      context: ./backend/App
-      dockerfile: Dockerfile.setup
-    container_name: wep-setup
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: "no"
-    networks:
-      - wep-network
-
   # Backend - Microservicio de Autentificación
   autentificacion:
     build:
-      context: ./backend/App/microservicios/autentificacion
+      context: ./backend/microservicios/autentificacion
       dockerfile: Dockerfile
     container_name: autentificacion-service
     ports:
@@ -55,7 +40,7 @@ services:
   # Backend - Microservicio de Estudiantes
   estudiantes:
     build:
-      context: ./backend/App/microservicios/estudiantes
+      context: ./backend/microservicios/estudiantes
       dockerfile: Dockerfile
     container_name: estudiantes-service
     ports:
@@ -73,7 +58,7 @@ services:
   # Backend - Microservicio de Profesores
   profesores:
     build:
-      context: ./backend/App/microservicios/profesores
+      context: ./backend/microservicios/profesores
       dockerfile: Dockerfile
     container_name: profesores-service
     ports:
@@ -91,7 +76,7 @@ services:
   # Backend - Microservicio de Notificaciones
   notificaciones:
     build:
-      context: ./backend/App/microservicios/notificaciones
+      context: ./backend/microservicios/notificaciones
       dockerfile: Dockerfile
     container_name: notificaciones-service
     ports:
@@ -109,7 +94,7 @@ services:
   # Backend - Microservicio de Cursos
   cursos:
     build:
-      context: ./backend/App/microservicios/cursos
+      context: ./backend/microservicios/cursos
       dockerfile: Dockerfile
     container_name: cursos-service
     ports:
@@ -127,7 +112,7 @@ services:
   # Backend - BFF (Backend for Frontend)
   bff:
     build:
-      context: ./backend/App/microservicios/bff
+      context: ./backend/bff
       dockerfile: Dockerfile
     container_name: bff-service
     ports:
@@ -152,7 +137,7 @@ services:
   # Frontend - React
   frontend:
     build:
-      context: ./frontend/Happ
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend-app
     ports:
