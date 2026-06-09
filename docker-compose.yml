@@ -1,0 +1,157 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: wep-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: wep
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Autentificación
+  autentificacion:
+    build:
+      context: ./backend/microservicios/autentificacion
+      dockerfile: Dockerfile
+    container_name: autentificacion-service
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Estudiantes
+  estudiantes:
+    build:
+      context: ./backend/microservicios/estudiantes
+      dockerfile: Dockerfile
+    container_name: estudiantes-service
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Profesores
+  profesores:
+    build:
+      context: ./backend/microservicios/profesores
+      dockerfile: Dockerfile
+    container_name: profesores-service
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Notificaciones
+  notificaciones:
+    build:
+      context: ./backend/microservicios/notificaciones
+      dockerfile: Dockerfile
+    container_name: notificaciones-service
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Cursos
+  cursos:
+    build:
+      context: ./backend/microservicios/cursos
+      dockerfile: Dockerfile
+    container_name: cursos-service
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - BFF (Backend for Frontend)
+  bff:
+    build:
+      context: ./backend/bff
+      dockerfile: Dockerfile
+    container_name: bff-service
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - AUTENTIFICACION_SERVICE=http://autentificacion:3002
+      - ESTUDIANTES_SERVICE=http://estudiantes:3001
+      - PROFESORES_SERVICE=http://profesores:3004
+      - NOTIFICACIONES_SERVICE=http://notificaciones:3003
+      - CURSOS_SERVICE=http://cursos:3005
+    depends_on:
+      - autentificacion
+      - estudiantes
+      - profesores
+      - notificaciones
+      - cursos
+    networks:
+      - wep-network
+
+  # Frontend - React
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-app
+    ports:
+      - "8080:8080"
+    environment:
+      - REACT_APP_API_URL=http://bff:3000
+    depends_on:
+      - bff
+    networks:
+      - wep-network
+
+volumes:
+  pgdata:
+
+networks:
+  wep-network:
+    driver: bridge
