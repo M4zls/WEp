@@ -1,4 +1,4 @@
-import authService from '../../features/auth/auth.service';
+import authService from '../../pages/auth/auth.service';
 
 const API_BASE_URL: string = 'http://localhost:3000/api';
 
