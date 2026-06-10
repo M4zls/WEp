@@ -6,6 +6,8 @@ export interface CursoInfo {
   materias: {
     id: number;
     asignatura_nombre: string;
+    asignatura_codigo?: string;
     profesor_nombre: string;
+    profesor_apellido?: string;
   }[];
 }

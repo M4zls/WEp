@@ -6,8 +6,9 @@
     "dev:autentificacion": "bun run microservicios/autentificacion/src/index.ts",
     "dev:notificaciones": "bun run microservicios/notificaciones/src/index.ts",
     "dev:profesores": "bun run microservicios/profesores/src/index.ts",
-    "dev:bff": "bun run microservicios/bff/src/index.ts",
-    "dev:cursos": "bun run microservicios/cursos/src/index.ts"
+    "dev:bff": "bun run /bff/src/index.ts",
+    "dev:cursos": "bun run microservicios/cursos/src/index.ts",
+    "dev:clases": "bun run microservicios/clases/src/index.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

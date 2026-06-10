@@ -109,6 +109,24 @@ services:
     networks:
       - wep-network
 
+  # Backend - Microservicio de Clases
+  clases:
+    build:
+      context: ./backend/microservicios/clases
+      dockerfile: Dockerfile
+    container_name: clases-service
+    ports:
+      - "3006:3006"
+    environment:
+      - NODE_ENV=production
+      - PORT=3006
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
   # Backend - BFF (Backend for Frontend)
   bff:
     build:
@@ -125,12 +143,14 @@ services:
       - PROFESORES_SERVICE=http://profesores:3004
       - NOTIFICACIONES_SERVICE=http://notificaciones:3003
       - CURSOS_SERVICE=http://cursos:3005
+      - CLASES_SERVICE=http://clases:3006
     depends_on:
       - autentificacion
       - estudiantes
       - profesores
       - notificaciones
       - cursos
+      - clases
     networks:
       - wep-network
 

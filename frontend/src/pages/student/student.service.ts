@@ -1,4 +1,4 @@
-import { UserData } from './types/Userdata';
+import type { UserData } from './dashboard/types/Userdata';
 
 export interface StudentLoginResponse {
   rut: string;
