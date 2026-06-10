@@ -1,3 +1,4 @@
+import '../drizzle/migrate.ts';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { cursosController } from './controllers/CursosController.js';

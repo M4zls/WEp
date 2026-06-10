@@ -1,5 +1,10 @@
-import { ProfesoresRepository, type IProfesor } from "../repositories/ProfesoresRepository.js";
+import { ProfesoresRepository } from "../repositories/ProfesoresRepository.js";
+import type { IProfesor } from "../types/Profesor.js";
+import { PROFESSOR_ERRORS } from "../common/Consts.js";
 
+/**
+ * Servicio de negocio para profesores.
+ */
 export class ProfesoresService {
     private repository: ProfesoresRepository;
 
@@ -7,72 +12,107 @@ export class ProfesoresService {
         this.repository = new ProfesoresRepository();
     }
 
-    async obtenerTodos(): Promise<IProfesor[]> {
-        return await this.repository.obtenerTodos();
+    /**
+     * Obtiene todos los profesores.
+     * @returns {Promise<IProfesor[]>} Listado de profesores.
+     */
+    async getAllTeachers(): Promise<IProfesor[]> {
+        return await this.repository.getAllTeachers();
     }
-    async obtenerProfesor(rut: string): Promise<IProfesor | null> {
+
+    /**
+     * Obtiene un profesor por su RUT.
+     * @param {string} rut - RUT del profesor a buscar.
+     * @returns {Promise<IProfesor | null>} Profesor encontrado o null.
+     */
+    async getTeacherByRut(rut: string): Promise<IProfesor | null> {
         if (!rut || rut.trim() === '') {
-            throw new Error('El RUT es requerido');
+            throw new Error(PROFESSOR_ERRORS.RUT_REQUIRED_QUERY);
         }
-        const profesor = await this.repository.obtenerRut(rut);
+        const profesor = await this.repository.findTeacherByRut(rut);
         if (!profesor) {
-            throw new Error('Profesor no encontrado');
+            throw new Error(PROFESSOR_ERRORS.NOT_FOUND);
         }
         return profesor;
     }
-    // Login de profesor
-    async login(email: string, password:string): Promise<IProfesor | null> {
+
+    /**
+     * Autentica un profesor usando email y contraseña.
+     * @param {string} email - Email del profesor.
+     * @param {string} password - Contraseña del profesor.
+     * @returns {Promise<IProfesor | null>} Profesor autenticado sin contraseña, o null.
+     */
+    async authenticateTeacher(email: string, password:string): Promise<IProfesor | null> {
         if (!email || email.trim() === ''){
-            throw new Error('El email es obligatorio');
+            throw new Error(PROFESSOR_ERRORS.EMAIL_REQUIRED);
         }
         if (!password || password.trim() === '') {
-            throw new Error('La contraseña es obligatoria');
+            throw new Error(PROFESSOR_ERRORS.PASSWORD_REQUIRED);
         }
-        // Buscar profesor por email
-        const profesor = await this.repository.obtenerPorEmail(email);
+
+        const profesor = await this.repository.findTeacherByEmail(email);
         if (!profesor) {
-            throw new Error('Profesor no encontrado');
+            throw new Error(PROFESSOR_ERRORS.NOT_FOUND);
         }
-        // Validar contraseña 
         if (profesor.password !== password) {
             throw new Error('Contraseña incorrecta');
         }
-        // Retornar datos del profesor sin la contraseña
+
         const { password: _, ...profesorSeguro } = profesor as any;
         return profesorSeguro as IProfesor;
     }
-    // crear nuevo profesor con validacion
-    async crearProfesor(datos: IProfesor): Promise<void> {
+
+    /**
+     * Crea un profesor validando sus campos principales.
+     * @param {IProfesor} datos - Datos del profesor a crear.
+     * @returns {Promise<void>} Resuelve cuando el profesor es creado.
+     */
+    async createTeacher(datos: IProfesor): Promise<void> {
         if (!datos.rut || datos.rut.trim() === '') {
-            throw new Error('El RUT es obligatorio');
+            throw new Error(PROFESSOR_ERRORS.RUT_REQUIRED);
         }
-        //validar digito verificador
+
         if (!datos.dv || datos.dv.trim() === '') {
-            throw new Error('El dígito verificador es obligatorio');
+            throw new Error(PROFESSOR_ERRORS.DV_REQUIRED);
         }
         if (!datos.nombre || datos.nombre.trim() === '') {
-            throw new Error('El nombre es obligatorio');
+            throw new Error(PROFESSOR_ERRORS.NAME_REQUIRED);
         }
         if (!datos.email || datos.email.trim() === '') {
-            throw new Error('El email es obligatorio');
+            throw new Error(PROFESSOR_ERRORS.EMAIL_REQUIRED);
         }
         if (!datos.password || datos.password.trim() === '') {
-            throw new Error('La contraseña es obligatoria');
+            throw new Error(PROFESSOR_ERRORS.PASSWORD_REQUIRED);
         }
-        await this.repository.crear(datos);
+
+        await this.repository.createTeacher(datos);
     }
-    async actualizarProfesor(rut: string, datos: Partial<IProfesor>): Promise<void> {
+
+    /**
+     * Actualiza un profesor por su RUT.
+     * @param {string} rut - RUT del profesor a actualizar.
+     * @param {Partial<IProfesor>} datos - Campos a actualizar.
+     * @returns {Promise<void>} Resuelve cuando la actualización finaliza.
+     */
+    async updateTeacher(rut: string, datos: Partial<IProfesor>): Promise<void> {
         if (!rut || rut.trim() === '') {
-            throw new Error('El RUT es requerido');
+            throw new Error(PROFESSOR_ERRORS.RUT_REQUIRED_QUERY);
         }
-        //actualiza
-        await this.repository.actualizar(rut, datos);
+
+        await this.repository.updateTeacher(rut, datos);
     }
-    async eliminarProfesor(rut: string): Promise<void> {
+
+    /**
+     * Elimina un profesor por su RUT.
+     * @param {string} rut - RUT del profesor a eliminar.
+     * @returns {Promise<void>} Resuelve cuando el profesor es eliminado.
+     */
+    async deleteTeacher(rut: string): Promise<void> {
         if (!rut || rut.trim() === '') {
-            throw new Error('El RUT es requerido');
+            throw new Error(PROFESSOR_ERRORS.RUT_REQUIRED_QUERY);
         }
-        await this.repository.eliminar(rut);
+
+        await this.repository.deleteTeacher(rut);
     }
     
 }    

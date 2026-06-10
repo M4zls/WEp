@@ -1,16 +1,24 @@
 import { sign, verify } from 'hono/jwt';
 import { AuthRepository } from '../repositories/AuthRepository.js';
 import { UserPayload } from '../types/UserPayload.js';
-import { AuthServiceInterface } from './AuthService.interface.js';
+import { AuthServiceContract } from './AuthServiceContract.js';
 import { Utils } from '../common/Utils.js';
 import { Consts } from '../common/Consts.js';
 import { UserRegister } from '../types/UserRegister.js';
 
 const repo = new AuthRepository();
 
-export class AuthService implements AuthServiceInterface {
+/**
+ * Servicio de autenticación que coordina login, registro, cierre y verificación de sesiones.
+ */
+export class AuthService implements AuthServiceContract {
+  /**
+   * Inicia sesión con email o RUT.
+   * @param {string} identifier - Email o RUT del usuario.
+   * @param {string} password - Contraseña del usuario.
+   * @returns {Promise<UserPayload>} Información del usuario autenticado y token.
+   */
   async login(identifier: string, password: string): Promise<UserPayload> {
-    // Detectar si es email o RUT
     const isEmail = identifier.includes('@');
     const usuario = isEmail
       ? await repo.findByEmail(identifier)
@@ -25,13 +33,17 @@ export class AuthService implements AuthServiceInterface {
     const payload = Utils.buildPayload(usuario);
     const token = await sign(payload, Consts.JWT_SECRET);
 
-    // Guardar sesión en DB
     const expiresAt = new Date(Date.now() + Consts.JWT_EXPIRES_IN * 1000).toISOString();
     await repo.guardarSesion(usuario.id, token, expiresAt);
 
     return Utils.buildLoginResponse(token, usuario);
   }
 
+  /**
+   * Registra un usuario nuevo y crea su sesión inicial.
+   * @param {UserRegister} data - Datos para crear el usuario.
+   * @returns {Promise<any>} Respuesta de login con token y usuario.
+   */
   async register(data: UserRegister) {
     const existeEmail = await repo.findByEmail(data.email);
     if (existeEmail) throw new Error('El email ya está registrado');
@@ -51,20 +63,26 @@ export class AuthService implements AuthServiceInterface {
     return Utils.buildLoginResponse(token, usuario);
   }
 
+  /**
+   * Cierra una sesión usando su token.
+   * @param {string} token - Token de la sesión a cerrar.
+   * @returns {Promise<void>} Resuelve cuando la sesión se elimina.
+   */
   async logout(token: string) {
     await repo.deleteSesion(token);
   }
 
+  /**
+   * Verifica un token y confirma que la sesión siga activa.
+   * @param {string} token - Token JWT a verificar.
+   * @returns {Promise<any>} Payload del JWT verificado.
+   */
   async verifyToken(token: string) {
-    // Verificar firma JWT
-    // Pass an empty options object to satisfy the verify signature
     const payload = await verify(token, Consts.JWT_SECRET, {} as any);
 
-    // Verificar que la sesión exista en DB (no fue cerrada)
     const sesion = await repo.findSesion(token);
     if (!sesion) throw new Error('Sesión no encontrada o cerrada');
 
-    // Verificar expiración de sesión en DB
     if (new Date(sesion.expiresAt) < new Date()) {
       await repo.deleteSesion(token);
       throw new Error('Sesión expirada');

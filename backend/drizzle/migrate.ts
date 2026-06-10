@@ -1,19 +1,24 @@
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import postgres from 'postgres';
-import { drizzle } from 'drizzle-orm/postgres-js';
+// Orquesta las migraciones de cada microservicio.
+// Requiere que el runtime soporte top-level await e import dinámico (ej. Bun o Node+ESM).
+const migrators = [
+  './microservicios/autentificacion/drizzle/migrate.ts',
+  './microservicios/estudiantes/drizzle/migrate.ts',
+  './microservicios/cursos/drizzle/migrate.ts',
+  './microservicios/notificaciones/drizzle/migrate.ts',
+  './microservicios/profesores/drizzle/migrate.ts'
+];
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error('DATABASE_URL is required');
+for (const m of migrators) {
+  try {
+    // Resuelve rutas relativas respecto a este archivo y ejecuta el migrador.
+    await import(new URL(m, import.meta.url).toString());
+    console.log(`Migrador ejecutado: ${m}`);
+  } catch (err) {
+    console.error(`Error ejecutando migrador ${m}:`, err);
+    throw err;
+  }
+}
 
-const sql = postgres(connectionString, { max: 1 });
-const db = drizzle(sql);
+console.log('Migraciones orquestadas ejecutadas');
 
-await sql\CREATE SCHEMA IF NOT EXISTS autentificacion\;
-await sql\CREATE SCHEMA IF NOT EXISTS estudiantes\;
-await sql\CREATE SCHEMA IF NOT EXISTS profesores\;
-await sql\CREATE SCHEMA IF NOT EXISTS cursos\;
-await sql\CREATE SCHEMA IF NOT EXISTS notificaciones\;
-
-await migrate(db, { migrationsFolder: './drizzle' });
-console.log('Migraciones ejecutadas correctamente');
-await sql.end();
+export {};

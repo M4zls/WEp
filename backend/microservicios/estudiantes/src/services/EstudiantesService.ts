@@ -1,5 +1,10 @@
-import { EstudiantesRepository, type IEstudiante } from '../repositories/EstudiantesRepository.js';
+import { EstudiantesRepository } from '../repositories/EstudiantesRepository.js';
+import type { IEstudiante } from '../types/Estudiante.js';
+import { STUDENT_ERRORS, STUDENT_RUT_REGEX } from '../common/Consts.js';
 
+/**
+ * Servicio de negocio para estudiantes.
+ */
 export class EstudiantesService {
     private repository: EstudiantesRepository;
 
@@ -7,116 +12,134 @@ export class EstudiantesService {
         this.repository = new EstudiantesRepository();
     }
 
-    //obtener todos
-    async obtenerTodos(): Promise<IEstudiante[]> {
-        return await this.repository.obtenerTodos();
+    /**
+     * Obtiene todos los estudiantes.
+     * @returns {Promise<IEstudiante[]>} Listado de estudiantes.
+     */
+    async getAllStudents(): Promise<IEstudiante[]> {
+        return await this.repository.getAllStudents();
     }
 
-    //obtener por rut
-    async obtenerEstudiante(rut: string): Promise<IEstudiante | null> {
+    /** Obtiene un estudiante por su RUT. */
+    /**
+     * Obtiene un estudiante por su RUT.
+     * @param {string} rut - RUT del estudiante a buscar.
+     * @returns {Promise<IEstudiante | null>} El estudiante encontrado o null.
+     */
+    async getStudentByRut(rut: string): Promise<IEstudiante | null> {
         if(!rut || rut.trim() === '') {
-            throw new Error('El RUT es requerido');
+            throw new Error(STUDENT_ERRORS.RUT_REQUIRED_QUERY);
         }
-        const estudiante = await this.repository.obtenerRut(rut);
+        const estudiante = await this.repository.findStudentByRut(rut);
         if (!estudiante) {
-            throw new Error('Estudiante no encontrado');
+            throw new Error(STUDENT_ERRORS.NOT_FOUND);
         }
         return estudiante;
     }
 
-    // Login de estudiante
-    async login(email: string, password: string): Promise<IEstudiante | null> {
+    /**
+     * Autentica un estudiante usando email y contraseña.
+     * @param {string} email - Email del estudiante.
+     * @param {string} password - Contraseña del estudiante.
+     * @returns {Promise<IEstudiante | null>} Estudiante autenticado sin contraseña, o null.
+     */
+    async authenticateStudent(email: string, password: string): Promise<IEstudiante | null> {
         if (!email || email.trim() === '') {
-            throw new Error('El email es obligatorio');
+            throw new Error(STUDENT_ERRORS.EMAIL_REQUIRED);
         }
         if (!password || password.trim() === '') {
-            throw new Error('La contraseña es obligatoria');
+            throw new Error(STUDENT_ERRORS.PASSWORD_REQUIRED);
         }
 
-        // Buscar estudiante por email
-        const estudiante = await this.repository.obtenerPorEmail(email);
+        const estudiante = await this.repository.findStudentByEmail(email);
         if (!estudiante) {
-            throw new Error('Estudiante no encontrado');
+            throw new Error(STUDENT_ERRORS.NOT_FOUND);
         }
 
-        // Validar contraseña (en producción usar bcrypt)
         if (estudiante.password !== password) {
             throw new Error('Contraseña incorrecta');
         }
 
-        // Retornar datos del estudiante sin la contraseña
         const { password: _, ...estudianteSeguro } = estudiante as any;
         return estudianteSeguro as IEstudiante;
     }
 
-    // crear nueva Con validacion 
-    async crearEstudiante(datos: IEstudiante): Promise<void> {
+    /**
+     * Crea un estudiante validando sus campos principales.
+     * @param {IEstudiante} datos - Datos completos del estudiante a crear.
+     * @returns {Promise<void>} Resuelve cuando el estudiante es creado.
+     */
+    async createStudent(datos: IEstudiante): Promise<void> {
         if (!datos.rut || datos.rut.trim() === '') {
-            throw new Error('El RUT es obligatorio');
+            throw new Error(STUDENT_ERRORS.RUT_REQUIRED);
         }
 
-    //validar digito verificador
         if (!datos.dv || datos.dv.trim() === '') {
-            throw new Error('El dígito verificador es obligatorio');
+            throw new Error(STUDENT_ERRORS.DV_REQUIRED);
         }
 
-        //validar rut: 7-8 dígitos
-        const rutRegex = /^\d{7,8}$/;
-        if (!rutRegex.test(datos.rut)) {
-            throw new Error('El RUT debe tener entre 7 y 8 dígitos numéricos');
+        if (!STUDENT_RUT_REGEX.test(datos.rut)) {
+            throw new Error(STUDENT_ERRORS.RUT_INVALID);
         }
 
-        //validar curso
         if (!datos.cursos || datos.cursos.trim() === '') {
-            throw new Error('El curso es obligatorio');
+            throw new Error(STUDENT_ERRORS.COURSE_REQUIRED);
         }
 
-        //validar email
         if (!datos.email || datos.email.trim() === '') {
-            throw new Error('El email es obligatorio');
+            throw new Error(STUDENT_ERRORS.EMAIL_REQUIRED);
         }
 
-        //validar password
         if (!datos.password || datos.password.trim() === '') {
-            throw new Error('La contraseña es obligatoria');
+            throw new Error(STUDENT_ERRORS.PASSWORD_REQUIRED);
         }
 
-        //verificar que no exista un estudiante con el mismo RUT
-        const existente = await this.repository.obtenerRut(datos.rut);
+        const existente = await this.repository.findStudentByRut(datos.rut);
         if (existente) {
-            throw new Error('Ya existe un estudiante con ese RUT');
+            throw new Error(STUDENT_ERRORS.DUPLICATE_RUT);
         }
 
-        // crear el estudiante
-        await this.repository.crear(datos);
+        await this.repository.createStudent(datos);
     }
-    //retornar el estudiante
-    async actualizarEstudiante(rut: string, datos: Partial<IEstudiante>): Promise<void> {
-        const estudiante = await this.repository.obtenerRut(rut);
+
+    /**
+     * Actualiza un estudiante por su RUT.
+     * @param {string} rut - RUT del estudiante a actualizar.
+     * @param {Partial<IEstudiante>} datos - Campos a actualizar.
+     * @returns {Promise<void>} Resuelve cuando la actualización finaliza.
+     */
+    async updateStudent(rut: string, datos: Partial<IEstudiante>): Promise<void> {
+        const estudiante = await this.repository.findStudentByRut(rut);
         if (!estudiante) {
-            throw new Error('estudiante no encontrado');
+            throw new Error(STUDENT_ERRORS.NOT_FOUND);
         }
 
-        //actualizar
-        await this.repository.actualizar(rut, datos);
+        await this.repository.updateStudent(rut, datos);
     }
 
-    //eliminar estudiante
-    async eliminarEstudiante(rut: string): Promise<void> {
-        const estudiante = await this.repository.obtenerRut(rut);
+    /**
+     * Elimina un estudiante por su RUT.
+     * @param {string} rut - RUT del estudiante a eliminar.
+     * @returns {Promise<void>} Resuelve cuando el estudiante es eliminado.
+     */
+    async deleteStudent(rut: string): Promise<void> {
+        const estudiante = await this.repository.findStudentByRut(rut);
         if (!estudiante) {
-            throw new Error('estudiante no encontrado');
+            throw new Error(STUDENT_ERRORS.NOT_FOUND);
         }
 
-        await this.repository.eliminar(rut);
+        await this.repository.deleteStudent(rut);
     }
 
-
-    //obtener estudiantes por curso
-    async obtenerEstudiantesPorCurso(curso: string): Promise<IEstudiante[]> {
+    /**
+     * Obtiene estudiantes filtrando por curso.
+     * @param {string} curso - Nombre del curso para filtrar.
+     * @returns {Promise<IEstudiante[]>} Lista de estudiantes del curso.
+     */
+    async getStudentsByCourse(curso: string): Promise<IEstudiante[]> {
         if (!curso || curso.trim() === '') {
-            throw new Error('El curso es obligatorio');
+            throw new Error(STUDENT_ERRORS.COURSE_REQUIRED_QUERY);
         }
-        return await this.repository.obtenerCurso(curso);
+        return await this.repository.findStudentsByCourse(curso);
     }
 }

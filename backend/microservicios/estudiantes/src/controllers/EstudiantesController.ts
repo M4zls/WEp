@@ -3,9 +3,18 @@ import { EstudiantesService } from '../services/EstudiantesService.js';
 import { loginEstudianteSchema, crearEstudianteSchema, actualizarEstudianteSchema } from '../dtos/EstudianteDto.js';
 
 const service = new EstudiantesService();
+
+/**
+ * Controller HTTP para la gestión de estudiantes.
+ */
 export const estudianteController = new Hono();
 
-// POST /estudiantes/login - login de estudiante
+/**
+ * Autentica a un estudiante con email y contraseña.
+ * @route POST /estudiantes/login
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Datos del estudiante autenticado.
+ */
 estudianteController.post('/login', async (c) => {
   try {
     const datos = await c.req.json();
@@ -16,7 +25,7 @@ estudianteController.post('/login', async (c) => {
     }
 
     const { email, password } = parsed.data;
-    const estudiante = await service.login(email, password);
+    const estudiante = await service.authenticateStudent(email, password);
     return c.json(estudiante, { status: 200 });
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error al iniciar sesión';
@@ -24,10 +33,15 @@ estudianteController.post('/login', async (c) => {
   }
 });
 
-// GET /estudiantes - obtener todos
+/**
+ * Obtiene todos los estudiantes.
+ * @route GET /estudiantes
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Lista de estudiantes.
+ */
 estudianteController.get('/', async (c) => {
   try {
-    const estudiantes = await service.obtenerTodos();
+    const estudiantes = await service.getAllStudents();
     return c.json(estudiantes);
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error al obtener estudiantes';
@@ -35,11 +49,16 @@ estudianteController.get('/', async (c) => {
   }
 });
 
-// GET /estudiantes/:rut - obtener por rut
+/**
+ * Obtiene un estudiante por su RUT.
+ * @route GET /estudiantes/:rut
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Estudiante encontrado.
+ */
 estudianteController.get('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
-    const estudiante = await service.obtenerEstudiante(rut);
+    const estudiante = await service.getStudentByRut(rut);
     return c.json(estudiante);
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error al obtener estudiante';
@@ -47,7 +66,12 @@ estudianteController.get('/:rut', async (c) => {
   }
 });
 
-// POST /estudiantes - crear nuevo
+/**
+ * Crea un nuevo estudiante.
+ * @route POST /estudiantes
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Confirmación de creación.
+ */
 estudianteController.post('/', async (c) => {
   try {
     const datos = await c.req.json();
@@ -57,7 +81,7 @@ estudianteController.post('/', async (c) => {
       return c.json({ error: msgs }, { status: 400 });
     }
 
-    await service.crearEstudiante(parsed.data);
+    await service.createStudent(parsed.data);
     return c.json({ message: 'Estudiante creado correctamente', datos: parsed.data }, { status: 201 });
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error al crear estudiante';
@@ -65,7 +89,12 @@ estudianteController.post('/', async (c) => {
   }
 });
 
-// PUT /estudiantes/:rut - actualizar
+/**
+ * Actualiza un estudiante por su RUT.
+ * @route PUT /estudiantes/:rut
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Confirmación de actualización.
+ */
 estudianteController.put('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
@@ -76,7 +105,7 @@ estudianteController.put('/:rut', async (c) => {
       return c.json({ error: msgs }, { status: 400 });
     }
 
-    await service.actualizarEstudiante(rut, parsed.data);
+    await service.updateStudent(rut, parsed.data);
     return c.json({ message: 'Estudiante actualizado correctamente', datos: parsed.data });
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error al actualizar estudiante';
@@ -84,11 +113,16 @@ estudianteController.put('/:rut', async (c) => {
   }
 });
 
-// DELETE /estudiantes/:rut - eliminar
+/**
+ * Elimina un estudiante por su RUT.
+ * @route DELETE /estudiantes/:rut
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Confirmación de eliminación.
+ */
 estudianteController.delete('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
-    await service.eliminarEstudiante(rut);
+    await service.deleteStudent(rut);
     return c.json({ message: 'Estudiante eliminado correctamente' });
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error al eliminar estudiante';
@@ -96,11 +130,16 @@ estudianteController.delete('/:rut', async (c) => {
   }
 });
 
-// GET /estudiantes/curso/:curso - obtener por curso
+/**
+ * Obtiene los estudiantes filtrados por curso.
+ * @route GET /estudiantes/curso/:curso
+ * @param {import('hono').Context} c - Contexto HTTP de Hono.
+ * @returns {Promise<Response>} Lista de estudiantes del curso.
+ */
 estudianteController.get('/curso/:curso', async (c) => {
   try {
     const curso = c.req.param('curso');
-    const estudiantes = await service.obtenerEstudiantesPorCurso(curso);
+    const estudiantes = await service.getStudentsByCourse(curso);
     return c.json(estudiantes);
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : 'Error al obtener estudiantes por curso';

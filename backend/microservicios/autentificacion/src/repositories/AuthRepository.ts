@@ -1,13 +1,14 @@
 import { eq } from 'drizzle-orm';
-import { getDatabaseinstance } from '../models/data.js';
+import { getDatabaseInstance } from '../models/data.js';
 import { usuarios, sesiones } from '../models/schema.js';
+import type { DBNewUser, DBSession, DBUser } from '../models/AuthDatabaseTypes.js';
 
 export class AuthRepository {
   private get db() {
-    return getDatabaseinstance();
+    return getDatabaseInstance();
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<DBUser | null> {
     const result = await this.db
       .select()
       .from(usuarios)
@@ -16,7 +17,7 @@ export class AuthRepository {
     return result[0] ?? null;
   }
 
-  async findByRut(rut: string) {
+  async findByRut(rut: string): Promise<DBUser | null> {
     const result = await this.db
       .select()
       .from(usuarios)
@@ -25,7 +26,7 @@ export class AuthRepository {
     return result[0] ?? null;
   }
 
-  async findById(id: number) {
+  async findById(id: number): Promise<DBUser | null> {
     const result = await this.db
       .select()
       .from(usuarios)
@@ -34,15 +35,7 @@ export class AuthRepository {
     return result[0] ?? null;
   }
 
-  async createUsuario(data: {
-    rut: string;
-    dv: string;
-    nombre: string;
-    apellido: string;
-    email: string;
-    password: string;
-    rol?: string;
-  }) {
+  async createUsuario(data: DBNewUser): Promise<DBUser> {
     const result = await this.db
       .insert(usuarios)
       .values({
@@ -58,15 +51,15 @@ export class AuthRepository {
     return result[0];
   }
 
-  async guardarSesion(usuarioId: number, token: string, expiresAt: string) {
+  async guardarSesion(usuarioId: number, token: string, expiresAt: string): Promise<void> {
     await this.db.insert(sesiones).values({ usuarioId, token, expiresAt });
   }
 
-  async deleteSesion(token: string) {
+  async deleteSesion(token: string): Promise<void> {
     await this.db.delete(sesiones).where(eq(sesiones.token, token));
   }
 
-  async findSesion(token: string) {
+  async findSesion(token: string): Promise<DBSession | null> {
     const result = await this.db
       .select()
       .from(sesiones)
