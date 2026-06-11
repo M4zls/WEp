@@ -1,18 +1,6 @@
 # Portal Educativo — Colegio Bernardo O'Higgins
 
-Plataforma web integral para la gestión académica del Colegio Bernardo O'Higgins. Centraliza la administración de estudiantes, profesores, cursos y asignaturas en un solo sistema accesible desde el navegador.
-
----
-
-## Objetivo del Negocio
-
-Digitalizar y unificar los procesos administrativos y académicos del colegio, reemplazando planillas manuales y sistemas aislados por una plataforma centralizada que permita la:
-
-- **Gestión de estudiantes**: registro, consulta y actualización de datos académicos
-- **Gestión de profesores**: administración del cuerpo docente y asignación de materias
-- **Administración de cursos**: creación y organización de cursos con sus respectivas asignaturas
-- **Autenticación centralizada**: inicio de sesión único para estudiantes, profesores y administradores
-- **Notificaciones**: comunicación interna dentro de la plataforma
+Plataforma web integral para la gestión académica del Colegio Bernardo O'Higgins. Centraliza la administración de estudiantes, profesores, cursos, clases y asignaturas en un solo sistema accesible desde el navegador.
 
 ---
 
@@ -20,11 +8,13 @@ Digitalizar y unificar los procesos administrativos y académicos del colegio, r
 
 | Tecnología | Propósito |
 |---|---|
-| **Bun** | Runtime JavaScript — ejecuta TypeScript nativamente, reemplaza Node.js + tsx |
+| **Bun** | Runtime JavaScript — ejecuta TypeScript nativamente |
 | **React 18** | Librería de interfaz de usuario |
 | **Hono** | Framework web para microservicios |
 | **PostgreSQL 16** | Base de datos relacional |
 | **Docker Compose** | Orquestación de contenedores |
+| **Vitest** | Test runner del frontend |
+| **Bun Test** | Test runner del backend |
 
 ---
 
@@ -34,23 +24,24 @@ Digitalizar y unificar los procesos administrativos y académicos del colegio, r
 flowchart TB
     Browser["Navegador"]
 
-    subgraph Frontend["Frontend - React SPA (8080)"]
-        ReactApp["App.tsx<br/>Router + ErrorBoundary"]
-        Features["features/<br/>auth / student / professor / welcome"]
-        Shared["shared/<br/>apiClient / components"]
+    subgraph Frontend["Frontend - React SPA :8080"]
+        ReactApp["App.tsx<br/>Router"]
+        Pages["pages/<br/>auth / student / professor / dashboard / home"]
+        Shared["shared/<br/>apiClient / layout / courses / clases"]
     end
 
-    subgraph BFF["BFF - Hono (3000)"]
+    subgraph BFF["BFF - Hono :3000"]
         BFFRoutes["routes/*.ts"]
         OpenAPI["openapi.ts<br/>Swagger UI"]
     end
 
     subgraph Microservices["Microservicios Backend"]
-        Auth["Autentificación<br/>(3002)"]
-        Students["Estudiantes<br/>(3001)"]
-        Teachers["Profesores<br/>(3004)"]
-        Courses["Cursos<br/>(3005)"]
-        Notif["Notificaciones<br/>(3003)"]
+        Auth["Autentificación<br/>:3002"]
+        Students["Estudiantes<br/>:3001"]
+        Clases["Clases y Horarios<br/>:3006"]
+        Teachers["Profesores<br/>:3004"]
+        Courses["Cursos<br/>:3005"]
+        Notif["Notificaciones<br/>:3003"]
     end
 
     subgraph DB["PostgreSQL 16 (5432)"]
@@ -59,27 +50,28 @@ flowchart TB
         S3["schema: profesores"]
         S4["schema: cursos"]
         S5["schema: notificaciones"]
+        S6["schema: clases"]
     end
 
     Browser --> ReactApp
-    ReactApp --> Features
-    Features --> Shared
-    Shared --> BFFRoutes
+    ReactApp --> BFFRoutes
     BFFRoutes --> Auth
     BFFRoutes --> Students
     BFFRoutes --> Teachers
     BFFRoutes --> Courses
     BFFRoutes --> Notif
+    BFFRoutes --> Clases
     Auth --> S1
     Students --> S2
     Teachers --> S3
     Courses --> S4
     Notif --> S5
+    Clases --> S6
 ```
 
 - **Frontend**: aplicación React de página única (SPA) que consume una sola API (el BFF)
 - **BFF (Backend for Frontend)**: única puerta de entrada para el frontend, orquesta las llamadas a los microservicios internos
-- **Microservicios**: 5 servicios independientes, cada uno con su propio schema de base de datos y responsabilidad de negocio
+- **Microservicios**: 6 servicios independientes, cada uno con su propio schema de base de datos y responsabilidad de negocio
 - **Base de datos**: PostgreSQL con schemas aislados por microservicio
 
 ### Microservicios
@@ -91,7 +83,55 @@ flowchart TB
 | **Estudiantes** | 3001 | CRUD de estudiantes |
 | **Profesores** | 3004 | CRUD de profesores |
 | **Cursos** | 3005 | Gestión de cursos, asignaturas y asignaciones |
+| **Clases y Horarios** | 3006 | Gestión de clases y bloques horarios |
 | **Notificaciones** | 3003 | Notificaciones del sistema |
+
+---
+
+## Estructura del Repositorio
+
+```
+Wep/
+├── frontend/           → Aplicación React (Vite + TailwindCSS + Zustand)
+│   ├── src/
+│   │   ├── pages/      → Componentes de página agrupados por feature
+│   │   ├── shared/     → Componentes y servicios compartidos
+│   │   ├── config/     → Constantes de rutas
+│   │   └── common/     → Utilidades generales
+│   └── vitest.config.ts
+├── backend/
+│   ├── bff/            → Backend for Frontend (Hono + Zod OpenAPI)
+│   └── microservicios/ → 6 microservicios independientes
+│       ├── autentificacion/
+│       ├── estudiantes/
+│       ├── profesores/
+│       ├── cursos/
+│       ├── clases/
+│       └── notificaciones/
+├── docker-compose.yml  → Orquestación de todos los servicios
+└── README.md
+```
+
+---
+
+## Testing
+
+### Frontend (Vitest)
+
+```bash
+cd frontend
+npm test              # Modo watch
+npm run test:run      # Ejecución única
+npm run test:coverage # Con reporte de cobertura (threshold 80%)
+```
+
+### Backend (Bun Test)
+
+```bash
+cd backend/microservicios/<servicio>
+bun test              # Ejecución única
+bun test --coverage   # Con reporte de cobertura
+```
 
 ---
 
@@ -108,19 +148,7 @@ La aplicación queda disponible en `http://localhost:8080`.
 ### Requisitos
 
 - Docker Desktop (o Docker Engine + Docker Compose)
-- Puerto 5432, 3000-3005, 8080 libres
-
----
-
-## Estructura del Repositorio
-
-```
-Wep/
-├── frontend/Happ/       → Aplicación React (Vite, TailwindCSS, Zustand)
-├── backend/App/         → Microservicios backend (Hono, Drizzle ORM, PostgreSQL)
-├── docker-compose.yml   → Orquestación de todos los servicios
-└── README.md
-```
+- Puerto 5432, 3000-3006, 8080 libres
 
 ---
 

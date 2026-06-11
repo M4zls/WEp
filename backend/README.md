@@ -6,38 +6,39 @@ Conjunto de microservicios que proveen la API para la gestión académica del Co
 
 ## Tecnologías
 
-| Tecnología | Versión | Propósito | Justificación |
-|---|---|---|---|
-| **Bun** | 1.3.14 | Runtime JavaScript | Nativo TypeScript, HTTP server incorporado (`Bun.serve`), reemplaza Node.js + tsx + @hono/node-server |
-| **Hono** | ^4.12.15 | Framework web | Ultraligero, ESM nativo, integración JWT (`hono/jwt`), middleware simple |
-| **TypeScript** | ^5.9.3 | Lenguaje con tipos | Tipado estricto completo, `noImplicitAny: true` |
-| **Drizzle ORM** | ^0.45.2 | ORM PostgreSQL | Type-safe, `pgSchema()` para schemas aislados por microservicio |
-| **postgres.js** | ^3.4.9 | Driver PostgreSQL | Conexiones preparadas, ESM nativo, rápido |
-| **Zod** | ^4.4.3 | Validación DTOs | Schemas declarativos con inferencia automática de tipos |
-| **bcryptjs** | — | Hashing de contraseñas | Algoritmo estándar para almacenamiento seguro de passwords |
-| **JWT (hono/jwt)** | — | Autenticación | Tokens firmados con `JWT_SECRET`, sesiones persistentes en DB |
+| Tecnología | Versión | Propósito |
+|---|---|---|
+| **Bun** | 1.3.14 | Runtime JavaScript + test runner |
+| **Hono** | ^4.12.15 | Framework web ultraligero |
+| **TypeScript** | ^5.9.3 | Lenguaje con tipos |
+| **Drizzle ORM** | ^0.45.2 | ORM PostgreSQL type-safe |
+| **postgres.js** | ^3.4.9 | Driver PostgreSQL |
+| **Zod** | ^4.4.3 | Validación DTOs con inferencia de tipos |
+| **bcryptjs** | — | Hashing de contraseñas |
+| **JWT (hono/jwt)** | — | Autenticación con tokens firmados |
 
 ---
 
 ## Arquitectura
 
 ```
-Frontend (8080) → BFF (3000) → [autentificacion, estudiantes, profesores, cursos, notificaciones]
-                                                                          │
-                                                                  PostgreSQL 16 (5432)
+Frontend (:8080) → BFF (:3000) → [autentificacion, estudiantes, profesores, cursos, clases, notificaciones]
+                                                                                │
+                                                                        PostgreSQL 16 (:5432)
 ```
 
 Cada microservicio sigue una arquitectura en capas:
 
 ```
 src/
-├── controllers/   → Capa de presentación (Hono router) — recibe HTTP, valida con Zod, delega al service
+├── controllers/   → Capa de presentación (Hono router)
 ├── services/      → Capa de negocio (lógica de la aplicación)
-├── repositories/  → Capa de datos (Repository Pattern) — queries Drizzle ORM
-├── models/        → Schemas Drizzle (pgSchema) + conexión postgres.js (getDatabaseinstance)
-├── dtos/          → DTO Pattern — Schemas Zod para validación de requests
-├── types/         → Interfaces TypeScript (payloads, respuestas)
-├── common/        → Constantes (JWT secret, expiración) + utilidades (PasswordUtils, handleControllerError)
+├── repositories/  → Capa de datos (Repository Pattern con Drizzle)
+├── models/        → Schemas Drizzle + conexión postgres.js
+├── dtos/          → Schemas Zod para validación de requests
+├── types/         → Interfaces TypeScript
+├── common/        → Constantes y utilidades compartidas
+├── __tests__/     → Tests unitarios (bun test)
 └── index.ts       → Entry point (Bun.serve)
 ```
 
@@ -45,23 +46,32 @@ src/
 
 | Servicio | Puerto | Schema DB | Responsabilidad |
 |---|---|---|---|
-| **BFF** | 3000 | — | BFF: única puerta de entrada del frontend, orquesta los demás servicios |
+| **BFF** | 3000 | — | BFF: única puerta de entrada del frontend |
 | **Autentificación** | 3002 | `autentificacion` | Login, registro, JWT, sesiones |
 | **Estudiantes** | 3001 | `estudiantes` | CRUD de estudiantes |
 | **Profesores** | 3004 | `profesores` | CRUD de profesores |
-| **Cursos** | 3005 | `cursos` | Cursos, asignaturas, asignación materia-profesor |
+| **Cursos** | 3005 | `cursos` | Cursos, asignaturas, asignaciones |
+| **Clases y Horarios** | 3006 | `clases` | Clases y bloques horarios |
 | **Notificaciones** | 3003 | `notificaciones` | Notificaciones del sistema |
 
 ---
 
-## Patrones de Diseño
+## Testing
 
-| Patrón | Descripción |
-|---|---|
-| **BFF Pattern (Backend for Frontend)** | El frontend solo conoce al BFF (puerto 3000), que orquesta las llamadas a los microservicios internos |
-| **Layered Architecture (n-tier)** | Separación en capas: Controller → Service → Repository → DB. Cada capa tiene una responsabilidad única |
-| **Repository Pattern** | Abstracción de la capa de datos mediante repositorios que usan Drizzle ORM |
-| **DTO Pattern** | Schemas Zod para validación de requests en la capa de controller |
+Todos los microservicios usan **bun test** (no vitest). Los tests se encuentran en `src/__tests__/`.
+
+```bash
+# Ejecutar tests de un microservicio
+cd backend/microservicios/<servicio>
+bun test
+
+# Con cobertura
+bun test --coverage
+```
+
+Cada microservicio incluye tests unitarios para:
+- **Services**: lógica de negocio con mocks de repositorios y utilidades
+- **DTOs**: validación de schemas Zod
 
 ---
 
@@ -69,17 +79,9 @@ src/
 
 ```bash
 # Desarrollo (ejecutar un microservicio específico)
-cd backend/App
+cd backend/microservicios/<servicio>
 bun install
-bun run dev:estudiantes
-bun run dev:autentificacion
-bun run dev:profesores
-bun run dev:notificaciones
-bun run dev:cursos
-bun run dev:bff
-
-# Seed de base de datos (migraciones + datos de prueba)
-bun run seed
+bun run dev
 ```
 
 ### Variables de Entorno
@@ -97,14 +99,14 @@ NOVU_SECRET_KEY=tu_key       # Solo notificaciones
 
 ## Autenticación JWT
 
-- **Firma**: `sign(payload, JWT_SECRET)` con `hono/jwt` — payload incluye `sub`, `email`, `rut`, `rol`, `nombre`, `apellido`, `exp`
-- **Sesiones**: cada token se persiste en `autentificacion.sesiones` con fecha de expiración
-- **Verificación**: al validar un token se chequea firma + existencia en DB + vigencia
+- **Firma**: `sign(payload, JWT_SECRET)` con `hono/jwt`
+- **Sesiones**: cada token se persiste en `autentificacion.sesiones`
+- **Verificación**: firma + existencia en DB + vigencia
 - **Contraseñas**: hasheadas con bcrypt
-- **JWT_SECRET**: requerido desde entorno (sin fallback hardcodeado), el servidor falla al iniciar si no está definido
+- **JWT_SECRET**: requerido desde entorno, el servidor falla al iniciar si no está definido
 
 ---
 
 ## Documentación API
 
-Swagger UI disponible en `GET /docs` del BFF. Generado automáticamente desde los schemas Zod usando `@hono/zod-openapi`. La documentación siempre refleja el código porque los schemas Zod son la fuente de verdad.
+Swagger UI disponible en `GET /docs` del BFF. Generado automáticamente desde los schemas Zod usando `@hono/zod-openapi`.

@@ -1,33 +1,37 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, mock, beforeEach } from 'bun:test';
 
-const mockRepo = vi.hoisted(() => ({
-  findByEmail: vi.fn(),
-  findByRut: vi.fn(),
-  createUsuario: vi.fn(),
-  guardarSesion: vi.fn(),
-  deleteSesion: vi.fn(),
-  findSesion: vi.fn(),
+const mockRepo = {
+  findByEmail: mock(() => undefined),
+  findByRut: mock(() => undefined),
+  createUsuario: mock(() => undefined),
+  guardarSesion: mock(() => undefined),
+  deleteSesion: mock(() => undefined),
+  findSesion: mock(() => undefined),
+};
+
+mock.module('../models/data.js', () => ({
+  getDatabaseInstance: () => ({}),
 }));
 
-vi.mock('../repositories/AuthRepository.js', () => ({
+mock.module('../repositories/AuthRepository.js', () => ({
   AuthRepository: function () { return mockRepo; },
 }));
 
-vi.mock('hono/jwt', () => ({
-  sign: vi.fn(() => 'mock-token'),
-  verify: vi.fn(() => ({ sub: 1, email: 'test@test.com' })),
+mock.module('hono/jwt', () => ({
+  sign: mock(() => 'mock-token'),
+  verify: mock(() => ({ sub: 1, email: 'test@test.com' })),
 }));
 
-vi.mock('../common/Utils.js', () => ({
+mock.module('../common/Utils.js', () => ({
   Utils: {
-    verifyPassword: vi.fn(() => true),
-    hashPassword: vi.fn(() => 'hashed'),
-    buildPayload: vi.fn(() => ({ sub: 1, email: 'test@test.com', rut: '12345678', rol: 'profesor' })),
-    buildLoginResponse: vi.fn((token: string, usuario: any) => ({ token, usuario })),
+    verifyPassword: mock(() => true),
+    hashPassword: mock(() => 'hashed'),
+    buildPayload: mock(() => ({ sub: 1, email: 'test@test.com', rut: '12345678', rol: 'profesor' })),
+    buildLoginResponse: mock((token: string, usuario: any) => ({ token, usuario })),
   },
 }));
 
-import { AuthService } from '../services/AuthService.js';
+const { AuthService } = await import('../services/AuthService.js');
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -35,7 +39,9 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     service = new AuthService();
-    vi.clearAllMocks();
+    for (const key of Object.keys(mockRepo) as (keyof typeof mockRepo)[]) {
+      mockRepo[key].mockClear();
+    }
   });
 
   describe('login', () => {

@@ -6,9 +6,8 @@
   "scripts": {
     "dev": "bun run src/index.ts",
     "migrate": "bun run drizzle/migrate.ts",
-    "test": "vitest",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test": "bun test",
+    "test:coverage": "bun test --coverage"
   },
   "dependencies": {
     "@novu/api": "^3.16.0",
@@ -18,8 +17,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.1.8",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.8"
+    "typescript": "^5.9.3"
   }
 }

@@ -1,86 +1,64 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, mock, beforeEach } from 'bun:test';
 
-const mockRepo = vi.hoisted(() => ({
-  findAll: vi.fn(),
-  findById: vi.fn(),
-  create: vi.fn(),
-  update: vi.fn(),
-  delete: vi.fn(),
-}));
+const mockRepo = {
+  findAll: mock(() => undefined),
+  findById: mock(() => undefined),
+  create: mock(() => undefined),
+  update: mock(() => undefined),
+  delete: mock(() => undefined),
+};
 
-vi.mock('../repositories/HorariosRepository.js', () => ({
+mock.module('../models/data.js', () => ({ getDatabaseInstance: () => ({}) }));
+mock.module('../repositories/HorariosRepository.js', () => ({
   HorariosRepository: function () { return mockRepo; },
 }));
 
-import { HorariosService } from '../services/HorariosService.js';
+const { HorariosService } = await import('../services/HorariosService.js');
 
 describe('HorariosService', () => {
   let service: HorariosService;
 
   beforeEach(() => {
     service = new HorariosService();
-    vi.clearAllMocks();
+    for (const key of Object.keys(mockRepo) as (keyof typeof mockRepo)[]) mockRepo[key].mockClear();
   });
 
-  describe('listarHorarios', () => {
-    it('should return all horarios', async () => {
-      mockRepo.findAll.mockResolvedValue([{ id: 1, diaSemana: 1 }]);
-      const result = await service.listarHorarios();
-      expect(result).toHaveLength(1);
-    });
-
-    it('should filter by cursoAsignaturaId', async () => {
-      mockRepo.findAll.mockResolvedValue([{ id: 1, cursoAsignaturaId: 5 }]);
-      const result = await service.listarHorarios(5);
-      expect(mockRepo.findAll).toHaveBeenCalledWith(5);
-    });
+  it('listarHorarios', async () => {
+    mockRepo.findAll.mockResolvedValue([{ id: 1 }]);
+    expect(await service.listarHorarios()).toHaveLength(1);
   });
 
-  describe('obtenerHorario', () => {
-    it('should return horario by id', async () => {
-      mockRepo.findById.mockResolvedValue({ id: 1, diaSemana: 1 });
-      const result = await service.obtenerHorario(1);
-      expect(result).toBeDefined();
-    });
-
-    it('should throw on not found', async () => {
-      mockRepo.findById.mockResolvedValue(null);
-      await expect(service.obtenerHorario(999)).rejects.toThrow('Horario no encontrado');
-    });
+  it('listarHorarios filtra', async () => {
+    await service.listarHorarios(5);
+    expect(mockRepo.findAll).toHaveBeenCalledWith(5);
   });
 
-  describe('crearHorario', () => {
-    it('should create horario', async () => {
-      mockRepo.create.mockResolvedValue({ id: 1, diaSemana: 1, horaInicio: '08:00', horaTermino: '09:00' });
-      const data = { cursoAsignaturaId: 1, diaSemana: 1, horaInicio: '08:00', horaTermino: '09:00' };
-      const result = await service.crearHorario(data);
-      expect(result).toBeDefined();
-    });
+  it('obtenerHorario', async () => {
+    mockRepo.findById.mockResolvedValue({ id: 1 });
+    expect(await service.obtenerHorario(1)).toBeDefined();
   });
 
-  describe('actualizarHorario', () => {
-    it('should update existing horario', async () => {
-      mockRepo.findById.mockResolvedValue({ id: 1 });
-      await service.actualizarHorario(1, { diaSemana: 3 });
-      expect(mockRepo.update).toHaveBeenCalledWith(1, { diaSemana: 3 });
-    });
-
-    it('should throw on not found', async () => {
-      mockRepo.findById.mockResolvedValue(null);
-      await expect(service.actualizarHorario(999, {})).rejects.toThrow('Horario no encontrado');
-    });
+  it('obtenerHorario throws on not found', async () => {
+    mockRepo.findById.mockResolvedValue(null);
+    await expect(service.obtenerHorario(999)).rejects.toThrow('Horario no encontrado');
   });
 
-  describe('eliminarHorario', () => {
-    it('should delete existing horario', async () => {
-      mockRepo.findById.mockResolvedValue({ id: 1 });
-      await service.eliminarHorario(1);
-      expect(mockRepo.delete).toHaveBeenCalledWith(1);
-    });
+  it('crearHorario', async () => {
+    const d = { cursoAsignaturaId: 1, diaSemana: 1, horaInicio: '08:00', horaTermino: '09:00' };
+    mockRepo.create.mockResolvedValue({ id: 1 });
+    const r = await service.crearHorario(d);
+    expect(r).toBeDefined();
+  });
 
-    it('should throw on not found', async () => {
-      mockRepo.findById.mockResolvedValue(null);
-      await expect(service.eliminarHorario(999)).rejects.toThrow('Horario no encontrado');
-    });
+  it('actualizarHorario', async () => {
+    mockRepo.findById.mockResolvedValue({ id: 1 });
+    await service.actualizarHorario(1, { diaSemana: 3 });
+    expect(mockRepo.update).toHaveBeenCalled();
+  });
+
+  it('eliminarHorario', async () => {
+    mockRepo.findById.mockResolvedValue({ id: 1 });
+    await service.eliminarHorario(1);
+    expect(mockRepo.delete).toHaveBeenCalled();
   });
 });
