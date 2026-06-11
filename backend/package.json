@@ -8,7 +8,9 @@
     "dev:profesores": "bun run microservicios/profesores/src/index.ts",
     "dev:bff": "bun run /bff/src/index.ts",
     "dev:cursos": "bun run microservicios/cursos/src/index.ts",
-    "dev:clases": "bun run microservicios/clases/src/index.ts"
+    "dev:clases": "bun run microservicios/clases/src/index.ts",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

@@ -1,18 +1,6 @@
 # Portal Educativo — Colegio Bernardo O'Higgins
 
-Plataforma web integral para la gestión académica del Colegio Bernardo O'Higgins. Centraliza la administración de estudiantes, profesores, cursos y asignaturas en un solo sistema accesible desde el navegador.
-
----
-
-## Objetivo del Negocio
-
-Digitalizar y unificar los procesos administrativos y académicos del colegio, reemplazando planillas manuales y sistemas aislados por una plataforma centralizada que permita la:
-
-- **Gestión de estudiantes**: registro, consulta y actualización de datos académicos
-- **Gestión de profesores**: administración del cuerpo docente y asignación de materias
-- **Administración de cursos**: creación y organización de cursos con sus respectivas asignaturas
-- **Autenticación centralizada**: inicio de sesión único para estudiantes, profesores y administradores
-- **Notificaciones**: comunicación interna dentro de la plataforma
+Plataforma web integral para la gestión académica del Colegio Bernardo O'Higgins. Centraliza la administración de estudiantes, profesores, cursos, clases y asignaturas en un solo sistema accesible desde el navegador.
 
 ---
 
@@ -20,11 +8,96 @@ Digitalizar y unificar los procesos administrativos y académicos del colegio, r
 
 | Tecnología | Propósito |
 |---|---|
-| **Bun** | Runtime JavaScript — ejecuta TypeScript nativamente, reemplaza Node.js + tsx |
+| **Bun** | Runtime JavaScript + test runner del backend |
 | **React 18** | Librería de interfaz de usuario |
 | **Hono** | Framework web para microservicios |
 | **PostgreSQL 16** | Base de datos relacional |
 | **Docker Compose** | Orquestación de contenedores |
+| **Vitest** | Test runner del frontend |
+
+---
+
+## Dependencias
+
+Necesitás tener instalado lo siguiente en tu máquina:
+
+| Dependencia | Versión mínima | Descarga |
+|---|---|---|
+| **Bun** | 1.3.x | [bun.sh](https://bun.sh) — `powershell -c "irm bun.sh/install.ps1 | iex"` |
+| **Docker Desktop** | — | [docker.com](https://www.docker.com/products/docker-desktop/) |
+| **Node.js** | 18+ | [nodejs.org](https://nodejs.org/) — solo para el frontend (npm) |
+
+> Bun es el runtime principal del proyecto. Se usa para el backend (servidores, tests) y también para gestionar dependencias del frontend si se prefiere.
+
+---
+
+## Cómo Empezar
+
+### 1. Clonar e instalar dependencias
+
+```bash
+git clone <repo>
+cd Wep
+
+# Backend (cada microservicio)
+cd backend/microservicios/autentificacion && bun install
+cd ../estudiantes && bun install
+cd ../profesores && bun install
+cd ../cursos && bun install
+cd ../clases && bun install
+cd ../notificaciones && bun install
+
+# BFF
+cd ../../bff && bun install
+
+# Frontend
+cd ../../frontend && npm install
+
+# Volver a la raíz
+cd ..
+```
+
+
+
+### 2. Iniciar base de datos
+
+```bash
+docker compose up -d
+```
+
+Esto levanta PostgreSQL 16 en `localhost:5432`.
+
+### 3. Correr migraciones y seed
+
+```bash
+# Cada microservicio tiene su schema
+cd backend/microservicios/autentificacion && bun run seed
+cd ../estudiantes && bun run seed
+cd ../profesores && bun run seed
+cd ../cursos && bun run seed
+cd ../clases && bun run seed
+cd ../notificaciones && bun run seed
+```
+
+### 4. Iniciar los servicios
+
+```bash
+# Cada microservicio en su propia terminal
+cd backend/microservicios/autentificacion && bun run dev   # :3002
+cd backend/microservicios/estudiantes && bun run dev       # :3001
+cd backend/microservicios/profesores && bun run dev        # :3004
+cd backend/microservicios/cursos && bun run dev            # :3005
+cd backend/microservicios/clases && bun run dev            # :3006
+cd backend/microservicios/notificaciones && bun run dev    # :3003
+
+# BFF (única API que consume el frontend)
+cd backend/bff && bun run dev                              # :3000
+
+# Frontend
+cd frontend && npm run dev                                 # :8081
+```
+
+La aplicación queda disponible en `http://localhost:8081`.
 
 ---
 
@@ -34,23 +107,24 @@ Digitalizar y unificar los procesos administrativos y académicos del colegio, r
 flowchart TB
     Browser["Navegador"]
 
-    subgraph Frontend["Frontend - React SPA (8080)"]
-        ReactApp["App.tsx<br/>Router + ErrorBoundary"]
-        Features["features/<br/>auth / student / professor / welcome"]
-        Shared["shared/<br/>apiClient / components"]
+    subgraph Frontend["Frontend - React SPA :8081"]
+        ReactApp["App.tsx<br/>Router"]
+        Pages["pages/<br/>auth / student / professor / dashboard / home"]
+        Shared["shared/<br/>apiClient / layout / courses / clases"]
     end
 
-    subgraph BFF["BFF - Hono (3000)"]
+    subgraph BFF["BFF - Hono :3000"]
         BFFRoutes["routes/*.ts"]
         OpenAPI["openapi.ts<br/>Swagger UI"]
     end
 
     subgraph Microservices["Microservicios Backend"]
-        Auth["Autentificación<br/>(3002)"]
-        Students["Estudiantes<br/>(3001)"]
-        Teachers["Profesores<br/>(3004)"]
-        Courses["Cursos<br/>(3005)"]
-        Notif["Notificaciones<br/>(3003)"]
+        Auth["Autentificación<br/>:3002"]
+        Students["Estudiantes<br/>:3001"]
+        Clases["Clases y Horarios<br/>:3006"]
+        Teachers["Profesores<br/>:3004"]
+        Courses["Cursos<br/>:3005"]
+        Notif["Notificaciones<br/>:3003"]
     end
 
     subgraph DB["PostgreSQL 16 (5432)"]
@@ -59,27 +133,28 @@ flowchart TB
         S3["schema: profesores"]
         S4["schema: cursos"]
         S5["schema: notificaciones"]
+        S6["schema: clases"]
     end
 
     Browser --> ReactApp
-    ReactApp --> Features
-    Features --> Shared
-    Shared --> BFFRoutes
+    ReactApp --> BFFRoutes
     BFFRoutes --> Auth
     BFFRoutes --> Students
     BFFRoutes --> Teachers
     BFFRoutes --> Courses
     BFFRoutes --> Notif
+    BFFRoutes --> Clases
     Auth --> S1
     Students --> S2
     Teachers --> S3
     Courses --> S4
     Notif --> S5
+    Clases --> S6
 ```
 
-- **Frontend**: aplicación React de página única (SPA) que consume una sola API (el BFF)
-- **BFF (Backend for Frontend)**: única puerta de entrada para el frontend, orquesta las llamadas a los microservicios internos
-- **Microservicios**: 5 servicios independientes, cada uno con su propio schema de base de datos y responsabilidad de negocio
+- **Frontend**: aplicación React SPA que consume una sola API (el BFF)
+- **BFF**: única puerta de entrada para el frontend, orquesta los microservicios internos
+- **Microservicios**: 6 servicios independientes, cada uno con su propio schema de DB
 - **Base de datos**: PostgreSQL con schemas aislados por microservicio
 
 ### Microservicios
@@ -91,24 +166,19 @@ flowchart TB
 | **Estudiantes** | 3001 | CRUD de estudiantes |
 | **Profesores** | 3004 | CRUD de profesores |
 | **Cursos** | 3005 | Gestión de cursos, asignaturas y asignaciones |
+| **Clases y Horarios** | 3006 | Gestión de clases y bloques horarios |
 | **Notificaciones** | 3003 | Notificaciones del sistema |
 
 ---
 
-## Cómo Empezar
+## Testing
 
-```bash
-git clone <repo>
-cd Wep
-docker compose up -d
-```
+| Capa | Runner | Comando | Docs |
+|---|---|---|---|
+| **Frontend** | Vitest | `cd frontend && npm test` | [frontend/README.md](./frontend/README.md) |
+| **Backend** | Bun test | `cd backend/microservicios/<svc> && bun test` | [backend/README.md](./backend/README.md) |
 
-La aplicación queda disponible en `http://localhost:8080`.
-
-### Requisitos
-
-- Docker Desktop (o Docker Engine + Docker Compose)
-- Puerto 5432, 3000-3005, 8080 libres
+Ver README de cada capa para detalles de cobertura y estructura de tests.
 
 ---
 
@@ -116,9 +186,17 @@ La aplicación queda disponible en `http://localhost:8080`.
 
 ```
 Wep/
-├── frontend/Happ/       → Aplicación React (Vite, TailwindCSS, Zustand)
-├── backend/App/         → Microservicios backend (Hono, Drizzle ORM, PostgreSQL)
-├── docker-compose.yml   → Orquestación de todos los servicios
+├── frontend/           → Aplicación React (Vite + TailwindCSS + Zustand)
+├── backend/
+│   ├── bff/            → Backend for Frontend (Hono + Zod OpenAPI)
+│   └── microservicios/ → 6 microservicios independientes
+│       ├── autentificacion/
+│       ├── estudiantes/
+│       ├── profesores/
+│       ├── cursos/
+│       ├── clases/
+│       └── notificaciones/
+├── docker-compose.yml  → Orquestación de todos los servicios
 └── README.md
 ```
 
