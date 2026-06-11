@@ -1,0 +1,64 @@
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import Sidebar from '../shared/layout/Sidebar';
+
+describe('Sidebar', () => {
+  const defaultProps = {
+    selectedSection: 'inicio',
+    onSectionChange: vi.fn(),
+    onLogout: vi.fn(),
+    userName: 'Juan Pérez',
+    userInitials: 'JP',
+    role: 'profesor' as const,
+  };
+
+  it('should render user info', () => {
+    render(<Sidebar {...defaultProps} />);
+    expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
+    expect(screen.getByText('JP')).toBeInTheDocument();
+    expect(screen.getByText('Portal Educativo')).toBeInTheDocument();
+  });
+
+  it('should show Cursos item for profesor role', () => {
+    render(<Sidebar {...defaultProps} />);
+    expect(screen.getByText('Cursos')).toBeInTheDocument();
+  });
+
+  it('should show Clases item for estudiante role', () => {
+    render(<Sidebar {...defaultProps} role="estudiante" />);
+    expect(screen.getByText('Clases')).toBeInTheDocument();
+  });
+
+  it('should highlight active section', () => {
+    render(<Sidebar {...defaultProps} selectedSection="notificaciones" />);
+    const btn = screen.getByText('Notificaciones');
+    expect(btn.parentElement).toHaveClass('border-emerald-400');
+  });
+
+  it('should call onSectionChange on nav click', async () => {
+    const onSectionChange = vi.fn();
+    const user = userEvent.setup();
+
+    render(<Sidebar {...defaultProps} onSectionChange={onSectionChange} />);
+    await user.click(screen.getByText('Inicio'));
+
+    expect(onSectionChange).toHaveBeenCalledWith('inicio');
+  });
+
+  it('should call onLogout on logout click', async () => {
+    const onLogout = vi.fn();
+    const user = userEvent.setup();
+
+    render(<Sidebar {...defaultProps} onLogout={onLogout} />);
+    await user.click(screen.getByText('Cerrar Sesión'));
+
+    expect(onLogout).toHaveBeenCalled();
+  });
+
+  it('should use fallback values when props are empty', () => {
+    render(<Sidebar selectedSection="" onSectionChange={vi.fn()} onLogout={vi.fn()} />);
+    expect(screen.getByText('Usuario')).toBeInTheDocument();
+    expect(screen.getByText('?')).toBeInTheDocument();
+  });
+});
