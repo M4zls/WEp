@@ -8,13 +8,105 @@ Plataforma web integral para la gestión académica del Colegio Bernardo O'Higgi
 
 | Tecnología | Propósito |
 |---|---|
-| **Bun** | Runtime JavaScript — ejecuta TypeScript nativamente |
+| **Bun** | Runtime JavaScript + test runner del backend |
 | **React 18** | Librería de interfaz de usuario |
 | **Hono** | Framework web para microservicios |
 | **PostgreSQL 16** | Base de datos relacional |
 | **Docker Compose** | Orquestación de contenedores |
 | **Vitest** | Test runner del frontend |
-| **Bun Test** | Test runner del backend |
+
+---
+
+## Dependencias
+
+Necesitás tener instalado lo siguiente en tu máquina:
+
+| Dependencia | Versión mínima | Descarga |
+|---|---|---|
+| **Bun** | 1.3.x | [bun.sh](https://bun.sh) — `powershell -c "irm bun.sh/install.ps1 | iex"` |
+| **Docker Desktop** | — | [docker.com](https://www.docker.com/products/docker-desktop/) |
+| **Node.js** | 18+ | [nodejs.org](https://nodejs.org/) — solo para el frontend (npm) |
+
+> Bun es el runtime principal del proyecto. Se usa para el backend (servidores, tests) y también para gestionar dependencias del frontend si se prefiere.
+
+---
+
+## Cómo Empezar
+
+### 1. Clonar e instalar dependencias
+
+```bash
+git clone <repo>
+cd Wep
+
+# Backend (cada microservicio)
+cd backend/microservicios/autentificacion && bun install
+cd ../estudiantes && bun install
+cd ../profesores && bun install
+cd ../cursos && bun install
+cd ../clases && bun install
+cd ../notificaciones && bun install
+
+# BFF
+cd ../../bff && bun install
+
+# Frontend
+cd ../../frontend && npm install
+
+# Volver a la raíz
+cd ..
+```
+
+### 2. Variables de entorno
+
+Cada microservicio necesita un archivo `.env`:
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/wep
+PORT=3000                    # Puerto del servicio
+JWT_SECRET=tu_secreto_jwt    # Solo autentificacion
+NOVU_SECRET_KEY=tu_key       # Solo notificaciones
+```
+
+### 3. Iniciar base de datos
+
+```bash
+docker compose up -d
+```
+
+Esto levanta PostgreSQL 16 en `localhost:5432`.
+
+### 4. Correr migraciones y seed
+
+```bash
+# Cada microservicio tiene su schema
+cd backend/microservicios/autentificacion && bun run seed
+cd ../estudiantes && bun run seed
+cd ../profesores && bun run seed
+cd ../cursos && bun run seed
+cd ../clases && bun run seed
+cd ../notificaciones && bun run seed
+```
+
+### 5. Iniciar los servicios
+
+```bash
+# Cada microservicio en su propia terminal
+cd backend/microservicios/autentificacion && bun run dev   # :3002
+cd backend/microservicios/estudiantes && bun run dev       # :3001
+cd backend/microservicios/profesores && bun run dev        # :3004
+cd backend/microservicios/cursos && bun run dev            # :3005
+cd backend/microservicios/clases && bun run dev            # :3006
+cd backend/microservicios/notificaciones && bun run dev    # :3003
+
+# BFF (única API que consume el frontend)
+cd backend/bff && bun run dev                              # :3000
+
+# Frontend
+cd frontend && npm run dev                                 # :8081
+```
+
+La aplicación queda disponible en `http://localhost:8081`.
 
 ---
 
@@ -24,7 +116,7 @@ Plataforma web integral para la gestión académica del Colegio Bernardo O'Higgi
 flowchart TB
     Browser["Navegador"]
 
-    subgraph Frontend["Frontend - React SPA :8080"]
+    subgraph Frontend["Frontend - React SPA :8081"]
         ReactApp["App.tsx<br/>Router"]
         Pages["pages/<br/>auth / student / professor / dashboard / home"]
         Shared["shared/<br/>apiClient / layout / courses / clases"]
@@ -69,9 +161,9 @@ flowchart TB
     Clases --> S6
 ```
 
-- **Frontend**: aplicación React de página única (SPA) que consume una sola API (el BFF)
-- **BFF (Backend for Frontend)**: única puerta de entrada para el frontend, orquesta las llamadas a los microservicios internos
-- **Microservicios**: 6 servicios independientes, cada uno con su propio schema de base de datos y responsabilidad de negocio
+- **Frontend**: aplicación React SPA que consume una sola API (el BFF)
+- **BFF**: única puerta de entrada para el frontend, orquesta los microservicios internos
+- **Microservicios**: 6 servicios independientes, cada uno con su propio schema de DB
 - **Base de datos**: PostgreSQL con schemas aislados por microservicio
 
 ### Microservicios
@@ -88,17 +180,22 @@ flowchart TB
 
 ---
 
+## Testing
+
+| Capa | Runner | Comando | Docs |
+|---|---|---|---|
+| **Frontend** | Vitest | `cd frontend && npm test` | [frontend/README.md](./frontend/README.md) |
+| **Backend** | Bun test | `cd backend/microservicios/<svc> && bun test` | [backend/README.md](./backend/README.md) |
+
+Ver README de cada capa para detalles de cobertura y estructura de tests.
+
+---
+
 ## Estructura del Repositorio
 
 ```
 Wep/
 ├── frontend/           → Aplicación React (Vite + TailwindCSS + Zustand)
-│   ├── src/
-│   │   ├── pages/      → Componentes de página agrupados por feature
-│   │   ├── shared/     → Componentes y servicios compartidos
-│   │   ├── config/     → Constantes de rutas
-│   │   └── common/     → Utilidades generales
-│   └── vitest.config.ts
 ├── backend/
 │   ├── bff/            → Backend for Frontend (Hono + Zod OpenAPI)
 │   └── microservicios/ → 6 microservicios independientes
@@ -111,44 +208,6 @@ Wep/
 ├── docker-compose.yml  → Orquestación de todos los servicios
 └── README.md
 ```
-
----
-
-## Testing
-
-### Frontend (Vitest)
-
-```bash
-cd frontend
-npm test              # Modo watch
-npm run test:run      # Ejecución única
-npm run test:coverage # Con reporte de cobertura (threshold 80%)
-```
-
-### Backend (Bun Test)
-
-```bash
-cd backend/microservicios/<servicio>
-bun test              # Ejecución única
-bun test --coverage   # Con reporte de cobertura
-```
-
----
-
-## Cómo Empezar
-
-```bash
-git clone <repo>
-cd Wep
-docker compose up -d
-```
-
-La aplicación queda disponible en `http://localhost:8080`.
-
-### Requisitos
-
-- Docker Desktop (o Docker Engine + Docker Compose)
-- Puerto 5432, 3000-3006, 8080 libres
 
 ---
 
