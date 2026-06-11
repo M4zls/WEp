@@ -57,18 +57,9 @@ cd ../../frontend && npm install
 cd ..
 ```
 
-### 2. Variables de entorno
 
-Cada microservicio necesita un archivo `.env`:
 
-```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/wep
-PORT=3000                    # Puerto del servicio
-JWT_SECRET=tu_secreto_jwt    # Solo autentificacion
-NOVU_SECRET_KEY=tu_key       # Solo notificaciones
-```
-
-### 3. Iniciar base de datos
+### 2. Iniciar base de datos
 
 ```bash
 docker compose up -d
@@ -76,7 +67,7 @@ docker compose up -d
 
 Esto levanta PostgreSQL 16 en `localhost:5432`.
 
-### 4. Correr migraciones y seed
+### 3. Correr migraciones y seed
 
 ```bash
 # Cada microservicio tiene su schema
@@ -88,7 +79,7 @@ cd ../clases && bun run seed
 cd ../notificaciones && bun run seed
 ```
 
-### 5. Iniciar los servicios
+### 4. Iniciar los servicios
 
 ```bash
 # Cada microservicio en su propia terminal
