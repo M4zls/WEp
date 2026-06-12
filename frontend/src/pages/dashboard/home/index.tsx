@@ -1,7 +1,7 @@
 import React, { FC, ReactElement, useEffect, useState, useCallback } from 'react';
-import claseService from '../../../shared/clases/clase.service';
-import type { Clase } from '../../../shared/clases/clase.types';
-import courseService from '../../../shared/courses/course.service';
+import claseService from '../../clases/service';
+import type { Clase } from '../../clases/types';
+import courseService from '../../cursos/service';
 
 interface HomeViewProps {
   userData: { nombre?: string; apellido?: string; email?: string; rut?: string; cursos?: string } | null;

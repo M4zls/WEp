@@ -144,6 +144,8 @@ services:
       - NOTIFICACIONES_SERVICE=http://notificaciones:3003
       - CURSOS_SERVICE=http://cursos:3005
       - CLASES_SERVICE=http://clases:3006
+      - HORARIO_SERVICE=http://horario:3007
+      - ASISTENCIA_SERVICE=http://asistencia:3008
     depends_on:
       - autentificacion
       - estudiantes
@@ -151,6 +153,44 @@ services:
       - notificaciones
       - cursos
       - clases
+      - horario
+      - asistencia
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Horario
+  horario:
+    build:
+      context: ./backend/microservicios/horario
+      dockerfile: Dockerfile
+    container_name: horario-service
+    ports:
+      - "3007:3007"
+    environment:
+      - NODE_ENV=production
+      - PORT=3007
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Asistencia
+  asistencia:
+    build:
+      context: ./backend/microservicios/asistencia
+      dockerfile: Dockerfile
+    container_name: asistencia-service
+    ports:
+      - "3008:3008"
+    environment:
+      - NODE_ENV=production
+      - PORT=3008
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - wep-network
 

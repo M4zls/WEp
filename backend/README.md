@@ -51,7 +51,9 @@ src/
 | **Estudiantes** | 3001 | `estudiantes` | CRUD de estudiantes |
 | **Profesores** | 3004 | `profesores` | CRUD de profesores |
 | **Cursos** | 3005 | `cursos` | Cursos, asignaturas, asignaciones |
-| **Clases y Horarios** | 3006 | `clases` | Clases y bloques horarios |
+| **Clases** | 3006 | `clases` | Clases |
+| **Horario** | 3007 | `horario` | Bloques horarios fijos (08:00-16:00) |
+| **Asistencia** | 3008 | `asistencia` | Registro de asistencia por clase y estudiante |
 | **Notificaciones** | 3003 | `notificaciones` | Notificaciones del sistema |
 
 ---
@@ -99,11 +101,35 @@ NOVU_SECRET_KEY=tu_key       # Solo notificaciones
 
 ## Autenticación JWT
 
-- **Firma**: `sign(payload, JWT_SECRET)` con `hono/jwt`
-- **Sesiones**: cada token se persiste en `autentificacion.sesiones`
-- **Verificación**: firma + existencia en DB + vigencia
-- **Contraseñas**: hasheadas con bcrypt
-- **JWT_SECRET**: requerido desde entorno, el servidor falla al iniciar si no está definido
+### BFF Middleware (`backend/bff/src/middleware/auth.ts`)
+
+Todas las rutas `/api/*` del BFF están protegidas. El middleware se aplica globalmente en `index.ts`:
+
+```ts
+app.use('/api/*', authMiddleware);
+```
+
+| Aspecto | Detalle |
+|---|---|
+| **Verificación** | Solo firma con `verify(token, JWT_SECRET, { alg: 'HS256' })` — stateless |
+| **Algoritmo** | HS256 |
+| **Secret** | `JWT_SECRET` env var, fallback `colegio_ohiggins_secret_changeme` |
+| **Rutas públicas** | `/api/auth/login`, `/api/auth/register`, `/api/estudiantes/login`, `/health`, `/docs` |
+| **401** | `Token no proporcionado` / `Token inválido o expirado` |
+
+### Microservicio de Autentificación
+
+| Aspecto | Detalle |
+|---|---|
+| **Firma** | `sign(payload, JWT_SECRET)` con `hono/jwt` |
+| **Sesiones** | cada token se persiste en `autentificacion.sesiones` |
+| **Verificación** | firma + existencia en DB + vigencia |
+| **Contraseñas** | hasheadas con bcrypt |
+| **JWT_SECRET** | requerido desde entorno (`Consts.JWT_SECRET`) |
+
+### Nota
+
+El BFF solo verifica firma (stateless, no consulta DB). El microservicio de autentificación (para profesores) verifica firma + DB. El BFF genera el JWT para estudiantes directamente porque su microservicio no maneja autenticación.
 
 ---
 

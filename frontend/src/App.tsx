@@ -1,12 +1,12 @@
 import React, { FC, ReactElement } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import WelcomePage from './pages/home/index';
-import LoginForm from './pages/login/index';
-import ProtectedRoute from './pages/auth/ProtectedRoute';
-import StudentDashboard from './pages/student/dashboard/index';
-import ProfessorDashboard from './pages/professor/dashboard/index';
-import SubjectDetail from './shared/courses/SubjectDetail';
-import { useAuthStore } from './pages/auth/auth.store';
+import LoginForm from './pages/auth/components/LoginForm';
+import ProtectedRoute from './pages/auth/components/ProtectedRoute';
+import StudentDashboard from './pages/estudiante/dashboard/index';
+import ProfessorDashboard from './pages/profesor/dashboard/index';
+import SubjectDetail from './pages/cursos/components/SubjectDetail';
+import { useAuthStore } from './pages/auth/store';
 
 const Dashboard: FC = (): ReactElement => {
   const role = useAuthStore((s) => s.role);

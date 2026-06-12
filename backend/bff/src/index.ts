@@ -6,12 +6,15 @@ import autentificacionRoutes from './routes/autentificacionRoutes.js';
 import cursosRoutes from './routes/cursosRoutes.js';
 import clasesRoutes from './routes/clasesRoutes.js';
 import horariosRoutes from './routes/horariosRoutes.js';
+import asistenciaRoutes from './routes/asistenciaRoutes.js';
 import openapiRoutes from './openapi.js';
+import { authMiddleware } from './middleware/auth.js'
+
 
 const app = new Hono();
 
 app.use('*', cors());
-
+app.use('/api/*', authMiddleware);
 app.route('/docs', openapiRoutes);
 
 app.route('/api/estudiantes', estudiantesRoutes);
@@ -20,6 +23,7 @@ app.route('/api/auth', autentificacionRoutes);
 app.route('/api/cursos', cursosRoutes);
 app.route('/api/clases', clasesRoutes);
 app.route('/api/horarios', horariosRoutes);
+app.route('/api/asistencia', asistenciaRoutes);
 
 app.get('/health', (c) => {
   return c.json({ status: 'BFF is running' });

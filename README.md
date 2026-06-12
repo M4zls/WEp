@@ -114,6 +114,7 @@ flowchart TB
     end
 
     subgraph BFF["BFF - Hono :3000"]
+        AuthMW["authMiddleware<br/>JWT verify en /api/*"]
         BFFRoutes["routes/*.ts"]
         OpenAPI["openapi.ts<br/>Swagger UI"]
     end
@@ -121,7 +122,9 @@ flowchart TB
     subgraph Microservices["Microservicios Backend"]
         Auth["Autentificación<br/>:3002"]
         Students["Estudiantes<br/>:3001"]
-        Clases["Clases y Horarios<br/>:3006"]
+        Horario["Horario<br/>:3007"]
+        Asistencia["Asistencia<br/>:3008"]
+        Clases["Clases<br/>:3006"]
         Teachers["Profesores<br/>:3004"]
         Courses["Cursos<br/>:3005"]
         Notif["Notificaciones<br/>:3003"]
@@ -144,6 +147,8 @@ flowchart TB
     BFFRoutes --> Courses
     BFFRoutes --> Notif
     BFFRoutes --> Clases
+    BFFRoutes --> Horario
+    BFFRoutes --> Asistencia
     Auth --> S1
     Students --> S2
     Teachers --> S3
@@ -153,21 +158,52 @@ flowchart TB
 ```
 
 - **Frontend**: aplicación React SPA que consume una sola API (el BFF)
-- **BFF**: única puerta de entrada para el frontend, orquesta los microservicios internos
-- **Microservicios**: 6 servicios independientes, cada uno con su propio schema de DB
+- **BFF**: única puerta de entrada para el frontend, orquesta los microservicios internos — middleware JWT valida cada request en `/api/*`
+- **Microservicios**: 8 servicios independientes, cada uno con su propio schema de DB
 - **Base de datos**: PostgreSQL con schemas aislados por microservicio
 
 ### Microservicios
 
 | Servicio | Puerto | Responsabilidad |
-|---|---|---|
-| **BFF** | 3000 | Orquestación — única API que consume el frontend |
+|---|---|---|---|
+| **BFF** | 3000 | Orquestación — única API que consume el frontend — valida JWT en `/api/*` |
+| **Horario** | 3007 | Horarios semanales y bloques fijos (08:00-16:00) |
+| **Asistencia** | 3008 | Registro de asistencia por clase y estudiante |
 | **Autentificación** | 3002 | Login, registro, manejo de sesiones JWT |
 | **Estudiantes** | 3001 | CRUD de estudiantes |
 | **Profesores** | 3004 | CRUD de profesores |
 | **Cursos** | 3005 | Gestión de cursos, asignaturas y asignaciones |
-| **Clases y Horarios** | 3006 | Gestión de clases y bloques horarios |
+| **Clases** | 3006 | Gestión de clases |
+| **Horario** | 3007 | Bloques horarios fijos (08:00-16:00) |
+| **Asistencia** | 3008 | Registro de asistencia por clase y estudiante |
 | **Notificaciones** | 3003 | Notificaciones del sistema |
+
+---
+
+## Autenticación JWT
+
+Todas las rutas `/api/*` del BFF están protegidas por un middleware JWT (`backend/bff/src/middleware/auth.ts`).
+
+| Concepto | Detalle |
+|---|---|
+| **Algoritmo** | HS256 (HMAC-SHA256) |
+| **Secret** | `JWT_SECRET` env var — fallback `colegio_ohiggins_secret_changeme` |
+| **Rutas públicas** | `/api/auth/login`, `/api/auth/register`, `/api/estudiantes/login`, `/health`, `/docs` |
+| **Header esperado** | `Authorization: Bearer <token>` |
+| **Respuesta 401** | `{ error: "Token no proporcionado" }` o `{ error: "Token inválido o expirado" }` |
+
+### Flujo
+
+1. **Login** (ruta pública) → el BFF o microservicio genera y devuelve un JWT
+2. **Frontend** guarda el token en `sessionStorage` clave `'token'`
+3. **Cada request** → `apiClient.ts` lee el token y lo inyecta en el header `Authorization`
+4. **BFF** verifica la firma con `hono/jwt.verify()` — si es inválido responde 401
+5. El **payload** decodificado queda disponible como `c.get('user')` en las rutas
+
+### Generación de tokens
+
+- **Profesores**: el microservicio de autentificación genera el JWT en `POST /api/auth/login`
+- **Estudiantes**: el BFF genera el JWT en `POST /api/estudiantes/login` (el microservicio de estudiantes no maneja auth)
 
 ---
 
@@ -189,12 +225,14 @@ Wep/
 ├── frontend/           → Aplicación React (Vite + TailwindCSS + Zustand)
 ├── backend/
 │   ├── bff/            → Backend for Frontend (Hono + Zod OpenAPI)
-│   └── microservicios/ → 6 microservicios independientes
+│   └── microservicios/ → 8 microservicios independientes
 │       ├── autentificacion/
 │       ├── estudiantes/
 │       ├── profesores/
 │       ├── cursos/
 │       ├── clases/
+│       ├── horario/
+│       ├── asistencia/
 │       └── notificaciones/
 ├── docker-compose.yml  → Orquestación de todos los servicios
 └── README.md

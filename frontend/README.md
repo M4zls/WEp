@@ -31,7 +31,7 @@ src/
 │   ├── student/             → Dashboard y servicio de estudiantes
 │   └── professor/           → Dashboard del profesor
 ├── shared/                  ← Recursos compartidos
-│   ├── api/apiClient.ts     → Cliente HTTP singleton con JWT
+│   ├── api/apiClient.ts     → Cliente HTTP singleton — lee JWT de sessionStorage y lo inyecta en cada request
 │   ├── layout/              → DashboardLayout y Sidebar
 │   ├── courses/             → Servicio de cursos, SubjectDetail, modales
 │   ├── clases/              → Servicios y tipos de clases y horarios
@@ -81,10 +81,25 @@ PORT=8081                    # Puerto del dev server
 
 ---
 
+## Flujo JWT
+
+1. **Login**: `pages/login/index.tsx` llama al BFF, recibe `{ ..., token }`
+2. **Persistencia**: el token se guarda en `sessionStorage.setItem('token', token)` — tanto para estudiantes como profesores
+3. **Inyección automática**: `shared/api/apiClient.ts`:
+   ```ts
+   const token = authService.getToken();   // sessionStorage.getItem('token')
+   if (token) headers.Authorization = `Bearer ${token}`;
+   ```
+4. **BFF valida**: el middleware del BFF verifica la firma del token en cada request a `/api/*`
+5. **401**: si el token falta o es inválido, el BFF responde con error y el frontend redirige al login
+
+---
+
 ## Convenciones
 
 - **Rutas**: definidas como constantes en `config/routes.ts`
-- **API Client**: singleton genérico que inyecta `Authorization` header automáticamente
+- **API Client**: singleton genérico en `shared/api/apiClient.ts` — lee el token de `sessionStorage` y lo inyecta como `Authorization: Bearer <token>`
+- **Token JWT**: se guarda en `sessionStorage.setItem('token', token)` al hacer login (estudiante o profesor)
 - **Estado global**: Zustand con middleware `persist` para sesión de usuario
 - **Estilos**: TailwindCSS utility-first
 - **Organización**: feature-based en `pages/`, componentes compartidos en `shared/`

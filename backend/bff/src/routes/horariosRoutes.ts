@@ -2,12 +2,12 @@ import { Hono } from 'hono';
 
 const app = new Hono();
 
-const CLASES_SERVICE = process.env.CLASES_SERVICE || 'http://localhost:3006';
+const HORARIO_SERVICE = process.env.HORARIO_SERVICE || 'http://localhost:3007';
 
 app.get('/', async (c) => {
   try {
     const cursoAsignaturaId = c.req.query('curso_asignatura_id');
-    let url = `${CLASES_SERVICE}/horarios`;
+    let url = `${HORARIO_SERVICE}/horarios`;
     if (cursoAsignaturaId) url += `?curso_asignatura_id=${cursoAsignaturaId}`;
     const response = await fetch(url);
     const data = await response.json();
@@ -20,7 +20,7 @@ app.get('/', async (c) => {
 app.get('/:id', async (c) => {
   try {
     const id = c.req.param('id');
-    const response = await fetch(`${CLASES_SERVICE}/horarios/${id}`);
+    const response = await fetch(`${HORARIO_SERVICE}/horarios/${id}`);
     const data = await response.json();
     return c.json(data, response.status as any);
   } catch (error) {
@@ -31,7 +31,7 @@ app.get('/:id', async (c) => {
 app.post('/', async (c) => {
   try {
     const body = await c.req.json();
-    const response = await fetch(`${CLASES_SERVICE}/horarios`, {
+    const response = await fetch(`${HORARIO_SERVICE}/horarios`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -47,7 +47,7 @@ app.put('/:id', async (c) => {
   try {
     const id = c.req.param('id');
     const body = await c.req.json();
-    const response = await fetch(`${CLASES_SERVICE}/horarios/${id}`, {
+    const response = await fetch(`${HORARIO_SERVICE}/horarios/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -62,7 +62,7 @@ app.put('/:id', async (c) => {
 app.delete('/:id', async (c) => {
   try {
     const id = c.req.param('id');
-    const response = await fetch(`${CLASES_SERVICE}/horarios/${id}`, {
+    const response = await fetch(`${HORARIO_SERVICE}/horarios/${id}`, {
       method: 'DELETE',
     });
     const data = await response.json();
