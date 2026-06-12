@@ -14,7 +14,7 @@ openapi.doc('/doc', {
   servers: [{ url: 'http://localhost:3000', description: 'BFF local' }],
 });
 
-openapi.get('/ui', swaggerUI({ url: '/doc' }));
+openapi.get('/ui', swaggerUI({ url: '/docs/doc' }));
 
 // POST /api/auth/login
 openapi.openapi(

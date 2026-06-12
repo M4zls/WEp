@@ -1,9 +1,11 @@
 import { Hono } from 'hono';
+import { sign } from 'hono/jwt';
 import { loginBffSchema } from '../dtos/BffDto.js';
 
 const app = new Hono();
 
 const ESTUDIANTES_SERVICE = process.env.ESTUDIANTES_SERVICE || 'http://localhost:3001';
+const JWT_SECRET = process.env.JWT_SECRET ?? 'colegio_ohiggins_secret_changeme';
 
 app.post('/login', async (c) => {
   try {
@@ -19,7 +21,22 @@ app.post('/login', async (c) => {
       body: JSON.stringify(body),
     });
     const data = await response.json();
-    return c.json(data, response.status as any);
+    if (!response.ok) return c.json(data, response.status as any);
+
+    const token = await sign(
+      {
+        sub: data.rut,
+        email: data.email,
+        rut: data.rut,
+        rol: 'estudiante',
+        nombre: data.nombre,
+        apellido: data.apellido,
+        exp: Math.floor(Date.now() / 1000) + 86400,
+      },
+      JWT_SECRET,
+    );
+
+    return c.json({ ...data, token });
   } catch (error) {
     return c.json({ error: 'Error during student login' }, 500);
   }

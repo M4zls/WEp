@@ -1,4 +1,5 @@
-import '../drizzle/migrate.ts';
+import '../drizzle/migrate.js';
+import '../drizzle/seed.js';
 import { Hono } from 'hono'
 import { cors } from 'hono/cors';
 import { estudianteController } from './controllers/EstudiantesController.js';

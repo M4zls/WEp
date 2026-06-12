@@ -1,11 +1,12 @@
 import React, { FC, ReactElement } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import WelcomePage from './features/welcome/WelcomePage';
-import LoginForm from './features/auth/LoginForm';
-import ProtectedRoute from './features/auth/ProtectedRoute';
-import StudentDashboard from './features/student/StudentDashboard';
-import ProfessorDashboard from './features/professor/ProfessorDashboard';
-import { useAuthStore } from './features/auth/auth.store';
+import WelcomePage from './pages/home/index';
+import LoginForm from './pages/auth/components/LoginForm';
+import ProtectedRoute from './pages/auth/components/ProtectedRoute';
+import StudentDashboard from './pages/estudiante/dashboard/index';
+import ProfessorDashboard from './pages/profesor/dashboard/index';
+import SubjectDetail from './pages/cursos/components/SubjectDetail';
+import { useAuthStore } from './pages/auth/store';
 
 const Dashboard: FC = (): ReactElement => {
   const role = useAuthStore((s) => s.role);
@@ -28,6 +29,14 @@ const App: FC = (): ReactElement => {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/materia/:cursoAsignaturaId"
+          element={
+            <ProtectedRoute>
+              <SubjectDetail />
             </ProtectedRoute>
           }
         />
