@@ -4,6 +4,8 @@ import auth from './controllers/AuthController.js';
 
 const app = new Hono()
 
+app.get('/health', (c) => c.json({ status: 'ok' }))
+
 app.route('/auth', auth)
 
 const port = Number(process.env.PORT ?? '3002')
