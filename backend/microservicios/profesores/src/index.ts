@@ -7,6 +7,8 @@ import { profesoresController } from './controllers/ProfesoresController.js';
 const app = new Hono()
 
 app.use(cors());
+app.get('/health', (c) => c.json({ status: 'ok' }));
+
 app.route('/profesores', profesoresController);
 
 const port = Number(process.env.PORT ?? '3004');
