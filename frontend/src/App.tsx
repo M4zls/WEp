@@ -1,6 +1,6 @@
 import React, { FC, ReactElement } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import WelcomePage from './pages/home/index';
+import WelcomePage from './pages/welcome/index';
 import LoginForm from './pages/auth/components/LoginForm';
 import ProtectedRoute from './pages/auth/components/ProtectedRoute';
 import StudentDashboard from './pages/estudiante/dashboard/index';

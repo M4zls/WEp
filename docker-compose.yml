@@ -146,6 +146,7 @@ services:
       - CLASES_SERVICE=http://clases:3006
       - HORARIO_SERVICE=http://horario:3007
       - ASISTENCIA_SERVICE=http://asistencia:3008
+      - MENSAJERIA_SERVICE=http://mensajeria:3009
     depends_on:
       - autentificacion
       - estudiantes
@@ -155,6 +156,7 @@ services:
       - clases
       - horario
       - asistencia
+      - mensajeria
     networks:
       - wep-network
 
@@ -187,6 +189,24 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3008
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Mensajería
+  mensajeria:
+    build:
+      context: ./backend/microservicios/mensajeria
+      dockerfile: Dockerfile
+    container_name: mensajeria-service
+    ports:
+      - "3009:3009"
+    environment:
+      - NODE_ENV=production
+      - PORT=3009
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
     depends_on:
       db:
