@@ -1,4 +1,4 @@
-import '../drizzle/migrate.ts';
+﻿import '../drizzle/migrate.ts';
 import '../drizzle/seed.ts';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -7,6 +7,7 @@ import { horariosController } from './controllers/HorariosController.js';
 const app = new Hono();
 
 app.use(cors());
+app.get('/health', (c) => c.json({ status: 'ok' }));
 app.route('/horarios', horariosController);
 
 const port = Number(process.env.PORT ?? '3007');
@@ -17,3 +18,4 @@ Bun.serve({
 });
 
 console.log(`Microservicio Horario running on http://localhost:${port}`);
+

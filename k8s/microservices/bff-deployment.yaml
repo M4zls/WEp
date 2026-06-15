@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bff
@@ -16,7 +16,7 @@ spec:
       containers:
       - name: bff
         image: wep-bff:latest
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
         env:
@@ -52,6 +52,21 @@ spec:
             configMapKeyRef:
               name: wep-config
               key: CURSOS_SERVICE
+        - name: CLASES_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: CLASES_SERVICE
+        - name: HORARIO_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: HORARIO_SERVICE
+        - name: ASISTENCIA_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: ASISTENCIA_SERVICE
         livenessProbe:
           httpGet:
             path: /health
@@ -78,3 +93,4 @@ spec:
     port: 3000
     targetPort: 3000
   type: LoadBalancer
+

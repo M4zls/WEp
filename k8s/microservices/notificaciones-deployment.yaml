@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: notificaciones
@@ -16,7 +16,7 @@ spec:
       containers:
       - name: notificaciones
         image: wep-notificaciones:latest
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3003
         env:
