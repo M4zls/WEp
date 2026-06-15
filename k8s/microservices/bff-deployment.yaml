@@ -52,6 +52,26 @@ spec:
             configMapKeyRef:
               name: wep-config
               key: CURSOS_SERVICE
+        - name: CLASES_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: CLASES_SERVICE
+        - name: HORARIO_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: HORARIO_SERVICE
+        - name: ASISTENCIA_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: ASISTENCIA_SERVICE
+        - name: MENSAJERIA_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: MENSAJERIA_SERVICE
         livenessProbe:
           httpGet:
             path: /health

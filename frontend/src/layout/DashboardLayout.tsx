@@ -1,6 +1,8 @@
 import React, { FC, ReactElement, useState } from 'react';
 import Sidebar from './Sidebar';
 import HomeView from '../pages/dashboard/home/index';
+import PerfilPage from '../pages/perfil/index';
+import MensajeriaPage from '../pages/mensajeria/index';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -60,6 +62,10 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, o
         <div className="max-w-5xl mx-auto py-8 px-6">
           {selectedSection === 'inicio' ? (
             <HomeView role={role} userData={userData} onGoToSubjects={() => setSelectedSection(role === 'estudiante' ? 'clases' : 'cursos')} />
+          ) : selectedSection === 'perfil' ? (
+            <PerfilPage userData={userData} role={role} />
+          ) : selectedSection === 'mensajeria' ? (
+            <MensajeriaPage />
           ) : subjectSections.includes(selectedSection) ? (
             children
           ) : (

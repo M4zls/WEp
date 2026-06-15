@@ -6,7 +6,15 @@ interface RequestOptions extends RequestInit {
   headers?: Record<string, string>;
 }
 
+/** Cliente HTTP base para todas las llamadas a la API del BFF.
+ * Incluye automáticamente el token JWT en cada petición. */
 class ApiClient {
+  /**
+   * Realiza una petición HTTP genérica.
+   * @param endpoint - Ruta relativa (se concatena con API_BASE_URL).
+   * @param options - Opciones de fetch (method, body, headers, etc.).
+   * @throws Error si la respuesta HTTP no es exitosa.
+   */
   async request(
     endpoint: string,
     options: RequestOptions = {}
@@ -40,10 +48,12 @@ class ApiClient {
     }
   }
 
+  /** Petición GET. */
   get(endpoint: string, options?: RequestOptions): Promise<any> {
     return this.request(endpoint, { ...options, method: 'GET' });
   }
 
+  /** Petición POST con cuerpo JSON. */
   post(endpoint: string, data: any, options?: RequestOptions): Promise<any> {
     return this.request(endpoint, {
       ...options,
@@ -52,6 +62,7 @@ class ApiClient {
     });
   }
 
+  /** Petición PUT con cuerpo JSON. */
   put(endpoint: string, data: any, options?: RequestOptions): Promise<any> {
     return this.request(endpoint, {
       ...options,
@@ -60,6 +71,7 @@ class ApiClient {
     });
   }
 
+  /** Petición DELETE. */
   delete(endpoint: string, options?: RequestOptions): Promise<any> {
     return this.request(endpoint, { ...options, method: 'DELETE' });
   }
