@@ -100,22 +100,26 @@ const SCHEDULE: [number, number, number][] = [
 ];
 
 async function seed() {
-  const existing = await sql`SELECT COUNT(*) as count FROM "horario"."horarios"`;
-  if (existing[0].count > 0) {
-    console.log('Ya hay horarios cargados, saltando seed.');
+  try {
+    const existing = await sql`SELECT COUNT(*) as count FROM "horario"."horarios"`;
+    if (existing[0].count > 0) {
+      console.log('Ya hay horarios cargados, saltando seed.');
+      return;
+    }
+
+    for (const [caId, dia, bloqueIdx] of SCHEDULE) {
+      await sql`
+        INSERT INTO "horario"."horarios" (curso_asignatura_id, dia_semana, hora_inicio, hora_termino)
+        VALUES (${caId}, ${dia}, ${BLOQUES[bloqueIdx].horaInicio}, ${BLOQUES[bloqueIdx].horaTermino})
+      `;
+    }
+
+    console.log(`Seed completado: ${SCHEDULE.length} bloques horarios creados.`);
+  } catch (error) {
+    console.error('Error en seed:', error);
+  } finally {
     await sql.end();
-    return;
   }
-
-  for (const [caId, dia, bloqueIdx] of SCHEDULE) {
-    await sql`
-      INSERT INTO "horario"."horarios" (curso_asignatura_id, dia_semana, hora_inicio, hora_termino)
-      VALUES (${caId}, ${dia}, ${BLOQUES[bloqueIdx].horaInicio}, ${BLOQUES[bloqueIdx].horaTermino})
-    `;
-  }
-
-  console.log(`Seed completado: ${SCHEDULE.length} bloques horarios creados.`);
-  await sql.end();
 }
 
-seed();
+await seed();

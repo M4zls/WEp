@@ -29,17 +29,22 @@ const ASIGNACIONES: [number, number][] = [
 ];
 
 async function seed() {
-  let actualizados = 0;
-  for (const [caId, profId] of ASIGNACIONES) {
-    const result = await sql`
-      UPDATE "cursos"."curso_asignatura"
-      SET profesor_id = ${profId}
-      WHERE id = ${caId}
-    `;
-    actualizados += result.count;
+  try {
+    let actualizados = 0;
+    for (const [caId, profId] of ASIGNACIONES) {
+      const result = await sql`
+        UPDATE "cursos"."curso_asignatura"
+        SET profesor_id = ${profId}
+        WHERE id = ${caId}
+      `;
+      actualizados += result.count;
+    }
+    console.log(`Seed completado: ${actualizados} curso_asignatura actualizados.`);
+  } catch (error) {
+    console.error('Error en seed:', error);
+  } finally {
+    await sql.end();
   }
-  console.log(`Seed completado: ${actualizados} curso_asignatura actualizados.`);
-  await sql.end();
 }
 
-seed();
+await seed();

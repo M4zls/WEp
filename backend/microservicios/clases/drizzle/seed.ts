@@ -76,22 +76,26 @@ const NUEVAS_CLASES = [
 ];
 
 async function seed() {
-  const existing = await sql`SELECT COUNT(*) as count FROM "clases"."clases"`;
-  if (existing[0].count > 23) {
-    console.log('Ya hay clases cargadas, saltando seed.');
+  try {
+    const existing = await sql`SELECT COUNT(*) as count FROM "clases"."clases"`;
+    if (existing[0].count > 23) {
+      console.log('Ya hay clases cargadas, saltando seed.');
+      return;
+    }
+
+    for (const c of NUEVAS_CLASES) {
+      await sql`
+        INSERT INTO "clases"."clases" (curso_asignatura_id, titulo, fecha, hora_inicio, hora_termino, estado)
+        VALUES (${c.caId}, ${c.titulo}, ${c.fecha}, ${c.horaInicio}, ${c.horaTermino}, ${c.estado})
+      `;
+    }
+
+    console.log(`Seed completado: ${NUEVAS_CLASES.length} nuevas clases creadas.`);
+  } catch (error) {
+    console.error('Error en seed:', error);
+  } finally {
     await sql.end();
-    return;
   }
-
-  for (const c of NUEVAS_CLASES) {
-    await sql`
-      INSERT INTO "clases"."clases" (curso_asignatura_id, titulo, fecha, hora_inicio, hora_termino, estado)
-      VALUES (${c.caId}, ${c.titulo}, ${c.fecha}, ${c.horaInicio}, ${c.horaTermino}, ${c.estado})
-    `;
-  }
-
-  console.log(`Seed completado: ${NUEVAS_CLASES.length} nuevas clases creadas.`);
-  await sql.end();
 }
 
-seed();
+await seed();

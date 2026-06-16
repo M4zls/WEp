@@ -25,27 +25,32 @@ const PROFESORES_AUTH = [
 ];
 
 async function seed() {
-  const hashedPassword = await hashPassword('123456');
-  let total = 0;
+  try {
+    const hashedPassword = await hashPassword('123456');
+    let total = 0;
 
-  for (const p of PROFESORES_AUTH) {
-    const result = await sql`
-      INSERT INTO "autentificacion"."usuarios" (rut, dv, nombre, apellido, email, password, rol)
-      VALUES (${p.rut}, ${p.dv}, ${p.nombre}, ${p.apellido}, ${p.email}, ${hashedPassword}, 'profesor')
-      ON CONFLICT (rut) DO UPDATE SET
-        nombre = EXCLUDED.nombre,
-        apellido = EXCLUDED.apellido,
-        email = EXCLUDED.email,
-        password = EXCLUDED.password,
-        rol = 'profesor',
-        activo = true
-      RETURNING id
-    `;
-    if (result.length > 0) total++;
+    for (const p of PROFESORES_AUTH) {
+      const result = await sql`
+        INSERT INTO "autentificacion"."usuarios" (rut, dv, nombre, apellido, email, password, rol)
+        VALUES (${p.rut}, ${p.dv}, ${p.nombre}, ${p.apellido}, ${p.email}, ${hashedPassword}, 'profesor')
+        ON CONFLICT (rut) DO UPDATE SET
+          nombre = EXCLUDED.nombre,
+          apellido = EXCLUDED.apellido,
+          email = EXCLUDED.email,
+          password = EXCLUDED.password,
+          rol = 'profesor',
+          activo = true
+        RETURNING id
+      `;
+      if (result.length > 0) total++;
+    }
+
+    console.log(`Seed completado: ${total} profesores sincronizados en auth.`);
+  } catch (error) {
+    console.error('Error en seed:', error);
+  } finally {
+    await sql.end();
   }
-
-  console.log(`Seed completado: ${total} profesores sincronizados en auth.`);
-  await sql.end();
 }
 
-seed();
+await seed();

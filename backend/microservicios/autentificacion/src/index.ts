@@ -1,5 +1,4 @@
 import '../drizzle/migrate.js';
-import '../drizzle/seed.js';
 import { Hono } from 'hono'
 import auth from './controllers/AuthController.js';
 

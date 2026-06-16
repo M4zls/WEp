@@ -35,22 +35,26 @@ const NUEVOS_ESTUDIANTES = [
 ];
 
 async function seed() {
-  const existing = await sql`SELECT COUNT(*) as count FROM "estudiantes"."estudiantes"`;
-  if (existing[0].count > 10) {
-    console.log('Ya hay estudiantes cargados, saltando seed.');
+  try {
+    const existing = await sql`SELECT COUNT(*) as count FROM "estudiantes"."estudiantes"`;
+    if (existing[0].count > 10) {
+      console.log('Ya hay estudiantes cargados, saltando seed.');
+      return;
+    }
+
+    for (const e of NUEVOS_ESTUDIANTES) {
+      await sql`
+        INSERT INTO "estudiantes"."estudiantes" (rut, dv, nombre, apellido, cursos, email, password)
+        VALUES (${e.rut}, ${e.dv}, ${e.nombre}, ${e.apellido}, ${e.cursos}, ${e.email}, '123456')
+      `;
+    }
+
+    console.log(`Seed completado: ${NUEVOS_ESTUDIANTES.length} nuevos estudiantes creados.`);
+  } catch (error) {
+    console.error('Error en seed:', error);
+  } finally {
     await sql.end();
-    return;
   }
-
-  for (const e of NUEVOS_ESTUDIANTES) {
-    await sql`
-      INSERT INTO "estudiantes"."estudiantes" (rut, dv, nombre, apellido, cursos, email, password)
-      VALUES (${e.rut}, ${e.dv}, ${e.nombre}, ${e.apellido}, ${e.cursos}, ${e.email}, '123456')
-    `;
-  }
-
-  console.log(`Seed completado: ${NUEVOS_ESTUDIANTES.length} nuevos estudiantes creados.`);
-  await sql.end();
 }
 
-seed();
+await seed();

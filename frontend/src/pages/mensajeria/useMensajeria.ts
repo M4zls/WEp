@@ -159,6 +159,18 @@ export function useMensajeria() {
               });
             }
           }
+          const companeros = await courseService.obtenerEstudiantesPorCurso(cursoNombre);
+          for (const c of companeros) {
+            if (c.rut !== usuarioId) {
+              lista.push({
+                id: c.rut,
+                nombre: c.nombre,
+                apellido: c.apellido,
+                rol: 'estudiante',
+                contexto: miCurso.nombre,
+              });
+            }
+          }
         }
       } else if (usuarioRol === 'profesor') {
         const profesorRut = user?.rut;

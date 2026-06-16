@@ -96,7 +96,7 @@ export class MensajeriaRepository {
 
     return convIds.map((convId, i) => ({
       id: convId,
-      otherParticipant: allParticipants.find((p) => p.usuarioId !== usuarioId),
+      otherParticipant: allParticipants.find((p) => p.conversacionId === convId && p.usuarioId !== usuarioId),
       ultimoMensaje: ultimosMensajes[i],
       noLeidos: noLeidos[i],
       createdAt: userConvs.find((c) => c.conversacionId === convId) ? null : null,
