@@ -101,11 +101,14 @@ const StudentDashboard: FC = (): ReactElement => {
 
   return (
     <DashboardLayout userData={userData} role="estudiante" onLogout={handleLogout} defaultSection={locationState?.section}>
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-slate-800">Mis Asignaturas</h3>
-        <p className="text-sm text-slate-500 mt-1">
-          {curso ? `Curso: ${curso.nombre}` : 'Curso no asignado'}
-        </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-800">Mis Asignaturas</h3>
+          <p className="text-sm text-slate-500 mt-1">
+            {curso ? `Curso: ${curso.nombre}` : 'Curso no asignado'}
+          </p>
+        </div>
+
       </div>
 
       {loading ? (

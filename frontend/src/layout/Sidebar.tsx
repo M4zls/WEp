@@ -9,23 +9,32 @@ interface SidebarProps {
   role?: 'estudiante' | 'profesor';
 }
 
-const baseNavItems = [
-  { id: 'inicio', label: 'Inicio', icon: '🏠' },
-  { id: 'notificaciones', label: 'Notificaciones', icon: '🔔' },
-  { id: 'mensajeria', label: 'Mensajería', icon: '✉️' },
-  { id: 'contacto', label: 'Contacto', icon: '📞' },
-  { id: 'perfil', label: 'Perfil', icon: '👤' },
-];
-
-const getNavItems = (role?: string) => {
-  const secondItem = role === 'estudiante'
-    ? { id: 'clases', label: 'Clases', icon: '📚' }
-    : { id: 'cursos', label: 'Cursos', icon: '📚' };
-  return [baseNavItems[0], secondItem, ...baseNavItems.slice(1)];
-};
-
 const Sidebar: FC<SidebarProps> = ({ selectedSection, onSectionChange, onLogout, userName, userInitials, role }): ReactElement => {
-  const navItems = getNavItems(role);
+
+  const baseNavItems = [
+    { id: 'inicio', label: 'Inicio', icon: '🏠' },
+    { id: 'notificaciones', label: 'Notificaciones', icon: '🔔' },
+    { id: 'mensajeria', label: 'Mensajería', icon: '✉️' },
+    { id: 'contacto', label: 'Contacto', icon: '📞' },
+    { id: 'perfil', label: 'Perfil', icon: '👤' },
+  ];
+
+  const getNavItems = () => {
+    const items = [];
+    items.push(baseNavItems[0]);
+    if (role === 'estudiante') {
+      items.push({ id: 'clases', label: 'Clases', icon: '📚' });
+      items.push({ id: 'calificaciones', label: 'Calificaciones', icon: '📊' });
+    } else {
+      items.push({ id: 'cursos', label: 'Cursos', icon: '📚' });
+      items.push({ id: 'gestion-notas', label: 'Gestión de Notas', icon: '📝' });
+    }
+    items.push(...baseNavItems.slice(1));
+    return items;
+  };
+
+  const navItems = getNavItems();
+
   return (
     <aside className="w-64 bg-slate-900 text-white flex flex-col h-screen sticky top-0">
       <div className="p-6 border-b border-slate-700">

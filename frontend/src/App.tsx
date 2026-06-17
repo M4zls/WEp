@@ -6,6 +6,8 @@ import ProtectedRoute from './pages/auth/components/ProtectedRoute';
 import StudentDashboard from './pages/estudiante/dashboard/index';
 import ProfessorDashboard from './pages/profesor/dashboard/index';
 import SubjectDetail from './pages/cursos/components/SubjectDetail';
+import CalificacionesPage from './pages/calificaciones/index';
+import GestionNotasPage from './pages/calificaciones/gestion/index';
 import { useAuthStore } from './pages/auth/store';
 
 const Dashboard: FC = (): ReactElement => {
@@ -37,6 +39,22 @@ const App: FC = (): ReactElement => {
           element={
             <ProtectedRoute>
               <SubjectDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/calificaciones"
+          element={
+            <ProtectedRoute>
+              <CalificacionesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/gestion-notas"
+          element={
+            <ProtectedRoute>
+              <GestionNotasPage />
             </ProtectedRoute>
           }
         />

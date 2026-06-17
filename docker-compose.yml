@@ -147,6 +147,7 @@ services:
       - HORARIO_SERVICE=http://horario:3007
       - ASISTENCIA_SERVICE=http://asistencia:3008
       - MENSAJERIA_SERVICE=http://mensajeria:3009
+      - NOTAS_SERVICE=http://notas:3010
     depends_on:
       - autentificacion
       - estudiantes
@@ -157,6 +158,7 @@ services:
       - horario
       - asistencia
       - mensajeria
+      - notas
     networks:
       - wep-network
 
@@ -207,6 +209,24 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3009
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Notas
+  notas:
+    build:
+      context: ./backend/microservicios/notas
+      dockerfile: Dockerfile
+    container_name: notas-service
+    ports:
+      - "3010:3010"
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
     depends_on:
       db:

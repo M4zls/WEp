@@ -3,6 +3,8 @@ import Sidebar from './Sidebar';
 import HomeView from '../pages/dashboard/home/index';
 import PerfilPage from '../pages/perfil/index';
 import MensajeriaPage from '../pages/mensajeria/index';
+import CalificacionesView from '../pages/calificaciones/CalificacionesView';
+import GestionNotasView from '../pages/calificaciones/GestionNotasView';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -66,6 +68,10 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, o
             <PerfilPage userData={userData} role={role} />
           ) : selectedSection === 'mensajeria' ? (
             <MensajeriaPage />
+          ) : selectedSection === 'calificaciones' && role === 'estudiante' ? (
+            <CalificacionesView />
+          ) : selectedSection === 'gestion-notas' && role === 'profesor' ? (
+            <GestionNotasView />
           ) : subjectSections.includes(selectedSection) ? (
             children
           ) : (
