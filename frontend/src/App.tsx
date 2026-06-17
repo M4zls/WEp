@@ -11,7 +11,10 @@ import GestionNotasPage from './pages/calificaciones/gestion/index';
 import { useAuthStore } from './pages/auth/store';
 
 const Dashboard: FC = (): ReactElement => {
-  const role = useAuthStore((s) => s.role);
+  const storeRole = useAuthStore((s) => s.role);
+  const sessionRole = sessionStorage.getItem('role');
+  const sessionUser = sessionStorage.getItem('user');
+  const role = sessionUser ? sessionRole : storeRole;
 
   if (role === 'profesor') {
     return <ProfessorDashboard />;
