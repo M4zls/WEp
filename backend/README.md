@@ -55,6 +55,7 @@ src/
 | **Horario** | 3007 | `horario` | Bloques horarios fijos (08:00-16:00) |
 | **Asistencia** | 3008 | `asistencia` | Registro de asistencia por clase y estudiante |
 | **Notificaciones** | 3003 | `notificaciones` | Notificaciones del sistema |
+| **Notas** | 3010 | `notas` | Gestión de calificaciones de alumnos |
 
 ---
 

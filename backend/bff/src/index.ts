@@ -8,6 +8,7 @@ import clasesRoutes from './routes/clasesRoutes.js';
 import horariosRoutes from './routes/horariosRoutes.js';
 import asistenciaRoutes from './routes/asistenciaRoutes.js';
 import mensajeriaRoutes from './routes/mensajeriaRoutes.js';
+import notasRoutes from './routes/notasRoutes.js';
 import openapiRoutes from './openapi.js';
 import { authMiddleware } from './middleware/auth.js'
 
@@ -26,6 +27,7 @@ app.route('/api/clases', clasesRoutes);
 app.route('/api/horarios', horariosRoutes);
 app.route('/api/asistencia', asistenciaRoutes);
 app.route('/api/mensajeria', mensajeriaRoutes);
+app.route('/api/notas', notasRoutes);
 
 app.get('/health', (c) => {
   return c.json({ status: 'BFF is running' });
