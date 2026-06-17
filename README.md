@@ -46,6 +46,7 @@ cd ../profesores && bun install
 cd ../cursos && bun install
 cd ../clases && bun install
 cd ../notificaciones && bun install
+cd ../notas && bun install
 
 # BFF
 cd ../../bff && bun install
@@ -77,6 +78,7 @@ cd ../profesores && bun run seed
 cd ../cursos && bun run seed
 cd ../clases && bun run seed
 cd ../notificaciones && bun run seed
+cd ../notas && bun run seed
 ```
 
 ### 4. Iniciar los servicios
@@ -89,6 +91,7 @@ cd backend/microservicios/profesores && bun run dev        # :3004
 cd backend/microservicios/cursos && bun run dev            # :3005
 cd backend/microservicios/clases && bun run dev            # :3006
 cd backend/microservicios/notificaciones && bun run dev    # :3003
+cd backend/microservicios/notas && bun run dev             # :3010
 
 # BFF (única API que consume el frontend)
 cd backend/bff && bun run dev                              # :3000
@@ -128,6 +131,7 @@ flowchart TB
         Teachers["Profesores<br/>:3004"]
         Courses["Cursos<br/>:3005"]
         Notif["Notificaciones<br/>:3003"]
+        Notas["Notas<br/>:3010"]
     end
 
     subgraph DB["PostgreSQL 16 (5432)"]
@@ -137,6 +141,7 @@ flowchart TB
         S4["schema: cursos"]
         S5["schema: notificaciones"]
         S6["schema: clases"]
+        S7["schema: notas"]
     end
 
     Browser --> ReactApp
@@ -149,17 +154,19 @@ flowchart TB
     BFFRoutes --> Clases
     BFFRoutes --> Horario
     BFFRoutes --> Asistencia
+    BFFRoutes --> Notas
     Auth --> S1
     Students --> S2
     Teachers --> S3
     Courses --> S4
     Notif --> S5
     Clases --> S6
+    Notas --> S7
 ```
 
 - **Frontend**: aplicación React SPA que consume una sola API (el BFF)
 - **BFF**: única puerta de entrada para el frontend, orquesta los microservicios internos — middleware JWT valida cada request en `/api/*`
-- **Microservicios**: 8 servicios independientes, cada uno con su propio schema de DB
+- **Microservicios**: 9 servicios independientes, cada uno con su propio schema de DB
 - **Base de datos**: PostgreSQL con schemas aislados por microservicio
 
 ### Microservicios
@@ -177,6 +184,7 @@ flowchart TB
 | **Horario** | 3007 | Bloques horarios fijos (08:00-16:00) |
 | **Asistencia** | 3008 | Registro de asistencia por clase y estudiante |
 | **Notificaciones** | 3003 | Notificaciones del sistema |
+| **Notas** | 3010 | Gestión de calificaciones de alumnos |
 
 ---
 
@@ -225,7 +233,7 @@ Wep/
 ├── frontend/           → Aplicación React (Vite + TailwindCSS + Zustand)
 ├── backend/
 │   ├── bff/            → Backend for Frontend (Hono + Zod OpenAPI)
-│   └── microservicios/ → 8 microservicios independientes
+│   └── microservicios/ → 9 microservicios independientes
 │       ├── autentificacion/
 │       ├── estudiantes/
 │       ├── profesores/
@@ -233,7 +241,8 @@ Wep/
 │       ├── clases/
 │       ├── horario/
 │       ├── asistencia/
-│       └── notificaciones/
+│       ├── notificaciones/
+│       └── notas/
 ├── docker-compose.yml  → Orquestación de todos los servicios
 └── README.md
 ```
