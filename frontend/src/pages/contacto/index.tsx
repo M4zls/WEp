@@ -21,14 +21,14 @@ const colegio: { label: string; value: string }[] = [
 ];
 
 const inspectores: ContactoItem[] = [
-  { nombre: 'Roberto Muñoz', cargo: 'Inspector General', telefono: '+56 9 8765 4321', email: 'roberto.munoz@colegio.cl' },
-  { nombre: 'Carolina Rivas', cargo: 'Inspectora de Piso', telefono: '+56 9 7654 3210', email: 'carolina.rivas@colegio.cl' },
-  { nombre: 'Felipe Soto', cargo: 'Inspector de Patio', telefono: '+56 9 6543 2109', email: 'felipe.soto@colegio.cl' },
+  { nombre: 'Roberto Muñoz', cargo: 'Inspector General', telefono: '+56 9 8765 4321', email: 'roberto.munoz@colegiobo.cl' },
+  { nombre: 'Carolina Rivas', cargo: 'Inspectora de Piso', telefono: '+56 9 7654 3210', email: 'carolina.rivas@colegiobo.cl' },
+  { nombre: 'Felipe Soto', cargo: 'Inspector de Patio', telefono: '+56 9 6543 2109', email: 'felipe.soto@colegiobo.cl' },
 ];
 
 const secretarios: ContactoItem[] = [
-  { nombre: 'María José Torres', cargo: 'Secretaria Académica', telefono: '+56 9 5432 1098', email: 'maria.torres@colegio.cl' },
-  { nombre: 'Patricia Vega', cargo: 'Secretaria de Dirección', telefono: '+56 9 4321 0987', email: 'patricia.vega@colegio.cl' },
+  { nombre: 'María José Torres', cargo: 'Secretaria Académica', telefono: '+56 9 5432 1098', email: 'maria.torres@colegiobo.cl' },
+  { nombre: 'Patricia Vega', cargo: 'Secretaria de Dirección', telefono: '+56 9 4321 0987', email: 'patricia.vega@colegiobo.cl' },
 ];
 
 const ContactCard: FC<{ item: ContactoItem; color: string }> = ({ item, color }) => (
@@ -57,12 +57,12 @@ const ContactoPage: FC = (): ReactElement => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Directorio</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Contactos</h1>
         <p className="text-slate-500 text-sm mt-1">Contactos de emergencia e información institucional</p>
       </div>
 
       <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
-        <h2 className="text-lg font-bold mb-3">Colegio Ohiggins</h2>
+        <h2 className="text-lg font-bold mb-3">Colegio Bernando O'Higgins</h2>
         <div className="space-y-1.5 text-emerald-50 text-sm">
           {colegio.map((info) => (
             <p key={info.label}><span className="font-medium text-white">{info.label}:</span> {info.value}</p>

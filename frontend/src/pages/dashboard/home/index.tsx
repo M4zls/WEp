@@ -203,7 +203,7 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
 
       <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-800">Próximas Clases (7 días)</h3>
+          <h3 className="text-lg font-semibold text-slate-800">Próximas Clases</h3>
           <button
             onClick={onGoToSubjects}
             className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition"
@@ -236,7 +236,7 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
             ))}
           </div>
         ) : (
-          <p className="text-slate-400 text-sm text-center py-6">No hay clases programadas para los próximos 7 días</p>
+          <p className="text-slate-400 text-sm text-center py-6">No hay clases programadas para los próximos días</p>
         )}
       </div>
 
