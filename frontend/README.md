@@ -24,20 +24,15 @@ Aplicación web React que provee la interfaz de usuario para la gestión académ
 ```
 src/
 ├── pages/                   ← Organizado por funcionalidad de negocio
-│   ├── home/                → Página de bienvenida (WelcomePage)
-│   ├── login/               → Inicio de sesión (LoginForm)
-│   ├── auth/                → Servicio de auth, store Zustand, ProtectedRoute
-│   ├── dashboard/home/      → Dashboard principal con estadísticas
-│   ├── student/             → Dashboard y servicio de estudiantes
-│   └── professor/           → Dashboard del profesor
-├── shared/                  ← Recursos compartidos
-│   ├── api/apiClient.ts     → Cliente HTTP singleton — lee JWT de sessionStorage y lo inyecta en cada request
-│   ├── layout/              → DashboardLayout y Sidebar
-│   ├── courses/             → Servicio de cursos, SubjectDetail, modales
-│   ├── clases/              → Servicios y tipos de clases y horarios
-│   └── styles/index.css     → Estilos globales Tailwind
-├── config/routes.ts         → Constantes de rutas (ROUTES)
-├── common/utils.ts          → Utilidades generales
+│   ├── auth/                → LoginForm, store Zustand, ProtectedRoute
+│   ├── calificaciones/      → CalificacionesView, GestionNotasView
+│   ├── contacto/            → Directorio con emergencias, inspectores, secretarios
+│   ├── cursos/              → SubjectDetail, servicio de cursos
+│   ├── estudiante/          → Dashboard y servicio del estudiante
+│   ├── mensajeria/          → Bandeja de mensajes y conversaciones
+│   └── profesor/            → Dashboard del profesor
+├── layout/                  → DashboardLayout + Sidebar
+├── api/                     → apiClient.ts — inyecta JWT en cada request
 ├── __tests__/               → Tests unitarios (vitest)
 ├── App.tsx                  → Router principal (React Router v6)
 └── index.tsx                → Entry point
@@ -67,23 +62,41 @@ Los tests se encuentran en `src/__tests__/` e incluyen:
 
 ## Cómo Empezar
 
+### Desarrollo con Docker (backends) + Vite local (frontend)
+
+```bash
+# 1. Asegúrate de que Docker esté corriendo (docker compose up -d desde la raíz)
+# 2. Para el contenedor del frontend para liberar el puerto 8080
+docker compose stop frontend
+
+# 3. Inicia el dev server con hot-reload
+cd frontend
+npm install        # solo la primera vez
+npm run dev        # http://localhost:8081
+```
+
+El frontend se conecta automáticamente al BFF en `http://localhost:3000/api` (Docker) sin configuración adicional.
+
+### Solo frontend (mockeando API)
+
 ```bash
 cd frontend
 npm install
 npm run dev
+# http://localhost:8081
 ```
 
 ### Variables de Entorno
 
 ```env
-PORT=8081                    # Puerto del dev server
+PORT=8081                    # Puerto del dev server (vite.config.ts)
 ```
 
 ---
 
 ## Flujo JWT
 
-1. **Login**: `pages/login/index.tsx` llama al BFF, recibe `{ ..., token }`
+1. **Login**: `pages/auth/components/LoginForm.tsx` llama al BFF, recibe `{ ..., token }`
 2. **Persistencia**: el token se guarda en `sessionStorage.setItem('token', token)` — tanto para estudiantes como profesores
 3. **Inyección automática**: `shared/api/apiClient.ts`:
    ```ts
@@ -98,8 +111,8 @@ PORT=8081                    # Puerto del dev server
 ## Convenciones
 
 - **Rutas**: definidas como constantes en `config/routes.ts`
-- **API Client**: singleton genérico en `shared/api/apiClient.ts` — lee el token de `sessionStorage` y lo inyecta como `Authorization: Bearer <token>`
+- **API Client**: singleton genérico en `api/apiClient.ts` — lee el token de `sessionStorage` y lo inyecta como `Authorization: Bearer <token>`
 - **Token JWT**: se guarda en `sessionStorage.setItem('token', token)` al hacer login (estudiante o profesor)
 - **Estado global**: Zustand con middleware `persist` para sesión de usuario
 - **Estilos**: TailwindCSS utility-first
-- **Organización**: feature-based en `pages/`, componentes compartidos en `shared/`
+- **Organización**: feature-based en `pages/`, componentes compartidos en `layout/` y `api/`
