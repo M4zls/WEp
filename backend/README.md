@@ -6,14 +6,14 @@ Conjunto de microservicios que proveen la API para la gestión académica del Co
 
 ## Tecnologías
 
-| Tecnología | Versión | Propósito |
-|---|---|---|
-| **Bun** | 1.3.14 | Runtime JavaScript + test runner |
-| **Hono** | ^4.12.15 | Framework web ultraligero |
-| **TypeScript** | ^5.9.3 | Lenguaje con tipos |
-| **Drizzle ORM** | ^0.45.2 | ORM PostgreSQL type-safe |
-| **postgres.js** | ^3.4.9 | Driver PostgreSQL |
-| **Zod** | ^4.4.3 | Validación DTOs con inferencia de tipos |
+| Tecnología | Propósito |
+|---|---|
+| **Bun** | Runtime JavaScript + test runner |
+| **Hono** | Framework web ultraligero |
+| **TypeScript** | Lenguaje con tipos |
+| **Drizzle ORM** | ORM PostgreSQL type-safe |
+| **postgres.js** | Driver PostgreSQL |
+| **Zod** | Validación DTOs con inferencia de tipos |
 | **bcryptjs** | — | Hashing de contraseñas |
 | **JWT (hono/jwt)** | — | Autenticación con tokens firmados |
 
@@ -22,9 +22,10 @@ Conjunto de microservicios que proveen la API para la gestión académica del Co
 ## Arquitectura
 
 ```
-Frontend (:8080) → BFF (:3000) → [autentificacion, estudiantes, profesores, cursos, clases, notificaciones]
-                                                                                │
-                                                                        PostgreSQL 16 (:5432)
+Frontend (:8080 / :8081 dev) → BFF (:3000) → [autentificacion, estudiantes, profesores, cursos,
+    clases, horario, asistencia, notificaciones, notas, mensajeria]
+                                                         │
+                                                 PostgreSQL 16 (:5432 / host :5433)
 ```
 
 Cada microservicio sigue una arquitectura en capas:
@@ -45,16 +46,17 @@ src/
 ### Microservicios
 
 | Servicio | Puerto | Schema DB | Responsabilidad |
-|---|---|---|---|
+|---|---|---|---|---|
 | **BFF** | 3000 | — | BFF: única puerta de entrada del frontend |
-| **Autentificación** | 3002 | `autentificacion` | Login, registro, JWT, sesiones |
 | **Estudiantes** | 3001 | `estudiantes` | CRUD de estudiantes |
+| **Autentificación** | 3002 | `autentificacion` | Login, registro, JWT, sesiones |
+| **Notificaciones** | 3003 | `notificaciones` | Notificaciones del sistema |
 | **Profesores** | 3004 | `profesores` | CRUD de profesores |
 | **Cursos** | 3005 | `cursos` | Cursos, asignaturas, asignaciones |
 | **Clases** | 3006 | `clases` | Clases |
 | **Horario** | 3007 | `horario` | Bloques horarios fijos (08:00-16:00) |
 | **Asistencia** | 3008 | `asistencia` | Registro de asistencia por clase y estudiante |
-| **Notificaciones** | 3003 | `notificaciones` | Notificaciones del sistema |
+| **Mensajería** | 3009 | `mensajeria` | Mensajería interna entre usuarios |
 | **Notas** | 3010 | `notas` | Gestión de calificaciones de alumnos |
 
 ---
@@ -92,11 +94,31 @@ bun run dev
 Cada microservicio requiere:
 
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/wep
+# Dentro de Docker se usa el hostname del contenedor (db:5432)
+# Desde fuera del contenedor se usa localhost:5433
+DATABASE_URL_DEV=postgresql://postgres:postgres@localhost:5433/wep
 PORT=3000                    # Puerto del servicio
 JWT_SECRET=tu_secreto_jwt    # Solo autentificacion
 NOVU_SECRET_KEY=tu_key       # Solo notificaciones
 ```
+
+### Kubernetes
+
+Los manifests en `k8s/` despliegan cada microservicio como un Deployment + ClusterIP Service. Las imágenes se construyen con `docker compose build` (usa los mismos Dockerfiles).
+
+```bash
+# Construir imágenes
+docker compose build
+
+# Desplegar todo
+kubectl apply -f k8s/config/namespace.yaml
+kubectl apply -f k8s/config/secret.yaml
+kubectl apply -f k8s/config/configmap.yaml
+kubectl apply -f k8s/database/
+kubectl apply -f k8s/microservices/
+```
+
+> Los manifests usan `imagePullPolicy: Never` — para producción cambiá a `Always` y usá un container registry.
 
 ---
 

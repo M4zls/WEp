@@ -12,7 +12,8 @@ Plataforma web integral para la gestión académica del Colegio Bernardo O'Higgi
 | **React 18** | Librería de interfaz de usuario |
 | **Hono** | Framework web para microservicios |
 | **PostgreSQL 16** | Base de datos relacional |
-| **Docker Compose** | Orquestación de contenedores |
+| **Docker Compose** | Orquestación de contenedores (desarrollo) |
+| **Kubernetes** | Orquestación de contenedores (producción) — manifests en `k8s/` |
 | **Vitest** | Test runner del frontend |
 
 ---
@@ -26,6 +27,7 @@ Necesitás tener instalado lo siguiente en tu máquina:
 | **Bun** | 1.3.x | [bun.sh](https://bun.sh) — `powershell -c "irm bun.sh/install.ps1 | iex"` |
 | **Docker Desktop** | — | [docker.com](https://www.docker.com/products/docker-desktop/) |
 | **Node.js** | 18+ | [nodejs.org](https://nodejs.org/) — solo para el frontend (npm) |
+| **kubectl** | — | [kubernetes.io](https://kubernetes.io/docs/tasks/tools/) — opcional, solo para K8s |
 
 > Bun es el runtime principal del proyecto. Se usa para el backend (servidores, tests) y también para gestionar dependencias del frontend si se prefiere.
 
@@ -33,74 +35,58 @@ Necesitás tener instalado lo siguiente en tu máquina:
 
 ## Cómo Empezar
 
-### 1. Clonar e instalar dependencias
-
-```bash
-git clone <repo>
-cd Wep
-
-# Backend (cada microservicio)
-cd backend/microservicios/autentificacion && bun install
-cd ../estudiantes && bun install
-cd ../profesores && bun install
-cd ../cursos && bun install
-cd ../clases && bun install
-cd ../notificaciones && bun install
-cd ../notas && bun install
-
-# BFF
-cd ../../bff && bun install
-
-# Frontend
-cd ../../frontend && npm install
-
-# Volver a la raíz
-cd ..
-```
-
-
-
-### 2. Iniciar base de datos
+### 1. Iniciar todos los servicios (Docker)
 
 ```bash
 docker compose up -d
+# Esperar ~30s a que DB y microservicios estén saludables
 ```
 
-Esto levanta PostgreSQL 16 en `localhost:5432`.
+La aplicación queda disponible en:
+- **Frontend**: `http://localhost:8080`
+- **BFF (API)**: `http://localhost:3000`
+- **Documentación API**: `http://localhost:3000/docs`
 
-### 3. Correr migraciones y seed
+> PostgreSQL se expone externamente en `localhost:5433` (puerto interno 5432).
+
+### 2. Desarrollo con hot-reload (frontend)
+
+Para editar el frontend con cambios instantáneos sin reconstruir Docker:
 
 ```bash
-# Cada microservicio tiene su schema
-cd backend/microservicios/autentificacion && bun run seed
-cd ../estudiantes && bun run seed
-cd ../profesores && bun run seed
-cd ../cursos && bun run seed
-cd ../clases && bun run seed
-cd ../notificaciones && bun run seed
-cd ../notas && bun run seed
+# 1. Parar solo el contenedor del frontend
+docker compose stop frontend
+
+# 2. Iniciar el dev server de Vite en local
+cd frontend
+npm install        # solo la primera vez
+npm run dev        # http://localhost:8081
 ```
 
-### 4. Iniciar los servicios
+El frontend en `localhost:8081` se conecta automáticamente al BFF en `localhost:3000` (Docker). Los cambios en el código se reflejan al instante gracias al HMR de Vite.
+
+> También puedes correr microservicios individuales fuera de Docker con `bun run dev` dentro de cada carpeta, si prefieres desarrollar backend con hot-reload.
+
+### 3. Despliegue en Kubernetes
+
+Los manifests se encuentran en `k8s/`. Para desplegar en un cluster (Minikube, kind, etc.):
 
 ```bash
-# Cada microservicio en su propia terminal
-cd backend/microservicios/autentificacion && bun run dev   # :3002
-cd backend/microservicios/estudiantes && bun run dev       # :3001
-cd backend/microservicios/profesores && bun run dev        # :3004
-cd backend/microservicios/cursos && bun run dev            # :3005
-cd backend/microservicios/clases && bun run dev            # :3006
-cd backend/microservicios/notificaciones && bun run dev    # :3003
-cd backend/microservicios/notas && bun run dev             # :3010
-
-# BFF (única API que consume el frontend)
-cd backend/bff && bun run dev                              # :3000
-
-# Frontend
-cd frontend && npm run dev                                 # :8081
+kubectl apply -f k8s/config/namespace.yaml
+kubectl apply -f k8s/config/secret.yaml
+kubectl apply -f k8s/config/configmap.yaml
+kubectl apply -f k8s/database/
+kubectl apply -f k8s/microservices/
 ```
 
-La aplicación queda disponible en `http://localhost:8081`.
+Esto crea:
+- Namespace `wep`
+- ConfigMap con URLs de servicios internos
+- Secret con credenciales de DB
+- PostgreSQL 16 (1 réplica, ClusterIP)
+- 11 deployments con sus servicios (BFF como LoadBalancer, frontend como LoadBalancer, microservicios como ClusterIP)
+
+> Las imágenes usan `imagePullPolicy: Never` — asumen que están cargadas localmente. Para producción, cambiá a `Always` y usá un registry.
 
 ---
 
@@ -108,12 +94,12 @@ La aplicación queda disponible en `http://localhost:8081`.
 
 ```mermaid
 flowchart TB
-    Browser["Navegador"]
+    Browser["Navegador<br/>:8080 (Docker) / :8081 (dev)"]
 
-    subgraph Frontend["Frontend - React SPA :8081"]
+    subgraph Frontend["Frontend - React SPA"]
         ReactApp["App.tsx<br/>Router"]
-        Pages["pages/<br/>auth / student / professor / dashboard / home"]
-        Shared["shared/<br/>apiClient / layout / courses / clases"]
+        Pages["pages/<br/>auth / calificaciones / contacto / cursos /<br/>estudiante / mensajeria / profesor"]
+        Shared["api / layout"]
     end
 
     subgraph BFF["BFF - Hono :3000"]
@@ -125,16 +111,17 @@ flowchart TB
     subgraph Microservices["Microservicios Backend"]
         Auth["Autentificación<br/>:3002"]
         Students["Estudiantes<br/>:3001"]
-        Horario["Horario<br/>:3007"]
-        Asistencia["Asistencia<br/>:3008"]
-        Clases["Clases<br/>:3006"]
         Teachers["Profesores<br/>:3004"]
         Courses["Cursos<br/>:3005"]
+        Classes["Clases<br/>:3006"]
         Notif["Notificaciones<br/>:3003"]
         Notas["Notas<br/>:3010"]
+        Horario["Horario<br/>:3007"]
+        Asistencia["Asistencia<br/>:3008"]
+        Mensajeria["Mensajería<br/>:3009"]
     end
 
-    subgraph DB["PostgreSQL 16 (5432)"]
+    subgraph DB["PostgreSQL 16 (5432 / host :5433)"]
         S1["schema: autentificacion"]
         S2["schema: estudiantes"]
         S3["schema: profesores"]
@@ -142,6 +129,9 @@ flowchart TB
         S5["schema: notificaciones"]
         S6["schema: clases"]
         S7["schema: notas"]
+        S8["schema: horario"]
+        S9["schema: asistencia"]
+        S10["schema: mensajeria"]
     end
 
     Browser --> ReactApp
@@ -151,17 +141,21 @@ flowchart TB
     BFFRoutes --> Teachers
     BFFRoutes --> Courses
     BFFRoutes --> Notif
-    BFFRoutes --> Clases
+    BFFRoutes --> Classes
+    BFFRoutes --> Notas
     BFFRoutes --> Horario
     BFFRoutes --> Asistencia
-    BFFRoutes --> Notas
+    BFFRoutes --> Mensajeria
     Auth --> S1
     Students --> S2
     Teachers --> S3
     Courses --> S4
     Notif --> S5
-    Clases --> S6
+    Classes --> S6
     Notas --> S7
+    Horario --> S8
+    Asistencia --> S9
+    Mensajeria --> S10
 ```
 
 - **Frontend**: aplicación React SPA que consume una sola API (el BFF)
@@ -172,18 +166,17 @@ flowchart TB
 ### Microservicios
 
 | Servicio | Puerto | Responsabilidad |
-|---|---|---|---|
+|---|---|---|
 | **BFF** | 3000 | Orquestación — única API que consume el frontend — valida JWT en `/api/*` |
-| **Horario** | 3007 | Horarios semanales y bloques fijos (08:00-16:00) |
-| **Asistencia** | 3008 | Registro de asistencia por clase y estudiante |
-| **Autentificación** | 3002 | Login, registro, manejo de sesiones JWT |
 | **Estudiantes** | 3001 | CRUD de estudiantes |
+| **Autentificación** | 3002 | Login, registro, manejo de sesiones JWT |
+| **Notificaciones** | 3003 | Notificaciones del sistema |
 | **Profesores** | 3004 | CRUD de profesores |
 | **Cursos** | 3005 | Gestión de cursos, asignaturas y asignaciones |
 | **Clases** | 3006 | Gestión de clases |
 | **Horario** | 3007 | Bloques horarios fijos (08:00-16:00) |
 | **Asistencia** | 3008 | Registro de asistencia por clase y estudiante |
-| **Notificaciones** | 3003 | Notificaciones del sistema |
+| **Mensajería** | 3009 | Mensajería interna entre usuarios |
 | **Notas** | 3010 | Gestión de calificaciones de alumnos |
 
 ---
@@ -233,7 +226,7 @@ Wep/
 ├── frontend/           → Aplicación React (Vite + TailwindCSS + Zustand)
 ├── backend/
 │   ├── bff/            → Backend for Frontend (Hono + Zod OpenAPI)
-│   └── microservicios/ → 9 microservicios independientes
+│   └── microservicios/ → 10 microservicios independientes
 │       ├── autentificacion/
 │       ├── estudiantes/
 │       ├── profesores/
@@ -242,8 +235,13 @@ Wep/
 │       ├── horario/
 │       ├── asistencia/
 │       ├── notificaciones/
+│       ├── mensajeria/
 │       └── notas/
-├── docker-compose.yml  → Orquestación de todos los servicios
+├── k8s/                → Manifiestos de Kubernetes
+│   ├── config/         →   Namespace, ConfigMap, Secret
+│   ├── database/       →   PostgreSQL deployment + service
+│   └── microservices/  →   Deployments + services de cada servicio
+├── docker-compose.yml  → Orquestación Docker para desarrollo
 └── README.md
 ```
 
