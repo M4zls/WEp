@@ -15,3 +15,4 @@ data:
   HORARIO_SERVICE: "http://horario-service:3007"
   ASISTENCIA_SERVICE: "http://asistencia-service:3008"
   MENSAJERIA_SERVICE: "http://mensajeria-service:3009"
+  NOTAS_SERVICE: "http://notas-service:3010"
