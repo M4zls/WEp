@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, useState } from 'react';
+import React, { FC, ReactElement, useState, useEffect, useCallback } from 'react';
 import Sidebar from './Sidebar';
 import HomeView from '../pages/dashboard/home/index';
 import PerfilPage from '../pages/perfil/index';
@@ -6,20 +6,18 @@ import MensajeriaPage from '../pages/mensajeria/index';
 import ContactoPage from '../pages/contacto/index';
 import CalificacionesView from '../pages/calificaciones/CalificacionesView';
 import GestionNotasView from '../pages/calificaciones/GestionNotasView';
+import NotificacionesPage from '../pages/notificaciones/index';
+import notificacionesService from '../pages/notificaciones/service';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  userData: { nombre?: string; apellido?: string; email?: string } | null;
+  userData: { id?: number; nombre?: string; apellido?: string; email?: string } | null;
   role: 'estudiante' | 'profesor';
   onLogout: () => void;
   defaultSection?: string;
 }
 
 const wipSections: Record<string, { title: string; description: string }> = {
-  notificaciones: {
-    title: 'Notificaciones',
-    description: 'Aquí podrás ver tus notificaciones y alertas.',
-  },
   mensajeria: {
     title: 'Mensajería',
     description: 'Bandeja de mensajes y conversaciones con profesores y alumnos.',
@@ -38,6 +36,28 @@ const subjectSections = ['cursos', 'clases'];
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, onLogout, defaultSection }): ReactElement => {
   const [selectedSection, setSelectedSection] = useState(defaultSection || 'inicio');
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchUnread = useCallback(async () => {
+    const usuarioId = userData?.id;
+    if (!usuarioId) return;
+    try {
+      const result = await notificacionesService.getUnreadCount(usuarioId);
+      setUnreadCount(result.count);
+    } catch {
+      // silent
+    }
+  }, [userData?.id]);
+
+  useEffect(() => {
+    fetchUnread();
+  }, [fetchUnread]);
+
+  useEffect(() => {
+    if (selectedSection === 'notificaciones') {
+      fetchUnread();
+    }
+  }, [selectedSection, fetchUnread]);
 
   const getInitials = (): string => {
     if (!userData) return '?';
@@ -59,6 +79,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, o
         userName={userName}
         userInitials={getInitials()}
         role={role}
+        unreadCount={unreadCount}
       />
 
       <main className="flex-1 overflow-auto">
@@ -75,6 +96,8 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, o
             <CalificacionesView />
           ) : selectedSection === 'gestion-notas' && role === 'profesor' ? (
             <GestionNotasView />
+          ) : selectedSection === 'notificaciones' ? (
+            <NotificacionesPage />
           ) : subjectSections.includes(selectedSection) ? (
             children
           ) : (

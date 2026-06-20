@@ -25,6 +25,12 @@ try {
 	CONSTRAINT "estudiantes_email_unique" UNIQUE ("email")
   );`);
 
+  try {
+    await sql.unsafe(`ALTER TABLE "estudiantes"."estudiantes" ADD COLUMN "apoderado_email" text;`);
+  } catch {
+    // la columna ya existe, ignorar
+  }
+
   console.log('Migraciones de estudiantes ejecutadas correctamente');
 } finally {
   await sql.end();

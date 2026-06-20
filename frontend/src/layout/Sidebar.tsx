@@ -7,9 +7,10 @@ interface SidebarProps {
   userName?: string;
   userInitials?: string;
   role?: 'estudiante' | 'profesor';
+  unreadCount?: number;
 }
 
-const Sidebar: FC<SidebarProps> = ({ selectedSection, onSectionChange, onLogout, userName, userInitials, role }): ReactElement => {
+const Sidebar: FC<SidebarProps> = ({ selectedSection, onSectionChange, onLogout, userName, userInitials, role, unreadCount }): ReactElement => {
 
   const baseNavItems = [
     { id: 'inicio', label: 'Inicio', icon: '🏠' },
@@ -63,7 +64,12 @@ const Sidebar: FC<SidebarProps> = ({ selectedSection, onSectionChange, onLogout,
               }`}
             >
               <span className="text-lg">{item.icon}</span>
-              <span>{item.label}</span>
+              <span className="flex-1 text-left">{item.label}</span>
+              {item.id === 'notificaciones' && unreadCount !== undefined && unreadCount > 0 && (
+                <span className="px-1.5 py-0.5 bg-emerald-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
             </button>
           );
         })}
