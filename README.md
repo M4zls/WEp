@@ -160,7 +160,7 @@ flowchart TB
 
 - **Frontend**: aplicación React SPA que consume una sola API (el BFF)
 - **BFF**: única puerta de entrada para el frontend, orquesta los microservicios internos — middleware JWT valida cada request en `/api/*`
-- **Microservicios**: 9 servicios independientes, cada uno con su propio schema de DB
+- **Microservicios**: 10 servicios independientes, cada uno con su propio schema de DB
 - **Base de datos**: PostgreSQL con schemas aislados por microservicio
 
 ### Microservicios
@@ -213,9 +213,9 @@ Todas las rutas `/api/*` del BFF están protegidas por un middleware JWT (`backe
 | Capa | Runner | Comando | Docs |
 |---|---|---|---|
 | **Frontend** | Vitest | `cd frontend && npm test` | [frontend/README.md](./frontend/README.md) |
-| **Backend** | Bun test | `cd backend/microservicios/<svc> && bun test` | [backend/README.md](./backend/README.md) |
+| **Backend** | Bun test | `cd backend && bun test` (todos) o `cd backend/microservicios/<svc> && bun test` (uno) | [backend/README.md](./backend/README.md) |
 
-Ver README de cada capa para detalles de cobertura y estructura de tests.
+Ver README de cada capa para detalles de cobertura y estructura de tests. Reporte completo en [`docs/test-report.md`](./docs/test-report.md).
 
 ---
 

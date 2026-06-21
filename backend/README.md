@@ -14,8 +14,8 @@ Conjunto de microservicios que proveen la API para la gestión académica del Co
 | **Drizzle ORM** | ORM PostgreSQL type-safe |
 | **postgres.js** | Driver PostgreSQL |
 | **Zod** | Validación DTOs con inferencia de tipos |
-| **bcryptjs** | — | Hashing de contraseñas |
-| **JWT (hono/jwt)** | — | Autenticación con tokens firmados |
+| **bcryptjs** | Hashing de contraseñas |
+| **JWT (hono/jwt)** | Autenticación con tokens firmados |
 
 ---
 
@@ -66,7 +66,11 @@ src/
 Todos los microservicios usan **bun test** (no vitest). Los tests se encuentran en `src/__tests__/`.
 
 ```bash
-# Ejecutar tests de un microservicio
+# Ejecutar todos los tests del backend
+cd backend
+bun test
+
+# Ejecutar tests de un microservicio específico
 cd backend/microservicios/<servicio>
 bun test
 
