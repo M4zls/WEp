@@ -22,7 +22,8 @@ notificacionesController.post('/aviso-inasistencia', async (c) => {
     }
     await service.sendAttendanceNotice(parsed.data);
     return c.json({ message: 'Notificación enviada' }, { status: 200 });
-  } catch {
+  } catch (e) {
+    console.error('[aviso-inasistencia]', e);
     return c.json({ error: 'Error al enviar notificación' }, { status: 500 });
   }
 });
@@ -40,7 +41,8 @@ notificacionesController.post('/aviso-nota', async (c) => {
     }
     await service.sendGradeNotice(parsed.data);
     return c.json({ message: 'Notificación de nota enviada' }, { status: 200 });
-  } catch {
+  } catch (e) {
+    console.error('[aviso-nota]', e);
     return c.json({ error: 'Error al enviar notificación de nota' }, { status: 500 });
   }
 });
@@ -57,7 +59,8 @@ notificacionesController.get('/usuario/:usuarioId', async (c) => {
     }
     const result = await service.getUserNotifications(usuarioId);
     return c.json(result);
-  } catch {
+  } catch (e) {
+    console.error('[getUserNotifications]', e);
     return c.json({ error: 'Error al obtener notificaciones' }, { status: 500 });
   }
 });
@@ -74,7 +77,8 @@ notificacionesController.get('/usuario/:usuarioId/no-leidas', async (c) => {
     }
     const result = await service.getUnreadCount(usuarioId);
     return c.json(result);
-  } catch {
+  } catch (e) {
+    console.error('[getUnreadCount]', e);
     return c.json({ error: 'Error al obtener conteo' }, { status: 500 });
   }
 });
@@ -91,7 +95,8 @@ notificacionesController.put('/:id/leer', async (c) => {
     }
     await service.markAsRead(id);
     return c.json({ message: 'Notificación marcada como leída' });
-  } catch {
+  } catch (e) {
+    console.error('[markAsRead]', e);
     return c.json({ error: 'Error al marcar notificación' }, { status: 500 });
   }
 });
