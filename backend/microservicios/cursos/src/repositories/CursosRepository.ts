@@ -64,6 +64,7 @@ export class CursosRepository {
         profesorId: cursoAsignatura.profesorId,
         asignaturaNombre: asignaturas.nombre,
         asignaturaCodigo: asignaturas.codigo,
+        profesorRut: profesores.rut,
         profesorNombre: profesores.nombre,
         profesorApellido: profesores.apellido,
       })

@@ -1,8 +1,10 @@
-import '../drizzle/migrate.ts';
+import '../drizzle/migrate.js';
 import { Hono } from 'hono'
 import auth from './controllers/AuthController.js';
 
 const app = new Hono()
+
+app.get('/health', (c) => c.json({ status: 'ok' }))
 
 app.route('/auth', auth)
 

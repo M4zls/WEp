@@ -14,5 +14,6 @@ export const estudiantes = estudiantesSchema.table('estudiantes', {
   password: text('password').notNull(),
   telefono: text('telefono'),
   apoderado: text('apoderado'),
+  apoderadoEmail: text('apoderado_email'),
   fechaRegistro: text('fecha_registro').default(sql`now()::text`),
 });

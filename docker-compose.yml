@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: wep
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -85,6 +85,7 @@ services:
       - NODE_ENV=production
       - PORT=3003
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+      - NOVU_SECRET_KEY=${NOVU_SECRET_KEY}
     depends_on:
       db:
         condition: service_healthy
@@ -109,6 +110,24 @@ services:
     networks:
       - wep-network
 
+  # Backend - Microservicio de Clases
+  clases:
+    build:
+      context: ./backend/microservicios/clases
+      dockerfile: Dockerfile
+    container_name: clases-service
+    ports:
+      - "3006:3006"
+    environment:
+      - NODE_ENV=production
+      - PORT=3006
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
   # Backend - BFF (Backend for Frontend)
   bff:
     build:
@@ -125,12 +144,110 @@ services:
       - PROFESORES_SERVICE=http://profesores:3004
       - NOTIFICACIONES_SERVICE=http://notificaciones:3003
       - CURSOS_SERVICE=http://cursos:3005
+      - CLASES_SERVICE=http://clases:3006
+      - HORARIO_SERVICE=http://horario:3007
+      - ASISTENCIA_SERVICE=http://asistencia:3008
+      - MENSAJERIA_SERVICE=http://mensajeria:3009
+      - NOTAS_SERVICE=http://notas:3010
     depends_on:
       - autentificacion
       - estudiantes
       - profesores
       - notificaciones
       - cursos
+      - clases
+      - horario
+      - asistencia
+      - mensajeria
+      - notas
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Horario
+  horario:
+    build:
+      context: ./backend/microservicios/horario
+      dockerfile: Dockerfile
+    container_name: horario-service
+    ports:
+      - "3007:3007"
+    environment:
+      - NODE_ENV=production
+      - PORT=3007
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Asistencia
+  asistencia:
+    build:
+      context: ./backend/microservicios/asistencia
+      dockerfile: Dockerfile
+    container_name: asistencia-service
+    ports:
+      - "3008:3008"
+    environment:
+      - NODE_ENV=production
+      - PORT=3008
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Mensajería
+  mensajeria:
+    build:
+      context: ./backend/microservicios/mensajeria
+      dockerfile: Dockerfile
+    container_name: mensajeria-service
+    ports:
+      - "3009:3009"
+    environment:
+      - NODE_ENV=production
+      - PORT=3009
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Backend - Microservicio de Notas
+  notas:
+    build:
+      context: ./backend/microservicios/notas
+      dockerfile: Dockerfile
+    container_name: notas-service
+    ports:
+      - "3010:3010"
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  # Seed database (run once after all services are up)
+  seed:
+    build:
+      context: .
+      dockerfile: k8s/jobs/Dockerfile.seed
+    container_name: wep-seed
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - seed
     networks:
       - wep-network
 

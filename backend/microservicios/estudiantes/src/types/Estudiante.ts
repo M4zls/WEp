@@ -9,5 +9,6 @@ export interface IEstudiante {
   password: string;
   telefono?: string | null;
   apoderado?: string | null;
+  apoderadoEmail?: string | null;
   fechaRegistro?: string | null;
 }

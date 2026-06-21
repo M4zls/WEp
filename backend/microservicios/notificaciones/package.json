@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "bun run src/index.ts",
-    "migrate": "bun run drizzle/migrate.ts"
+    "migrate": "bun run drizzle/migrate.ts",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage"
   },
   "dependencies": {
     "@novu/api": "^3.16.0",

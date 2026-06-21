@@ -8,3 +8,17 @@ export type AvisoInasistenciaDto = {
   lastName?: string;
   email?: string;
 };
+
+export type AvisoNotaDto = {
+  subscriberId: string;
+  estudianteRut: string;
+  nombreAlumno: string;
+  emailAlumno: string;
+  nombreApoderado?: string;
+  emailApoderado?: string;
+  asignatura: string;
+  nota: string;
+  tipoEvaluacion: string;
+  nombreProfesor: string;
+  curso: string;
+};
