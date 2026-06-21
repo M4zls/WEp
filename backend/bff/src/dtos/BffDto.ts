@@ -96,6 +96,33 @@ export const crearNotaBffSchema = z.object({
 
 export const notasBatchBffSchema = z.array(crearNotaBffSchema).min(1, 'Debe haber al menos una nota');
 
+// ─── Notificaciones ───
+
+export const avisoInasistenciaBffSchema = z.object({
+  subscriberId: z.string().min(1, 'El subscriberId es obligatorio'),
+  nombreApoderado: z.string().min(1, 'El nombre del apoderado es obligatorio'),
+  nombreAlumno: z.string().min(1, 'El nombre del alumno es obligatorio'),
+  curso: z.string().min(1, 'El curso es obligatorio'),
+  fecha: z.string().min(1, 'La fecha es obligatoria'),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  email: z.string().email().optional(),
+});
+
+export const avisoNotaBffSchema = z.object({
+  subscriberId: z.string().min(1, 'El subscriberId es obligatorio'),
+  estudianteRut: z.string().min(1, 'El RUT del estudiante es obligatorio'),
+  nombreAlumno: z.string().min(1, 'El nombre del alumno es obligatorio'),
+  emailAlumno: z.string().email('Email del alumno inválido'),
+  nombreApoderado: z.string().optional(),
+  emailApoderado: z.string().email('Email del apoderado inválido').optional(),
+  asignatura: z.string().min(1, 'La asignatura es obligatoria'),
+  nota: z.string().min(1, 'La nota es obligatoria'),
+  tipoEvaluacion: z.string().min(1, 'El tipo de evaluación es obligatorio'),
+  nombreProfesor: z.string().min(1, 'El nombre del profesor es obligatorio'),
+  curso: z.string().min(1, 'El curso es obligatorio'),
+});
+
 // ─── Types ───
 
 export type LoginBffDto = z.infer<typeof loginBffSchema>;
@@ -110,3 +137,5 @@ export type MarcarAsistenciaBffDto = z.infer<typeof marcarAsistenciaBffSchema>;
 export type CrearConversacionBffDto = z.infer<typeof crearConversacionBffSchema>;
 export type EnviarMensajeBffDto = z.infer<typeof enviarMensajeBffSchema>;
 export type CrearNotaBffDto = z.infer<typeof crearNotaBffSchema>;
+export type AvisoInasistenciaBffDto = z.infer<typeof avisoInasistenciaBffSchema>;
+export type AvisoNotaBffDto = z.infer<typeof avisoNotaBffSchema>;

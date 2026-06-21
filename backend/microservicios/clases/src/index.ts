@@ -7,6 +7,7 @@ import { horariosController } from './controllers/HorariosController.js';
 const app = new Hono();
 
 app.use(cors());
+app.get('/health', (c) => c.json({ status: 'ok' }));
 app.route('/clases', clasesController);
 app.route('/horarios', horariosController);
 

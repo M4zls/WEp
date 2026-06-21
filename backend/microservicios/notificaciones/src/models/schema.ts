@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import { pgSchema, serial, integer, text, boolean } from 'drizzle-orm/pg-core';
 
 const notificacionesSchema = pgSchema('notificaciones');
+const estudiantesSchema = pgSchema('estudiantes');
 
 export const notificaciones = notificacionesSchema.table('notificaciones', {
   id: serial('id').primaryKey(),
@@ -24,6 +25,11 @@ export const eventos = notificacionesSchema.table('eventos', {
   activo: boolean('activo').default(true),
   fechaCreacion: text('fecha_creacion').default(sql`now()::text`),
   fechaProgramada: text('fecha_programada'),
+});
+
+export const estudiantes = estudiantesSchema.table('estudiantes', {
+  id: serial('id').primaryKey(),
+  rut: text('rut').notNull(),
 });
 
 export const logs = notificacionesSchema.table('logs', {

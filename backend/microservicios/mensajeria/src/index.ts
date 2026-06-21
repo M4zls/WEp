@@ -6,6 +6,7 @@ import { mensajeriaController } from './controllers/MensajeriaController.js';
 /** Punto de entrada del microservicio de mensajería. */
 const app = new Hono();
 app.use(cors());
+app.get('/health', (c) => c.json({ status: 'ok' }));
 app.route('/mensajeria', mensajeriaController);
 
 const port = Number(process.env.PORT ?? '3009');

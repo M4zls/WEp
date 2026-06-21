@@ -6,6 +6,7 @@ import {
   crearCursoBffSchema, crearAsignaturaBffSchema, asignarMateriaBffSchema,
   crearClaseBffSchema, crearHorarioBffSchema, marcarAsistenciaBffSchema,
   crearConversacionBffSchema, enviarMensajeBffSchema, crearNotaBffSchema, notasBatchBffSchema,
+  avisoInasistenciaBffSchema, avisoNotaBffSchema,
 } from './dtos/BffDto.js';
 
 const openapi = new OpenAPIHono();
@@ -441,6 +442,45 @@ openapi.openapi(createRoute({
   summary: 'Eliminar una nota',
   request: { params: z.object({ id: z.coerce.number().int() }) },
   responses: { 200: { description: 'Nota eliminada' }, 404: { description: 'Nota no encontrada' } },
+}), stub);
+
+// ─── Notificaciones ───
+
+openapi.openapi(createRoute({
+  method: 'post', path: '/notificaciones/aviso-inasistencia', tags: ['Notificaciones'],
+  summary: 'Enviar aviso de inasistencia',
+  description: 'Dispara una notificacion via Novu informando la inasistencia de un alumno al apoderado.',
+  request: { body: { content: { 'application/json': { schema: avisoInasistenciaBffSchema } } } },
+  responses: { 200: { description: 'Notificacion enviada' }, 400: { description: 'Datos invalidos' }, 500: { description: 'Error al enviar' } },
+}), stub);
+
+openapi.openapi(createRoute({
+  method: 'post', path: '/notificaciones/aviso-nota', tags: ['Notificaciones'],
+  summary: 'Enviar aviso de nueva calificacion',
+  description: 'Dispara una notificacion via Novu y guarda notificacion in-app al crear una calificacion.',
+  request: { body: { content: { 'application/json': { schema: avisoNotaBffSchema } } } },
+  responses: { 200: { description: 'Notificacion enviada' }, 400: { description: 'Datos invalidos' }, 500: { description: 'Error al enviar' } },
+}), stub);
+
+openapi.openapi(createRoute({
+  method: 'get', path: '/notificaciones/usuario/{usuarioId}', tags: ['Notificaciones'],
+  summary: 'Obtener notificaciones de un usuario',
+  request: { params: z.object({ usuarioId: z.coerce.number().int() }) },
+  responses: { 200: { description: 'Lista de notificaciones del usuario' } },
+}), stub);
+
+openapi.openapi(createRoute({
+  method: 'get', path: '/notificaciones/usuario/{usuarioId}/no-leidas', tags: ['Notificaciones'],
+  summary: 'Contar notificaciones no leidas',
+  request: { params: z.object({ usuarioId: z.coerce.number().int() }) },
+  responses: { 200: { description: 'Conteo de notificaciones no leidas, ej: { "count": 3 }' } },
+}), stub);
+
+openapi.openapi(createRoute({
+  method: 'put', path: '/notificaciones/{id}/leer', tags: ['Notificaciones'],
+  summary: 'Marcar notificacion como leida',
+  request: { params: z.object({ id: z.coerce.number().int() }) },
+  responses: { 200: { description: 'Notificacion marcada como leida' }, 400: { description: 'ID invalido' } },
 }), stub);
 
 export default openapi;

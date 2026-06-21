@@ -72,6 +72,11 @@ spec:
             configMapKeyRef:
               name: wep-config
               key: MENSAJERIA_SERVICE
+        - name: NOTAS_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: NOTAS_SERVICE
         livenessProbe:
           httpGet:
             path: /health
