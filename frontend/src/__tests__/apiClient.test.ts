@@ -1,11 +1,11 @@
-vi.mock('../pages/auth/auth.service', () => ({
+vi.mock('../pages/auth/service', () => ({
   default: {
     getToken: vi.fn(),
   },
 }));
 
-import apiClient from '../shared/api/apiClient';
-import authService from '../pages/auth/auth.service';
+import apiClient from '../api/apiClient';
+import authService from '../pages/auth/service';
 
 describe('ApiClient', () => {
   const mockFetch = vi.fn();

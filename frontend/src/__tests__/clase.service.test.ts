@@ -1,4 +1,4 @@
-vi.mock('../shared/api/apiClient', () => ({
+vi.mock('../api/apiClient', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
@@ -7,8 +7,8 @@ vi.mock('../shared/api/apiClient', () => ({
   },
 }));
 
-import claseService from '../shared/clases/clase.service';
-import apiClient from '../shared/api/apiClient';
+import claseService from '../pages/clases/service';
+import apiClient from '../api/apiClient';
 
 describe('ClaseService', () => {
   beforeEach(() => {

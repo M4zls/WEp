@@ -1,11 +1,11 @@
-vi.mock('../shared/api/apiClient', () => ({
+vi.mock('../api/apiClient', () => ({
   default: {
     get: vi.fn(),
   },
 }));
 
-import courseService from '../shared/courses/course.service';
-import apiClient from '../shared/api/apiClient';
+import courseService from '../pages/cursos/service';
+import apiClient from '../api/apiClient';
 
 describe('CourseService', () => {
   beforeEach(() => {

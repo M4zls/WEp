@@ -1,4 +1,4 @@
-import { ESTADOS_CLASE } from '../shared/clases/clase.types';
+import { ESTADOS_CLASE } from '../pages/clases/types';
 
 describe('ESTADOS_CLASE', () => {
   it('should have PENDIENTE', () => {

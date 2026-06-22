@@ -16,7 +16,7 @@ spec:
       containers:
       - name: asistencia
         image: wep-asistencia:latest
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3008
         env:

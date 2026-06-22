@@ -1,4 +1,4 @@
-import authService from '../pages/auth/auth.service';
+import authService from '../pages/auth/service';
 
 describe('AuthService', () => {
   beforeEach(() => {

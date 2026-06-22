@@ -1,4 +1,4 @@
-import studentService from '../pages/student/student.service';
+import studentService from '../pages/estudiante/service';
 
 describe('StudentService', () => {
   const mockFetch = vi.fn();

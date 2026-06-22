@@ -16,7 +16,7 @@ spec:
       containers:
       - name: mensajeria
         image: wep-mensajeria:latest
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3009
         env:
