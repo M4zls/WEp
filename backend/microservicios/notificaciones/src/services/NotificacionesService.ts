@@ -1,8 +1,8 @@
 import { novu } from '../common/novu.js';
 import { NOTIFICATION_WORKFLOWS } from '../common/Consts.js';
-import type { AvisoInasistenciaDto, AvisoNotaDto } from '../types/Notificacion.js';
+import type { AvisoInasistenciaDto, AvisoNotaDto, AvisoMensajeDto } from '../types/Notificacion.js';
 import { getDatabaseInstance } from '../models/data.js';
-import { notificaciones, estudiantes } from '../models/schema.js';
+import { notificaciones, estudiantes, usuarios } from '../models/schema.js';
 import { eq, and } from 'drizzle-orm';
 
 /**
@@ -45,21 +45,25 @@ export class NotificacionesService {
       to.email = data.emailApoderado;
     }
 
-    await novu.trigger({
-      workflowId: NOTIFICATION_WORKFLOWS.GRADE_NOTICE,
-      to,
-      payload: {
-        nombreAlumno: data.nombreAlumno,
-        asignatura: data.asignatura,
-        nota: data.nota,
-        tipoEvaluacion: data.tipoEvaluacion,
-        nombreProfesor: data.nombreProfesor,
-        curso: data.curso,
-        emailAlumno: data.emailAlumno,
-        emailApoderado: data.emailApoderado ?? '',
-        nombreApoderado: data.nombreApoderado ?? '',
-      },
-    });
+    try {
+      await novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.GRADE_NOTICE,
+        to,
+        payload: {
+          nombreAlumno: data.nombreAlumno,
+          asignatura: data.asignatura,
+          nota: data.nota,
+          tipoEvaluacion: data.tipoEvaluacion,
+          nombreProfesor: data.nombreProfesor,
+          curso: data.curso,
+          emailAlumno: data.emailAlumno,
+          emailApoderado: data.emailApoderado ?? '',
+          nombreApoderado: data.nombreApoderado ?? '',
+        },
+      });
+    } catch {
+      // Novu no disponible, se omite notificación externa
+    }
 
     const db = getDatabaseInstance();
     let usuarioId = 0;
@@ -80,7 +84,7 @@ export class NotificacionesService {
     await db.insert(notificaciones).values({
       usuarioId,
       titulo: 'Nueva calificación',
-      mensaje: `Has recibido una calificación de ${data.nota} en ${data.asignatura} (${data.tipoEvaluacion})`,
+      mensaje: `Tienes una nueva calificación registrada en ${data.asignatura}`,
       tipo: 'nota',
       url: '/calificaciones',
     });
@@ -124,6 +128,48 @@ export class NotificacionesService {
       .update(notificaciones)
       .set({ leida: true, fechaLectura: new Date().toISOString() })
       .where(eq(notificaciones.id, id));
+  }
+
+  /**
+   * Guarda una notificación in-app cuando se envía un mensaje.
+   */
+  async sendMessageNotice(data: AvisoMensajeDto) {
+    const db = getDatabaseInstance();
+    let usuarioId = 0;
+
+    try {
+      if (data.destinatarioRol === 'estudiante') {
+        const result = await db
+          .select({ id: estudiantes.id })
+          .from(estudiantes)
+          .where(eq(estudiantes.rut, data.destinatarioRut))
+          .limit(1);
+        if (result.length > 0) {
+          usuarioId = result[0].id;
+        }
+      } else {
+        const result = await db
+          .select({ id: usuarios.id })
+          .from(usuarios)
+          .where(eq(usuarios.rut, data.destinatarioRut))
+          .limit(1);
+        if (result.length > 0) {
+          usuarioId = result[0].id;
+        }
+      }
+    } catch {
+      // fallback a 0 si no se puede buscar
+    }
+
+    if (usuarioId === 0) return;
+
+    await db.insert(notificaciones).values({
+      usuarioId,
+      titulo: `Nuevo mensaje de ${data.remitenteNombre} ${data.remitenteApellido}`,
+      mensaje: 'Tienes un nuevo mensaje sin leer',
+      tipo: 'mensaje',
+      url: '/mensajeria',
+    });
   }
 
 }

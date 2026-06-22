@@ -3,6 +3,7 @@ import { pgSchema, serial, integer, text, boolean } from 'drizzle-orm/pg-core';
 
 const notificacionesSchema = pgSchema('notificaciones');
 const estudiantesSchema = pgSchema('estudiantes');
+const autentificacionSchema = pgSchema('autentificacion');
 
 export const notificaciones = notificacionesSchema.table('notificaciones', {
   id: serial('id').primaryKey(),
@@ -28,6 +29,11 @@ export const eventos = notificacionesSchema.table('eventos', {
 });
 
 export const estudiantes = estudiantesSchema.table('estudiantes', {
+  id: serial('id').primaryKey(),
+  rut: text('rut').notNull(),
+});
+
+export const usuarios = autentificacionSchema.table('usuarios', {
   id: serial('id').primaryKey(),
   rut: text('rut').notNull(),
 });

@@ -60,11 +60,13 @@ const NotificacionesPage: FC = (): ReactElement => {
                     ? 'bg-blue-100'
                     : notif.tipo === 'asistencia'
                     ? 'bg-amber-100'
+                    : notif.tipo === 'mensaje'
+                    ? 'bg-indigo-100'
                     : 'bg-slate-100'
                 }`}
               >
                 <span className="text-lg">
-                  {notif.tipo === 'nota' ? '📊' : notif.tipo === 'asistencia' ? '📋' : '🔔'}
+                  {notif.tipo === 'nota' ? '📊' : notif.tipo === 'asistencia' ? '📋' : notif.tipo === 'mensaje' ? '💬' : '🔔'}
                 </span>
               </div>
               <div className="flex-1 min-w-0">

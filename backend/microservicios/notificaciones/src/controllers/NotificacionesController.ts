@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { NotificacionesService } from '../services/NotificacionesService.js';
-import { avisoInasistenciaSchema, avisoNotaSchema } from '../dtos/NotificacionDto.js';
+import { avisoInasistenciaSchema, avisoNotaSchema, avisoMensajeSchema } from '../dtos/NotificacionDto.js';
 
 const service = new NotificacionesService();
 
@@ -44,6 +44,24 @@ notificacionesController.post('/aviso-nota', async (c) => {
   } catch (e) {
     console.error('[aviso-nota]', e);
     return c.json({ error: 'Error al enviar notificación de nota' }, { status: 500 });
+  }
+});
+
+/**
+ * Guarda una notificación in-app cuando se envía un mensaje.
+ * @route POST /notificaciones/aviso-mensaje
+ */
+notificacionesController.post('/aviso-mensaje', async (c) => {
+  try {
+    const datos = await c.req.json();
+    const parsed = avisoMensajeSchema.safeParse(datos);
+    if (!parsed.success) {
+      return c.json({ error: 'Datos inválidos', errors: parsed.error.issues }, { status: 400 });
+    }
+    await service.sendMessageNotice(parsed.data);
+    return c.json({ message: 'Notificación de mensaje enviada' }, { status: 200 });
+  } catch {
+    return c.json({ error: 'Error al enviar notificación de mensaje' }, { status: 500 });
   }
 });
 

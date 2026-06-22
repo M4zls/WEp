@@ -22,3 +22,12 @@ export type AvisoNotaDto = {
   nombreProfesor: string;
   curso: string;
 };
+
+export type AvisoMensajeDto = {
+  destinatarioRut: string;
+  destinatarioRol: 'estudiante' | 'profesor';
+  remitenteNombre: string;
+  remitenteApellido: string;
+  contenidoPreview: string;
+  conversacionId: number;
+};

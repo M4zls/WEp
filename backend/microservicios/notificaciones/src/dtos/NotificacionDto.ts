@@ -28,3 +28,14 @@ export const avisoNotaSchema = z.object({
 });
 
 export type AvisoNotaDto = z.infer<typeof avisoNotaSchema>;
+
+export const avisoMensajeSchema = z.object({
+  destinatarioRut: z.string().min(1),
+  destinatarioRol: z.enum(['estudiante', 'profesor']),
+  remitenteNombre: z.string().min(1),
+  remitenteApellido: z.string().min(1),
+  contenidoPreview: z.string().min(1),
+  conversacionId: z.number(),
+});
+
+export type AvisoMensajeDto = z.infer<typeof avisoMensajeSchema>;
