@@ -2,16 +2,16 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import LoginForm from '../pages/login/index';
-import { useAuthStore } from '../pages/auth/auth.store';
+import LoginForm from '../pages/auth/components/LoginForm';
+import { useAuthStore } from '../pages/auth/store';
 
-vi.mock('../pages/student/student.service', () => ({
+vi.mock('../pages/estudiante/service', () => ({
   default: {
     login: vi.fn(),
   },
 }));
 
-vi.mock('../shared/api/apiClient', () => ({
+vi.mock('../api/apiClient', () => ({
   default: {
     post: vi.fn(),
   },

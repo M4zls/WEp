@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: wep-frontend:latest
-        imagePullPolicy: Never
+        image: wep-frontend:fix-serve
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
         env:

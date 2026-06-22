@@ -1,29 +1,29 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from '../App';
-import { useAuthStore } from '../pages/auth/auth.store';
+import { useAuthStore } from '../pages/auth/store';
 
-vi.mock('../pages/home/index', () => ({
+vi.mock('../pages/dashboard/home/index', () => ({
   default: () => <div data-testid="welcome-page">Welcome</div>,
 }));
 
-vi.mock('../pages/login/index', () => ({
+vi.mock('../pages/auth/components/LoginForm', () => ({
   default: () => <div data-testid="login-form">Login</div>,
 }));
 
-vi.mock('../pages/auth/ProtectedRoute', () => ({
+vi.mock('../pages/auth/components/ProtectedRoute', () => ({
   default: ({ children }: any) => <div data-testid="protected-route">{children}</div>,
 }));
 
-vi.mock('../pages/student/dashboard/index', () => ({
+vi.mock('../pages/estudiante/dashboard/index', () => ({
   default: () => <div data-testid="student-dashboard">Student Dashboard</div>,
 }));
 
-vi.mock('../pages/professor/dashboard/index', () => ({
+vi.mock('../pages/profesor/dashboard/index', () => ({
   default: () => <div data-testid="professor-dashboard">Professor Dashboard</div>,
 }));
 
-vi.mock('../shared/courses/SubjectDetail', () => ({
+vi.mock('../pages/cursos/components/SubjectDetail', () => ({
   default: () => <div data-testid="subject-detail">Subject Detail</div>,
 }));
 

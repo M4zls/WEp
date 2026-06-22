@@ -5,7 +5,7 @@ const WelcomePage: FC = (): ReactElement => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-indigo-800 to-blue-950 flex flex-col justify-center items-center py-12 px-4">
+    <div data-testid="welcome-page" className="min-h-screen bg-gradient-to-br from-blue-950 via-indigo-800 to-blue-950 flex flex-col justify-center items-center py-12 px-4">
       <div className="max-w-2xl w-full">
         <div className="text-center mb-10">
           <div className="inline-flex p-4 rounded-3xl bg-white/10 backdrop-blur-md mb-6">

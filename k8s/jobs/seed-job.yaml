@@ -12,7 +12,7 @@ spec:
       containers:
       - name: seed
         image: wep-seed:latest
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         env:
         - name: DATABASE_URL
           valueFrom:

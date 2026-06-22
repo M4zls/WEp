@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import DashboardLayout from '../shared/layout/DashboardLayout';
+import DashboardLayout from '../layout/DashboardLayout';
 
-vi.mock('../shared/layout/Sidebar', () => ({
+vi.mock('../layout/Sidebar', () => ({
   default: ({ onLogout, userName, userInitials, onSectionChange }: any) => (
     <div data-testid="mock-sidebar">
       <span>{userName}</span>
@@ -10,6 +10,7 @@ vi.mock('../shared/layout/Sidebar', () => ({
       <button onClick={onLogout}>Cerrar Sesión</button>
       <button onClick={() => onSectionChange('cursos')}>Cursos</button>
       <button onClick={() => onSectionChange('notificaciones')}>Notificaciones</button>
+      <button onClick={() => onSectionChange('unknown')}>Unknown</button>
     </div>
   ),
 }));
@@ -19,6 +20,15 @@ vi.mock('../pages/dashboard/home/index', () => ({
     <div data-testid="mock-homeview">
       <span>Role: {role}</span>
       <button onClick={onGoToSubjects}>Go to Subjects</button>
+    </div>
+  ),
+}));
+
+vi.mock('../pages/notificaciones/index', () => ({
+  default: () => (
+    <div data-testid="mock-notificaciones">
+      <h3>Notificaciones</h3>
+      <p>No tienes notificaciones</p>
     </div>
   ),
 }));
@@ -44,14 +54,21 @@ describe('DashboardLayout', () => {
     expect(screen.getByTestId('child-content')).toBeInTheDocument();
   });
 
-  it('should render WorkInProgress for unknown sections', async () => {
+  it('should render NotificacionesPage for notificaciones section', async () => {
     const user = (await import('@testing-library/user-event')).default;
     render(<DashboardLayout {...defaultProps}><div>Child</div></DashboardLayout>);
 
     await user.click(screen.getByText('Notificaciones'));
 
-    expect(screen.getAllByText('Notificaciones').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/Aquí podrás ver tus notificaciones/)).toBeInTheDocument();
+    expect(screen.getByTestId('mock-notificaciones')).toBeInTheDocument();
+  });
+
+  it('should render WorkInProgress for unknown sections', async () => {
+    const user = (await import('@testing-library/user-event')).default;
+    render(<DashboardLayout {...defaultProps}><div>Child</div></DashboardLayout>);
+
+    await user.click(screen.getByText('Unknown'));
+
     expect(screen.getByText('Work in progress')).toBeInTheDocument();
   });
 });

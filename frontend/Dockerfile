@@ -18,6 +18,8 @@ WORKDIR /app
 
 COPY --from=builder /app/dist ./dist
 
+RUN bun add serve
+
 EXPOSE 8080
 
-CMD ["bun", "x", "serve", "-s", "dist", "-p", "8080"]
+CMD ["node_modules/.bin/serve", "-s", "dist", "-p", "8080"]

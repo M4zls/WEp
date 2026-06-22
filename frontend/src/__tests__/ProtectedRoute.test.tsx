@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import ProtectedRoute from '../pages/auth/ProtectedRoute';
-import { useAuthStore } from '../pages/auth/auth.store';
+import ProtectedRoute from '../pages/auth/components/ProtectedRoute';
+import { useAuthStore } from '../pages/auth/store';
 
 const renderProtectedRoute = (initialEntries = ['/dashboard']) =>
   render(

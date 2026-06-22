@@ -1,4 +1,4 @@
-import { DIAS_SEMANA } from '../shared/clases/horario.types';
+import { DIAS_SEMANA } from '../pages/horario/types';
 
 describe('DIAS_SEMANA', () => {
   it('should have days 1-5', () => {
