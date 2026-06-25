@@ -4,7 +4,7 @@ vi.mock('../api/apiClient', () => ({
   },
 }));
 
-import courseService from '../pages/cursos/service';
+import courseService from '../pages/courses/courses.service';
 import apiClient from '../api/apiClient';
 
 describe('CourseService', () => {
@@ -16,13 +16,13 @@ describe('CourseService', () => {
     const mockCursos = [{ id: 1, nombre: '1A', nivel: 'Primero', letra: 'A' }];
     vi.mocked(apiClient.get).mockResolvedValue(mockCursos);
 
-    const result = await courseService.obtenerCursos();
+    const result = await courseService.getCourses();
 
-    expect(apiClient.get).toHaveBeenCalledWith('/cursos');
+    expect(apiClient.get).toHaveBeenCalledWith('/courses');
     expect(result).toEqual(mockCursos);
   });
 
-  it('should fetch a single course with materias', async () => {
+  it('should fetch a single course with subjects', async () => {
     const mockCurso = {
       id: 1,
       nombre: '1A',
@@ -30,29 +30,29 @@ describe('CourseService', () => {
     };
     vi.mocked(apiClient.get).mockResolvedValue(mockCurso);
 
-    const result = await courseService.obtenerCurso(1);
+    const result = await courseService.getCourse(1);
 
-    expect(apiClient.get).toHaveBeenCalledWith('/cursos/1');
+    expect(apiClient.get).toHaveBeenCalledWith('/courses/1');
     expect(result).toEqual(mockCurso);
   });
 
-  it('should fetch materias by course id', async () => {
+  it('should fetch subjects by course id', async () => {
     const mockMaterias = [{ id: 1, asignatura_nombre: 'Matemáticas' }];
     vi.mocked(apiClient.get).mockResolvedValue(mockMaterias);
 
-    const result = await courseService.obtenerMaterias(1);
+    const result = await courseService.getSubjectsByCourse(1);
 
-    expect(apiClient.get).toHaveBeenCalledWith('/cursos/1/materias');
+    expect(apiClient.get).toHaveBeenCalledWith('/courses/1/subjects');
     expect(result).toEqual(mockMaterias);
   });
 
-  it('should fetch all asignaturas', async () => {
+  it('should fetch all subjects', async () => {
     const mockAsignaturas = [{ id: 1, nombre: 'Matemáticas', codigo: 'MAT101' }];
     vi.mocked(apiClient.get).mockResolvedValue(mockAsignaturas);
 
-    const result = await courseService.obtenerAsignaturas();
+    const result = await courseService.getSubjects();
 
-    expect(apiClient.get).toHaveBeenCalledWith('/cursos/asignaturas');
+    expect(apiClient.get).toHaveBeenCalledWith('/courses/subjects');
     expect(result).toEqual(mockAsignaturas);
   });
 });

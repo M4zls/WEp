@@ -3,6 +3,6 @@ export const ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
   SUBJECT_DETAIL: '/dashboard/materia/:cursoAsignaturaId',
-  CALIFICACIONES: '/dashboard/calificaciones',
-  GESTION_NOTAS: '/dashboard/gestion-notas',
+  GRADES: '/dashboard/grades',
+  MANAGE_GRADES: '/dashboard/manage-grades',
 } as const;

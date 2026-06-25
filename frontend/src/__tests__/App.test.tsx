@@ -15,15 +15,15 @@ vi.mock('../pages/auth/components/ProtectedRoute', () => ({
   default: ({ children }: any) => <div data-testid="protected-route">{children}</div>,
 }));
 
-vi.mock('../pages/estudiante/dashboard/index', () => ({
+vi.mock('../pages/student/dashboard/student-dashboard.page', () => ({
   default: () => <div data-testid="student-dashboard">Student Dashboard</div>,
 }));
 
-vi.mock('../pages/profesor/dashboard/index', () => ({
+vi.mock('../pages/teacher/dashboard/teacher-dashboard.page', () => ({
   default: () => <div data-testid="professor-dashboard">Professor Dashboard</div>,
 }));
 
-vi.mock('../pages/cursos/components/SubjectDetail', () => ({
+vi.mock('../pages/courses/components/subject.detail', () => ({
   default: () => <div data-testid="subject-detail">Subject Detail</div>,
 }));
 

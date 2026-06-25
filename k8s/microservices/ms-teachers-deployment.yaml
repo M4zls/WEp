@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-teachers
+  namespace: wep
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ms-teachers
+  template:
+    metadata:
+      labels:
+        app: ms-teachers
+    spec:
+      containers:
+      - name: ms-teachers
+        image: wep-ms-teachers:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3004
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: NODE_ENV
+        - name: PORT
+          value: "3004"
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: DATABASE_URL
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3004
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3004
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-teachers-service
+  namespace: wep
+spec:
+  selector:
+    app: ms-teachers
+  ports:
+  - protocol: TCP
+    port: 3004
+    targetPort: 3004
+  type: ClusterIP

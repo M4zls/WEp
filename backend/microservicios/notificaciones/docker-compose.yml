@@ -1,2 +1,0 @@
-environment:
-  NOVU_SECRET_KEY: ${NOVU_SECRET_KEY}

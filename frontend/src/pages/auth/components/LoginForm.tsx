@@ -1,7 +1,7 @@
 import React, { FormEvent, useState, FC, ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store';
-import studentService from '../../estudiante/service';
+import studentService from '../../student/student.service';
 import apiClient from '../../../api/apiClient';
 
 type Role = 'estudiante' | 'profesor';

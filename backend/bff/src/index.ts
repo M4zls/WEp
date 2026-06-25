@@ -1,15 +1,15 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import estudiantesRoutes from './routes/estudiantesRoutes.js';
-import profesoresRoutes from './routes/profesoresRoutes.js';
-import autentificacionRoutes from './routes/autentificacionRoutes.js';
-import cursosRoutes from './routes/cursosRoutes.js';
-import clasesRoutes from './routes/clasesRoutes.js';
-import horariosRoutes from './routes/horariosRoutes.js';
-import asistenciaRoutes from './routes/asistenciaRoutes.js';
-import mensajeriaRoutes from './routes/mensajeriaRoutes.js';
-import notasRoutes from './routes/notasRoutes.js';
-import notificacionesRoutes from './routes/notificacionesRoutes.js';
+import studentsRoutes from './routes/students.routes.js';
+import teachersRoutes from './routes/teachers.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import coursesRoutes from './routes/courses.routes.js';
+import classesRoutes from './routes/classes.routes.js';
+import scheduleRoutes from './routes/schedule.routes.js';
+import attendanceRoutes from './routes/attendance.routes.js';
+import messagingRoutes from './routes/messaging.routes.js';
+import gradesRoutes from './routes/grades.routes.js';
+import notificationsRoutes from './routes/notifications.routes.js';
 import openapiRoutes from './openapi.js';
 import { authMiddleware } from './middleware/auth.js'
 
@@ -20,16 +20,16 @@ app.use('*', cors());
 app.use('/api/*', authMiddleware);
 app.route('/docs', openapiRoutes);
 
-app.route('/api/estudiantes', estudiantesRoutes);
-app.route('/api/profesores', profesoresRoutes);
-app.route('/api/auth', autentificacionRoutes);
-app.route('/api/cursos', cursosRoutes);
-app.route('/api/clases', clasesRoutes);
-app.route('/api/horarios', horariosRoutes);
-app.route('/api/asistencia', asistenciaRoutes);
-app.route('/api/mensajeria', mensajeriaRoutes);
-app.route('/api/notas', notasRoutes);
-app.route('/api/notificaciones', notificacionesRoutes);
+app.route('/api/students', studentsRoutes);
+app.route('/api/teachers', teachersRoutes);
+app.route('/api/auth', authRoutes);
+app.route('/api/courses', coursesRoutes);
+app.route('/api/classes', classesRoutes);
+app.route('/api/schedule', scheduleRoutes);
+app.route('/api/attendance', attendanceRoutes);
+app.route('/api/messaging', messagingRoutes);
+app.route('/api/grades', gradesRoutes);
+app.route('/api/notifications', notificationsRoutes);
 
 app.get('/health', (c) => {
   return c.json({ status: 'BFF is running' });
