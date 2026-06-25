@@ -27,7 +27,7 @@ const SUBJECTS: { name: string; code: string; description: string }[] = [
 async function seed() {
   try {
     const existingCourses = await sql`SELECT COUNT(*) as count FROM "courses"."courses"`;
-    if (existingCourses[0].count === 0) {
+    if (existingCourses[0].count == 0) {
       for (const c of COURSES) {
         await sql`
           INSERT INTO "courses"."courses" (name, level, letter, year)
