@@ -8,8 +8,8 @@ vi.mock('../layout/Sidebar', () => ({
       <span>{userName}</span>
       <span>{userInitials}</span>
       <button onClick={onLogout}>Cerrar Sesión</button>
-      <button onClick={() => onSectionChange('cursos')}>Cursos</button>
-      <button onClick={() => onSectionChange('notificaciones')}>Notificaciones</button>
+      <button onClick={() => onSectionChange('courses')}>Cursos</button>
+      <button onClick={() => onSectionChange('notifications')}>Notificaciones</button>
       <button onClick={() => onSectionChange('unknown')}>Unknown</button>
     </div>
   ),
@@ -24,7 +24,7 @@ vi.mock('../pages/dashboard/home/index', () => ({
   ),
 }));
 
-vi.mock('../pages/notificaciones/index', () => ({
+vi.mock('../pages/notifications/index', () => ({
   default: () => (
     <div data-testid="mock-notificaciones">
       <h3>Notificaciones</h3>

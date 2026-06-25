@@ -5,7 +5,7 @@ import Sidebar from '../layout/Sidebar';
 
 describe('Sidebar', () => {
   const defaultProps = {
-    selectedSection: 'inicio',
+    selectedSection: 'home',
     onSectionChange: vi.fn(),
     onLogout: vi.fn(),
     userName: 'Juan Pérez',
@@ -31,9 +31,9 @@ describe('Sidebar', () => {
   });
 
   it('should highlight active section', () => {
-    render(<Sidebar {...defaultProps} selectedSection="notificaciones" />);
-    const btn = screen.getByText('Notificaciones');
-    expect(btn.parentElement).toHaveClass('border-emerald-400');
+    render(<Sidebar {...defaultProps} selectedSection="notifications" />);
+    const btn = screen.getByText('Notificaciones').closest('button')!;
+    expect(btn).toHaveClass('border-emerald-400');
   });
 
   it('should call onSectionChange on nav click', async () => {
@@ -43,7 +43,7 @@ describe('Sidebar', () => {
     render(<Sidebar {...defaultProps} onSectionChange={onSectionChange} />);
     await user.click(screen.getByText('Inicio'));
 
-    expect(onSectionChange).toHaveBeenCalledWith('inicio');
+    expect(onSectionChange).toHaveBeenCalledWith('home');
   });
 
   it('should call onLogout on logout click', async () => {

@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import WelcomePage from './pages/welcome/index';
 import LoginForm from './pages/auth/components/LoginForm';
 import ProtectedRoute from './pages/auth/components/ProtectedRoute';
-import StudentDashboard from './pages/estudiante/dashboard/index';
-import ProfessorDashboard from './pages/profesor/dashboard/index';
-import SubjectDetail from './pages/cursos/components/SubjectDetail';
-import CalificacionesPage from './pages/calificaciones/index';
-import GestionNotasPage from './pages/calificaciones/gestion/index';
+import StudentDashboard from './pages/student/dashboard/student-dashboard.page';
+import ProfessorDashboard from './pages/teacher/dashboard/teacher-dashboard.page';
+import SubjectDetail from './pages/courses/components/subject.detail';
+import GradesPage from './pages/grades/index';
+import ManageGradesPage from './pages/grades/manage/index';
 import { useAuthStore } from './pages/auth/store';
 
 const Dashboard: FC = (): ReactElement => {
@@ -46,18 +46,18 @@ const App: FC = (): ReactElement => {
           }
         />
         <Route
-          path="/dashboard/calificaciones"
+          path="/dashboard/grades"
           element={
             <ProtectedRoute>
-              <CalificacionesPage />
+              <GradesPage />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/dashboard/gestion-notas"
+          path="/dashboard/manage-grades"
           element={
             <ProtectedRoute>
-              <GestionNotasPage />
+              <ManageGradesPage />
             </ProtectedRoute>
           }
         />

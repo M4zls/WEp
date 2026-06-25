@@ -1,11 +1,11 @@
 // Orquesta las migraciones de cada microservicio.
 // Requiere que el runtime soporte top-level await e import dinámico (ej. Bun o Node+ESM).
 const migrators = [
-  './microservicios/autentificacion/drizzle/migrate.ts',
-  './microservicios/estudiantes/drizzle/migrate.ts',
-  './microservicios/cursos/drizzle/migrate.ts',
-  './microservicios/notificaciones/drizzle/migrate.ts',
-  './microservicios/profesores/drizzle/migrate.ts'
+  '../ms-auth/drizzle/migrate.ts',
+  '../ms-students/drizzle/migrate.ts',
+  '../ms-courses/drizzle/migrate.ts',
+  '../ms-notifications/drizzle/migrate.ts',
+  '../ms-teachers/drizzle/migrate.ts'
 ];
 
 for (const m of migrators) {

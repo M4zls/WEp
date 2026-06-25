@@ -1,9 +1,0 @@
-FROM oven/bun:latest
-
-WORKDIR /app
-
-COPY k8s/jobs/seed-all.ts .
-
-RUN bun add postgres
-
-CMD ["bun", "run", "seed-all.ts"]

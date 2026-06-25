@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: bff
-        image: wep-bff:latest
+        image: docker.io/library/wep-bff:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
@@ -27,56 +27,56 @@ spec:
               key: NODE_ENV
         - name: PORT
           value: "3000"
-        - name: AUTENTIFICACION_SERVICE
+        - name: MS_AUTH_SERVICE
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: AUTENTIFICACION_SERVICE
-        - name: ESTUDIANTES_SERVICE
+              key: MS_AUTH_SERVICE
+        - name: MS_STUDENTS_SERVICE
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: ESTUDIANTES_SERVICE
-        - name: PROFESORES_SERVICE
+              key: MS_STUDENTS_SERVICE
+        - name: MS_TEACHERS_SERVICE
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: PROFESORES_SERVICE
-        - name: NOTIFICACIONES_SERVICE
+              key: MS_TEACHERS_SERVICE
+        - name: MS_NOTIFICATIONS_SERVICE
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: NOTIFICACIONES_SERVICE
-        - name: CURSOS_SERVICE
+              key: MS_NOTIFICATIONS_SERVICE
+        - name: MS_COURSES_SERVICE
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: CURSOS_SERVICE
-        - name: CLASES_SERVICE
+              key: MS_COURSES_SERVICE
+        - name: MS_CLASSES_SERVICE
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: CLASES_SERVICE
-        - name: HORARIO_SERVICE
+              key: MS_CLASSES_SERVICE
+        - name: MS_SCHEDULE_SERVICE
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: HORARIO_SERVICE
-        - name: ASISTENCIA_SERVICE
+              key: MS_SCHEDULE_SERVICE
+        - name: MS_ATTENDANCE_SERVICE
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: ASISTENCIA_SERVICE
-        - name: MENSAJERIA_SERVICE
+              key: MS_ATTENDANCE_SERVICE
+        - name: MS_MESSAGING_SERVICE
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: MENSAJERIA_SERVICE
-        - name: NOTAS_SERVICE
+              key: MS_MESSAGING_SERVICE
+        - name: MS_GRADES_SERVICE
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: NOTAS_SERVICE
+              key: MS_GRADES_SERVICE
         livenessProbe:
           httpGet:
             path: /health
@@ -96,10 +96,11 @@ metadata:
   name: bff-service
   namespace: wep
 spec:
+  type: NodePort
   selector:
     app: bff
   ports:
   - protocol: TCP
     port: 3000
     targetPort: 3000
-  type: LoadBalancer
+    nodePort: 30000

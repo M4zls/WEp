@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import LoginForm from '../pages/auth/components/LoginForm';
 import { useAuthStore } from '../pages/auth/store';
 
-vi.mock('../pages/estudiante/service', () => ({
+vi.mock('../pages/student/student.service', () => ({
   default: {
     login: vi.fn(),
   },

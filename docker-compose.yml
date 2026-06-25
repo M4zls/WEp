@@ -19,12 +19,12 @@ services:
     networks:
       - wep-network
 
-  # Backend - Microservicio de Autentificación
-  autentificacion:
+  # Backend - Auth Microservice
+  ms-auth:
     build:
-      context: ./backend/microservicios/autentificacion
+      context: ./backend/ms-auth
       dockerfile: Dockerfile
-    container_name: autentificacion-service
+    container_name: ms-auth-service
     ports:
       - "3002:3002"
     environment:
@@ -37,12 +37,12 @@ services:
     networks:
       - wep-network
 
-  # Backend - Microservicio de Estudiantes
-  estudiantes:
+  # Backend - Students Microservice
+  ms-students:
     build:
-      context: ./backend/microservicios/estudiantes
+      context: ./backend/ms-students
       dockerfile: Dockerfile
-    container_name: estudiantes-service
+    container_name: ms-students-service
     ports:
       - "3001:3001"
     environment:
@@ -55,12 +55,12 @@ services:
     networks:
       - wep-network
 
-  # Backend - Microservicio de Profesores
-  profesores:
+  # Backend - Teachers Microservice
+  ms-teachers:
     build:
-      context: ./backend/microservicios/profesores
+      context: ./backend/ms-teachers
       dockerfile: Dockerfile
-    container_name: profesores-service
+    container_name: ms-teachers-service
     ports:
       - "3004:3004"
     environment:
@@ -73,12 +73,12 @@ services:
     networks:
       - wep-network
 
-  # Backend - Microservicio de Notificaciones
-  notificaciones:
+  # Backend - Notifications Microservice
+  ms-notifications:
     build:
-      context: ./backend/microservicios/notificaciones
+      context: ./backend/ms-notifications
       dockerfile: Dockerfile
-    container_name: notificaciones-service
+    container_name: ms-notifications-service
     ports:
       - "3003:3003"
     environment:
@@ -92,12 +92,12 @@ services:
     networks:
       - wep-network
 
-  # Backend - Microservicio de Cursos
-  cursos:
+  # Backend - Courses Microservice
+  ms-courses:
     build:
-      context: ./backend/microservicios/cursos
+      context: ./backend/ms-courses
       dockerfile: Dockerfile
-    container_name: cursos-service
+    container_name: ms-courses-service
     ports:
       - "3005:3005"
     environment:
@@ -110,12 +110,12 @@ services:
     networks:
       - wep-network
 
-  # Backend - Microservicio de Clases
-  clases:
+  # Backend - Classes Microservice
+  ms-classes:
     build:
-      context: ./backend/microservicios/clases
+      context: ./backend/ms-classes
       dockerfile: Dockerfile
-    container_name: clases-service
+    container_name: ms-classes-service
     ports:
       - "3006:3006"
     environment:
@@ -139,36 +139,36 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - AUTENTIFICACION_SERVICE=http://autentificacion:3002
-      - ESTUDIANTES_SERVICE=http://estudiantes:3001
-      - PROFESORES_SERVICE=http://profesores:3004
-      - NOTIFICACIONES_SERVICE=http://notificaciones:3003
-      - CURSOS_SERVICE=http://cursos:3005
-      - CLASES_SERVICE=http://clases:3006
-      - HORARIO_SERVICE=http://horario:3007
-      - ASISTENCIA_SERVICE=http://asistencia:3008
-      - MENSAJERIA_SERVICE=http://mensajeria:3009
-      - NOTAS_SERVICE=http://notas:3010
+      - MS_AUTH_SERVICE=http://ms-auth:3002
+      - MS_STUDENTS_SERVICE=http://ms-students:3001
+      - MS_TEACHERS_SERVICE=http://ms-teachers:3004
+      - MS_NOTIFICATIONS_SERVICE=http://ms-notifications:3003
+      - MS_COURSES_SERVICE=http://ms-courses:3005
+      - MS_CLASSES_SERVICE=http://ms-classes:3006
+      - MS_SCHEDULE_SERVICE=http://ms-schedule:3007
+      - MS_ATTENDANCE_SERVICE=http://ms-attendance:3008
+      - MS_MESSAGING_SERVICE=http://ms-messaging:3009
+      - MS_GRADES_SERVICE=http://ms-grades:3010
     depends_on:
-      - autentificacion
-      - estudiantes
-      - profesores
-      - notificaciones
-      - cursos
-      - clases
-      - horario
-      - asistencia
-      - mensajeria
-      - notas
+      - ms-auth
+      - ms-students
+      - ms-teachers
+      - ms-notifications
+      - ms-courses
+      - ms-classes
+      - ms-schedule
+      - ms-attendance
+      - ms-messaging
+      - ms-grades
     networks:
       - wep-network
 
-  # Backend - Microservicio de Horario
-  horario:
+  # Backend - Schedule Microservice
+  ms-schedule:
     build:
-      context: ./backend/microservicios/horario
+      context: ./backend/ms-schedule
       dockerfile: Dockerfile
-    container_name: horario-service
+    container_name: ms-schedule-service
     ports:
       - "3007:3007"
     environment:
@@ -181,12 +181,12 @@ services:
     networks:
       - wep-network
 
-  # Backend - Microservicio de Asistencia
-  asistencia:
+  # Backend - Attendance Microservice
+  ms-attendance:
     build:
-      context: ./backend/microservicios/asistencia
+      context: ./backend/ms-attendance
       dockerfile: Dockerfile
-    container_name: asistencia-service
+    container_name: ms-attendance-service
     ports:
       - "3008:3008"
     environment:
@@ -199,12 +199,12 @@ services:
     networks:
       - wep-network
 
-  # Backend - Microservicio de Mensajería
-  mensajeria:
+  # Backend - Messaging Microservice
+  ms-messaging:
     build:
-      context: ./backend/microservicios/mensajeria
+      context: ./backend/ms-messaging
       dockerfile: Dockerfile
-    container_name: mensajeria-service
+    container_name: ms-messaging-service
     ports:
       - "3009:3009"
     environment:
@@ -217,12 +217,12 @@ services:
     networks:
       - wep-network
 
-  # Backend - Microservicio de Notas
-  notas:
+  # Backend - Grades Microservice
+  ms-grades:
     build:
-      context: ./backend/microservicios/notas
+      context: ./backend/ms-grades
       dockerfile: Dockerfile
-    container_name: notas-service
+    container_name: ms-grades-service
     ports:
       - "3010:3010"
     environment:
@@ -232,22 +232,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - wep-network
-
-  # Seed database (run once after all services are up)
-  seed:
-    build:
-      context: .
-      dockerfile: k8s/jobs/Dockerfile.seed
-    container_name: wep-seed
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
-    depends_on:
-      db:
-        condition: service_healthy
-    profiles:
-      - seed
     networks:
       - wep-network
 

@@ -1,13 +1,13 @@
 import React, { FC, ReactElement, useState, useEffect, useCallback } from 'react';
 import Sidebar from './Sidebar';
 import HomeView from '../pages/dashboard/home/index';
-import PerfilPage from '../pages/perfil/index';
-import MensajeriaPage from '../pages/mensajeria/index';
-import ContactoPage from '../pages/contacto/index';
-import CalificacionesView from '../pages/calificaciones/CalificacionesView';
-import GestionNotasView from '../pages/calificaciones/GestionNotasView';
-import NotificacionesPage from '../pages/notificaciones/index';
-import notificacionesService from '../pages/notificaciones/service';
+import ProfilePage from '../pages/profile/profile.page';
+import MessagingPage from '../pages/messaging/index';
+import ContactPage from '../pages/contact/index';
+import GradesView from '../pages/grades/grades.view';
+import ManageGradesView from '../pages/grades/manage-grades.view';
+import NotificationsPage from '../pages/notifications/index';
+import notificationsService from '../pages/notifications/notifications.service';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -18,31 +18,31 @@ interface DashboardLayoutProps {
 }
 
 const wipSections: Record<string, { title: string; description: string }> = {
-  mensajeria: {
+  messaging: {
     title: 'Mensajería',
     description: 'Bandeja de mensajes y conversaciones con profesores y alumnos.',
   },
-  contacto: {
+  contact: {
     title: 'Contacto',
     description: 'Directorio de contactos y información institucional.',
   },
-  perfil: {
+  profile: {
     title: 'Mi Perfil',
     description: 'Edita tu información personal y configura tu cuenta.',
   },
 };
 
-const subjectSections = ['cursos', 'clases'];
+const subjectSections = ['courses', 'classes'];
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, onLogout, defaultSection }): ReactElement => {
-  const [selectedSection, setSelectedSection] = useState(defaultSection || 'inicio');
+  const [selectedSection, setSelectedSection] = useState(defaultSection || 'home');
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchUnread = useCallback(async () => {
     const usuarioId = userData?.id;
     if (!usuarioId) return;
     try {
-      const result = await notificacionesService.getUnreadCount(usuarioId);
+      const result = await notificationsService.getUnreadCount(usuarioId);
       setUnreadCount(result.count);
     } catch {
       // silent
@@ -54,7 +54,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, o
   }, [fetchUnread]);
 
   useEffect(() => {
-    if (selectedSection === 'notificaciones') {
+    if (selectedSection === 'notifications') {
       fetchUnread();
     }
   }, [selectedSection, fetchUnread]);
@@ -84,20 +84,20 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, o
 
       <main className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto py-8 px-6">
-          {selectedSection === 'inicio' ? (
-            <HomeView role={role} userData={userData} onGoToSubjects={() => setSelectedSection(role === 'estudiante' ? 'clases' : 'cursos')} />
-          ) : selectedSection === 'perfil' ? (
-            <PerfilPage userData={userData} role={role} />
-          ) : selectedSection === 'mensajeria' ? (
-            <MensajeriaPage />
-          ) : selectedSection === 'contacto' ? (
-            <ContactoPage />
-          ) : selectedSection === 'calificaciones' && role === 'estudiante' ? (
-            <CalificacionesView />
-          ) : selectedSection === 'gestion-notas' && role === 'profesor' ? (
-            <GestionNotasView />
-          ) : selectedSection === 'notificaciones' ? (
-            <NotificacionesPage />
+          {selectedSection === 'home' ? (
+            <HomeView role={role} userData={userData} onGoToSubjects={() => setSelectedSection(role === 'estudiante' ? 'classes' : 'courses')} />
+          ) : selectedSection === 'profile' ? (
+            <ProfilePage userData={userData} role={role} />
+          ) : selectedSection === 'messaging' ? (
+            <MessagingPage />
+          ) : selectedSection === 'contact' ? (
+            <ContactPage />
+          ) : selectedSection === 'grades' && role === 'estudiante' ? (
+            <GradesView />
+          ) : selectedSection === 'manage-grades' && role === 'profesor' ? (
+            <ManageGradesView />
+          ) : selectedSection === 'notifications' ? (
+            <NotificationsPage />
           ) : subjectSections.includes(selectedSection) ? (
             children
           ) : (

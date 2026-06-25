@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET ?? 'colegio_ohiggins_secret_changeme'
 const PUBLIC_PATHS = [
   '/api/auth/login',
   '/api/auth/register',
-  '/api/estudiantes/login',
+  '/api/students/login',
   '/health',
   '/docs',
 ]

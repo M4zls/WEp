@@ -1,7 +1,7 @@
 import React, { FC, ReactElement, useEffect, useState, useCallback } from 'react';
-import claseService from '../../clases/service';
-import type { Clase } from '../../clases/types';
-import courseService from '../../cursos/service';
+import classesService from '../../classes/classes.service';
+import type { Class as SchoolClass } from '../../classes/class.types';
+import courseService from '../../courses/courses.service';
 
 interface HomeViewProps {
   userData: { nombre?: string; apellido?: string; email?: string; rut?: string; cursos?: string } | null;
@@ -10,20 +10,20 @@ interface HomeViewProps {
 }
 
 const estadoBadge: Record<string, string> = {
-  pendiente: 'bg-amber-100 text-amber-700',
-  realizada: 'bg-emerald-100 text-emerald-700',
-  cancelada: 'bg-red-100 text-red-700',
+  pending: 'bg-amber-100 text-amber-700',
+  completed: 'bg-emerald-100 text-emerald-700',
+  cancelled: 'bg-red-100 text-red-700',
 };
 
 const estadoLabel: Record<string, string> = {
-  pendiente: 'Pendiente',
-  realizada: 'Realizada',
-  cancelada: 'Cancelada',
+  pending: 'Pendiente',
+  completed: 'Realizada',
+  cancelled: 'Cancelada',
 };
 
 const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactElement => {
   const [greeting, setGreeting] = useState('');
-  const [proximasClases, setProximasClases] = useState<Clase[]>([]);
+  const [proximasClases, setProximasClases] = useState<SchoolClass[]>([]);
   const [stats, setStats] = useState({ subjects: 0, courses: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -37,18 +37,18 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
       if (role === 'estudiante') {
         const cursoNombre = user.cursos;
         if (cursoNombre) {
-          const lista = await courseService.obtenerCursos();
+          const lista = await courseService.getCourses();
           const miCurso: any = lista.find((c: any) => c.nombre === cursoNombre);
           if (miCurso) {
-            const materias = await courseService.obtenerMaterias(miCurso.id);
+            const materias = await courseService.getSubjectsByCourse(miCurso.id);
             setStats({ subjects: materias.length, courses: 1 });
 
             const ids = materias.map((m: any) => m.id);
             if (ids.length > 0) {
-              const todas: Clase[] = [];
+              const todas: SchoolClass[] = [];
               for (const id of ids) {
                 try {
-                  const cs = await claseService.listar(id);
+                  const cs = await classesService.list(id);
                   todas.push(...cs);
                 } catch { /* skip */ }
               }
@@ -56,9 +56,9 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
               const dentroDe7 = new Date();
               dentroDe7.setDate(hoy.getDate() + 7);
               const proximas = todas
-                .filter(c => c.estado === 'pendiente' && c.fecha >= hoy.toISOString().slice(0, 10))
-                .filter(c => c.fecha <= dentroDe7.toISOString().slice(0, 10))
-                .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.horaInicio.localeCompare(b.horaInicio))
+            .filter(c => c.estado === 'pending' && c.fecha >= hoy.toISOString().slice(0, 10))
+                  .filter(c => c.fecha <= dentroDe7.toISOString().slice(0, 10))
+                  .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.horaInicio.localeCompare(b.horaInicio))
                 .slice(0, 5);
               setProximasClases(proximas);
             }
@@ -66,12 +66,12 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
         }
       } else {
         const profesorId = user.id;
-        const lista = await courseService.obtenerCursos();
+        const lista = await courseService.getCourses();
         let totalSubjects = 0;
         const ids: number[] = [];
         for (const c of lista) {
           try {
-            const materias = await courseService.obtenerMaterias(c.id);
+            const materias = await courseService.getSubjectsByCourse(c.id);
             const filtradas = materias.filter((m: any) => m.profesorId === profesorId);
             totalSubjects += filtradas.length;
             ids.push(...filtradas.map((m: any) => m.id));
@@ -80,10 +80,10 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
         setStats({ subjects: totalSubjects, courses: lista.length });
 
         if (ids.length > 0) {
-          const todas: Clase[] = [];
+          const todas: SchoolClass[] = [];
           for (const id of ids) {
             try {
-              const cs = await claseService.listar(id);
+              const cs = await classesService.list(id);
               todas.push(...cs);
             } catch { /* skip */ }
           }
@@ -91,9 +91,9 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
           const dentroDe7 = new Date();
           dentroDe7.setDate(hoy.getDate() + 7);
           const proximas = todas
-            .filter(c => c.estado === 'pendiente' && c.fecha >= hoy.toISOString().slice(0, 10))
+            .filter(c => c.estado === 'pending' && c.fecha >= hoy.toISOString().slice(0, 10))
             .filter(c => c.fecha <= dentroDe7.toISOString().slice(0, 10))
-            .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.horaInicio.localeCompare(b.horaInicio))
+            .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.startTime.localeCompare(b.startTime))
             .slice(0, 5);
           setProximasClases(proximas);
         }

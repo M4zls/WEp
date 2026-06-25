@@ -13,22 +13,22 @@ interface SidebarProps {
 const Sidebar: FC<SidebarProps> = ({ selectedSection, onSectionChange, onLogout, userName, userInitials, role, unreadCount }): ReactElement => {
 
   const baseNavItems = [
-    { id: 'inicio', label: 'Inicio', icon: '🏠' },
-    { id: 'notificaciones', label: 'Notificaciones', icon: '🔔' },
-    { id: 'mensajeria', label: 'Mensajería', icon: '✉️' },
-    { id: 'contacto', label: 'Contacto', icon: '📞' },
-    { id: 'perfil', label: 'Perfil', icon: '👤' },
+    { id: 'home', label: 'Inicio', icon: '🏠' },
+    { id: 'notifications', label: 'Notificaciones', icon: '🔔' },
+    { id: 'messaging', label: 'Mensajería', icon: '✉️' },
+    { id: 'contact', label: 'Contacto', icon: '📞' },
+    { id: 'profile', label: 'Perfil', icon: '👤' },
   ];
 
   const getNavItems = () => {
     const items = [];
     items.push(baseNavItems[0]);
     if (role === 'estudiante') {
-      items.push({ id: 'clases', label: 'Clases', icon: '📚' });
-      items.push({ id: 'calificaciones', label: 'Calificaciones', icon: '📊' });
+      items.push({ id: 'classes', label: 'Clases', icon: '📚' });
+      items.push({ id: 'grades', label: 'Calificaciones', icon: '📊' });
     } else {
-      items.push({ id: 'cursos', label: 'Cursos', icon: '📚' });
-      items.push({ id: 'gestion-notas', label: 'Gestión de Notas', icon: '📝' });
+      items.push({ id: 'courses', label: 'Cursos', icon: '📚' });
+      items.push({ id: 'manage-grades', label: 'Gestión de Notas', icon: '📝' });
     }
     items.push(...baseNavItems.slice(1));
     return items;
@@ -65,7 +65,7 @@ const Sidebar: FC<SidebarProps> = ({ selectedSection, onSectionChange, onLogout,
             >
               <span className="text-lg">{item.icon}</span>
               <span className="flex-1 text-left">{item.label}</span>
-              {item.id === 'notificaciones' && unreadCount !== undefined && unreadCount > 0 && (
+              {item.id === 'notifications' && unreadCount !== undefined && unreadCount > 0 && (
                 <span className="px-1.5 py-0.5 bg-emerald-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
