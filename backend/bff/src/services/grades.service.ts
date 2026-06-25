@@ -4,13 +4,13 @@ const MS_NOTIFICATIONS_SERVICE = process.env.MS_NOTIFICATIONS_SERVICE || 'http:/
 
 export class GradesService {
   private async fetchStudentInfo(rut: string) {
-    const response = await fetch(`${MS_STUDENTS_SERVICE}/estudiantes/${encodeURIComponent(rut)}`);
+    const response = await fetch(`${MS_STUDENTS_SERVICE}/students/${encodeURIComponent(rut)}`);
     if (!response.ok) return null;
     return response.json();
   }
 
   private async fetchProfesorInfo(rut: string) {
-    const response = await fetch(`${MS_TEACHERS_SERVICE}/profesores/${encodeURIComponent(rut)}`);
+    const response = await fetch(`${MS_TEACHERS_SERVICE}/teachers/${encodeURIComponent(rut)}`);
     if (!response.ok) return null;
     return response.json();
   }
@@ -35,7 +35,7 @@ export class GradesService {
       payload.emailApoderado = estudiante.apoderadoEmail;
     }
 
-    fetch(`${MS_NOTIFICATIONS_SERVICE}/notificaciones/aviso-nota`, {
+    fetch(`${MS_NOTIFICATIONS_SERVICE}/notifications/aviso-nota`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

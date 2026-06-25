@@ -1,7 +1,9 @@
-import '../drizzle/migrate.js';
 import { Hono } from 'hono'
 import { cors } from 'hono/cors';
 import { gradesController } from './controllers/grades.controller.js';
+
+await import('../drizzle/migrate.js');
+await import('../drizzle/seed.js');
 
 const app = new Hono()
 

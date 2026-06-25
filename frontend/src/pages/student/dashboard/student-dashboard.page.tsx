@@ -50,8 +50,9 @@ const StudentDashboard: FC = (): ReactElement => {
       return;
     }
 
-    const user = JSON.parse(stored) as UserData;
-    setUserData(user);
+    let user: any;
+    try { user = JSON.parse(stored); } catch { setLoading(false); return; }
+    setUserData(user as UserData);
 
     const loadCurso = async () => {
       try {
@@ -68,7 +69,7 @@ const StudentDashboard: FC = (): ReactElement => {
           return;
         }
 
-        const materias = await coursesService.getSubjects(miCurso.id);
+        const materias = await coursesService.getSubjectsByCourse(miCurso.id);
         setCurso({
           id: miCurso.id,
           nombre: miCurso.nombre,

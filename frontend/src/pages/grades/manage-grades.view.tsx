@@ -125,7 +125,7 @@ const ManageGradesView: FC = (): ReactElement => {
 
       for (const c of lista) {
         try {
-          const materiasData = await coursesService.getSubjects(c.id);
+          const materiasData = await coursesService.getSubjectsByCourse(c.id);
           const materiasFiltradas = profesorId
             ? materiasData.filter((m: any) => m.profesorId === profesorId)
             : [];

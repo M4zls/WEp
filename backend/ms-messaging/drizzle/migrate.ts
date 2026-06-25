@@ -8,14 +8,14 @@ if (!connectionString) throw new Error('DATABASE_URL is required');
 const sql = postgres(connectionString, { max: 1 });
 
 try {
-  await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "mensajeria";');
+  await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "messaging";');
 
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "mensajeria"."conversaciones" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "messaging"."conversaciones" (
     "id" serial PRIMARY KEY NOT NULL,
     "created_at" text DEFAULT (now()::text)
   );`);
 
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "mensajeria"."conversacion_participantes" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "messaging"."conversacion_participantes" (
     "id" serial PRIMARY KEY NOT NULL,
     "conversacion_id" integer NOT NULL,
     "usuario_id" text NOT NULL,
@@ -24,7 +24,7 @@ try {
     "usuario_rol" text NOT NULL
   );`);
 
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "mensajeria"."mensajes" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "messaging"."mensajes" (
     "id" serial PRIMARY KEY NOT NULL,
     "conversacion_id" integer NOT NULL,
     "remitente_id" text NOT NULL,

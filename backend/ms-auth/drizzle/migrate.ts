@@ -66,7 +66,7 @@ try {
 	ADD CONSTRAINT "permissions_user_id_users_id_fk"
 	FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;`);
 
-  console.log('Migraciones de autentificacion ejecutadas correctamente');
+  console.log('Migraciones de auth ejecutadas correctamente');
 } finally {
   await sql.end();
 }

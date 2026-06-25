@@ -7,7 +7,7 @@ const MS_TEACHERS_SERVICE = process.env.MS_TEACHERS_SERVICE || 'http://localhost
 // GET todos los profesores
 app.get('/', async (c) => {
   try {
-    const response = await fetch(`${MS_TEACHERS_SERVICE}/profesores`);
+    const response = await fetch(`${MS_TEACHERS_SERVICE}/teachers`);
     const data = await response.json();
     return c.json(data);
   } catch (error) {
@@ -19,7 +19,7 @@ app.get('/', async (c) => {
 app.get('/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    const response = await fetch(`${MS_TEACHERS_SERVICE}/profesores/${id}`);
+    const response = await fetch(`${MS_TEACHERS_SERVICE}/teachers/${id}`);
     const data = await response.json();
     return c.json(data);
   } catch (error) {
@@ -31,7 +31,7 @@ app.get('/:id', async (c) => {
 app.post('/', async (c) => {
   try {
     const body = await c.req.json();
-    const response = await fetch(`${MS_TEACHERS_SERVICE}/profesores`, {
+    const response = await fetch(`${MS_TEACHERS_SERVICE}/teachers`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -48,7 +48,7 @@ app.put('/:id', async (c) => {
   const id = c.req.param('id');
   try {
     const body = await c.req.json();
-    const response = await fetch(`${MS_TEACHERS_SERVICE}/profesores/${id}`, {
+    const response = await fetch(`${MS_TEACHERS_SERVICE}/teachers/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -64,7 +64,7 @@ app.put('/:id', async (c) => {
 app.delete('/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    await fetch(`${MS_TEACHERS_SERVICE}/profesores/${id}`, {
+    await fetch(`${MS_TEACHERS_SERVICE}/teachers/${id}`, {
       method: 'DELETE',
     });
     return c.json({ success: true });

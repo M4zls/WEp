@@ -1,11 +1,13 @@
+export interface OtherParticipant {
+  usuarioId: string;
+  usuarioNombre: string;
+  usuarioApellido: string;
+  usuarioRol: string;
+}
+
 export interface Conversation {
   id: number;
-  otherParticipant: {
-    userId: string;
-    usuarioNombre: string;
-    usuarioApellido: string;
-    usuarioRol: string;
-  } | null;
+  otherParticipant: OtherParticipant | null;
   participantes: ConversationParticipant[];
   ultimoMensaje: Message | null;
   noLeidos: number;
@@ -15,7 +17,7 @@ export interface Conversation {
 export interface ConversationParticipant {
   id?: number;
   conversacionId: number;
-  userId: string;
+  usuarioId: string;
   usuarioNombre: string;
   usuarioApellido: string;
   usuarioRol: string;
@@ -28,7 +30,7 @@ export interface Message {
   remitenteNombre: string;
   remitenteApellido: string;
   remitenteRol: string;
-  content: string;
+  contenido: string;
   leido?: boolean | null;
   createdAt?: string | null;
 }

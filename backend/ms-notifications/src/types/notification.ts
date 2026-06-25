@@ -2,6 +2,7 @@ export type AbsenceAlertDto = {
   subscriberId: string;
   guardianName: string;
   studentName: string;
+  studentRut?: string;
   course: string;
   date: string;
   firstName?: string;

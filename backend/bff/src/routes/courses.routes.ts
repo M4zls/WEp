@@ -7,7 +7,7 @@ const MS_COURSES_SERVICE = process.env.MS_COURSES_SERVICE || 'http://localhost:3
 
 app.get('/', async (c) => {
   try {
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos`);
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses`);
     const data = await response.json();
     return c.json(data);
   } catch (error) {
@@ -18,7 +18,7 @@ app.get('/', async (c) => {
 app.get('/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/${id}`);
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/${id}`);
     const data = await response.json();
     return c.json(data, response.status as any);
   } catch (error) {
@@ -34,7 +34,7 @@ app.post('/', async (c) => {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
     }
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos`, {
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(parsed.data),
@@ -50,7 +50,7 @@ app.put('/:id', async (c) => {
   const id = c.req.param('id');
   try {
     const body = await c.req.json();
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/${id}`, {
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -65,7 +65,7 @@ app.put('/:id', async (c) => {
 app.delete('/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/${id}`, {
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/${id}`, {
       method: 'DELETE',
     });
     const data = await response.json();
@@ -75,9 +75,9 @@ app.delete('/:id', async (c) => {
   }
 });
 
-app.get('/asignaturas', async (c) => {
+app.get('/subjects', async (c) => {
   try {
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/asignaturas`);
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/subjects`);
     const data = await response.json();
     return c.json(data);
   } catch (error) {
@@ -85,7 +85,7 @@ app.get('/asignaturas', async (c) => {
   }
 });
 
-app.post('/asignaturas', async (c) => {
+app.post('/subjects', async (c) => {
   try {
     const body = await c.req.json();
     const parsed = crearAsignaturaBffSchema.safeParse(body);
@@ -93,7 +93,7 @@ app.post('/asignaturas', async (c) => {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
     }
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/asignaturas`, {
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/subjects`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(parsed.data),
@@ -105,11 +105,11 @@ app.post('/asignaturas', async (c) => {
   }
 });
 
-app.put('/asignaturas/:id', async (c) => {
+app.put('/subjects/:id', async (c) => {
   const id = c.req.param('id');
   try {
     const body = await c.req.json();
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/asignaturas/${id}`, {
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/subjects/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -121,10 +121,10 @@ app.put('/asignaturas/:id', async (c) => {
   }
 });
 
-app.delete('/asignaturas/:id', async (c) => {
+app.delete('/subjects/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/asignaturas/${id}`, {
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/subjects/${id}`, {
       method: 'DELETE',
     });
     const data = await response.json();
@@ -134,10 +134,10 @@ app.delete('/asignaturas/:id', async (c) => {
   }
 });
 
-app.get('/:cursoId/materias', async (c) => {
-  const cursoId = c.req.param('cursoId');
+app.get('/:courseId/subjects', async (c) => {
+  const courseId = c.req.param('courseId');
   try {
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/${cursoId}/materias`);
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/${courseId}/subjects`);
     const data = await response.json();
     return c.json(data);
   } catch (error) {
@@ -145,7 +145,7 @@ app.get('/:cursoId/materias', async (c) => {
   }
 });
 
-app.post('/asignar-materia', async (c) => {
+app.post('/assign-subject', async (c) => {
   try {
     const body = await c.req.json();
     const parsed = asignarMateriaBffSchema.safeParse(body);
@@ -153,7 +153,7 @@ app.post('/asignar-materia', async (c) => {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
     }
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/asignar-materia`, {
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/assign-subject`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(parsed.data),
@@ -165,11 +165,11 @@ app.post('/asignar-materia', async (c) => {
   }
 });
 
-app.put('/asignar-materia/:id', async (c) => {
+app.put('/assign-subject/:id', async (c) => {
   const id = c.req.param('id');
   try {
     const body = await c.req.json();
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/asignar-materia/${id}`, {
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/assign-subject/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -181,10 +181,10 @@ app.put('/asignar-materia/:id', async (c) => {
   }
 });
 
-app.delete('/asignar-materia/:id', async (c) => {
+app.delete('/assign-subject/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    const response = await fetch(`${MS_COURSES_SERVICE}/cursos/asignar-materia/${id}`, {
+    const response = await fetch(`${MS_COURSES_SERVICE}/courses/assign-subject/${id}`, {
       method: 'DELETE',
     });
     const data = await response.json();

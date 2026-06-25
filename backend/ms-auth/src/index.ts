@@ -1,6 +1,8 @@
-import '../drizzle/migrate.js';
 import { Hono } from 'hono'
 import auth from './controllers/auth.controller.js';
+
+await import('../drizzle/migrate.js');
+await import('../drizzle/seed.js');
 
 const app = new Hono()
 

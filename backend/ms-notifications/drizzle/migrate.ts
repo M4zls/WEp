@@ -8,8 +8,8 @@ if (!connectionString) throw new Error('DATABASE_URL is required');
 const sql = postgres(connectionString, { max: 1 });
 
 try {
-  await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "notificaciones";');
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notificaciones"."eventos" (
+  await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "notifications";');
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notifications"."eventos" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"titulo" text NOT NULL,
 	"descripcion" text,
@@ -19,7 +19,7 @@ try {
 	"fecha_creacion" text DEFAULT (now()::text),
 	"fecha_programada" text
   );`);
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notificaciones"."logs" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notifications"."logs" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"usuario_id" integer,
 	"accion" text NOT NULL,
@@ -29,7 +29,7 @@ try {
 	"estado" text NOT NULL,
 	"fecha_creacion" text DEFAULT (now()::text)
   );`);
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notificaciones"."notificaciones" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notifications"."notificaciones" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"usuario_id" integer NOT NULL,
 	"titulo" text NOT NULL,
@@ -38,8 +38,10 @@ try {
 	"leida" boolean DEFAULT false,
 	"url" text,
 	"fecha_creacion" text DEFAULT (now()::text),
-	"fecha_lectura" text
+  "fecha_lectura" text
   );`);
+
+  await sql.unsafe(`DROP TABLE IF EXISTS "notifications"."notifications" CASCADE;`);
 
   console.log('Migraciones de notificaciones ejecutadas correctamente');
 } finally {

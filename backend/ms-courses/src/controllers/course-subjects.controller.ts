@@ -50,6 +50,7 @@ courseSubjectsController.delete('/assign-subject/:id', async (c) => {
 courseSubjectsController.get('/:courseId/subjects', async (c) => {
   try {
     const courseId = parseInt(c.req.param('courseId'));
+    if (isNaN(courseId)) return c.json({ error: 'ID de curso inválido' }, 400);
     const subjects = await service.getSubjectsByCourse(courseId);
     return c.json(subjects);
   } catch (err: any) {

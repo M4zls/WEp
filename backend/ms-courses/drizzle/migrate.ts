@@ -8,8 +8,8 @@ if (!connectionString) throw new Error('DATABASE_URL is required');
 const sql = postgres(connectionString, { max: 1 });
 
 try {
-  await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "cursos";');
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "cursos"."courses" (
+  await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "courses";');
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "courses"."courses" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"level" text NOT NULL,
@@ -17,7 +17,7 @@ try {
 	"year" text DEFAULT '2026',
 	"created_at" text DEFAULT (now()::text)
   );`);
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "cursos"."subjects" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "courses"."subjects" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"code" text NOT NULL,
@@ -25,7 +25,7 @@ try {
 	"created_at" text DEFAULT (now()::text),
 	CONSTRAINT "subjects_code_unique" UNIQUE ("code")
   );`);
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "cursos"."course_subject" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "courses"."course_subject" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"course_id" integer NOT NULL,
 	"subject_id" integer NOT NULL,

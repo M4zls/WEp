@@ -6,18 +6,51 @@ const app = new Hono();
 const MS_MESSAGING_SERVICE = process.env.MS_MESSAGING_SERVICE || 'http://localhost:3009';
 const messagingService = new MessagingService();
 
-/**
- * POST /mensajeria/conversaciones
- * Crea o reutiliza una conversación entre participantes.
- * Delega al microservicio de mensajería.
- */
+const esToEn: Record<string, string> = {
+  conversacionId: 'conversationId',
+  remitenteId: 'senderId',
+  remitenteNombre: 'senderName',
+  remitenteApellido: 'senderLastName',
+  remitenteRol: 'senderRole',
+  contenido: 'content',
+  participanteIds: 'participantIds',
+  participanteNombres: 'participantNames',
+  participanteApellidos: 'participantLastNames',
+  participanteRoles: 'participantRoles',
+  ultimoMensaje: 'lastMessage',
+  noLeidos: 'unreadCount',
+  usuarioId: 'userId',
+  usuarioNombre: 'userName',
+  usuarioApellido: 'userLastName',
+  usuarioRol: 'userRole',
+};
+
+const enToEs: Record<string, string> = {};
+for (const [es, en] of Object.entries(esToEn)) {
+  enToEs[en] = es;
+}
+
+function mapKeys(obj: any, mapping: Record<string, string>): any {
+  if (Array.isArray(obj)) return obj.map(i => mapKeys(i, mapping));
+  if (obj && typeof obj === 'object') {
+    const mapped: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      const newKey = mapping[key] ?? key;
+      mapped[newKey] = mapKeys(value, mapping);
+    }
+    return mapped;
+  }
+  return obj;
+}
+
 app.post('/conversaciones', async (c) => {
   try {
     const body = await c.req.json();
-    const response = await fetch(`${MS_MESSAGING_SERVICE}/mensajeria/conversaciones`, {
+    const payload = mapKeys(body, esToEn);
+    const response = await fetch(`${MS_MESSAGING_SERVICE}/messaging/conversations`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
     const data = await response.json();
     return c.json(data, response.status as any);
@@ -26,40 +59,31 @@ app.post('/conversaciones', async (c) => {
   }
 });
 
-/**
- * GET /mensajeria/conversaciones/:usuarioId
- * Lista las conversaciones de un usuario.
- */
 app.get('/conversaciones/:usuarioId', async (c) => {
   try {
     const usuarioId = c.req.param('usuarioId');
-    const response = await fetch(`${MS_MESSAGING_SERVICE}/mensajeria/conversaciones/${usuarioId}`);
+    const response = await fetch(`${MS_MESSAGING_SERVICE}/messaging/conversations/${usuarioId}`);
     const data = await response.json();
-    return c.json(data, response.status as any);
+    return c.json(mapKeys(data, enToEs), response.status as any);
   } catch (error) {
     return c.json({ error: 'Error fetching conversations' }, 500);
   }
 });
 
-/**
- * POST /mensajeria/mensajes
- * Envía un mensaje en una conversación existente
- * y dispara una notificación in-app al destinatario.
- */
 app.post('/mensajes', async (c) => {
   try {
     const body = await c.req.json();
-    const response = await fetch(`${MS_MESSAGING_SERVICE}/mensajeria/mensajes`, {
+    const payload = mapKeys(body, esToEn);
+    const response = await fetch(`${MS_MESSAGING_SERVICE}/messaging/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
     const data = await response.json();
     if (!response.ok) {
       return c.json(data, response.status as any);
     }
 
-    // Notificar al destinatario del mensaje
     messagingService.sendMessageNotification(body);
 
     return c.json(data, response.status as any);
@@ -68,30 +92,22 @@ app.post('/mensajes', async (c) => {
   }
 });
 
-/**
- * GET /mensajeria/mensajes/:conversacionId
- * Obtiene los mensajes de una conversación.
- */
 app.get('/mensajes/:conversacionId', async (c) => {
   try {
     const conversacionId = c.req.param('conversacionId');
-    const response = await fetch(`${MS_MESSAGING_SERVICE}/mensajeria/mensajes/${conversacionId}`);
+    const response = await fetch(`${MS_MESSAGING_SERVICE}/messaging/messages/${conversacionId}`);
     const data = await response.json();
-    return c.json(data, response.status as any);
+    return c.json(mapKeys(data, enToEs), response.status as any);
   } catch (error) {
     return c.json({ error: 'Error fetching messages' }, 500);
   }
 });
 
-/**
- * PUT /mensajeria/mensajes/leer/:conversacionId/:usuarioId
- * Marca como leídos los mensajes de una conversación para un usuario.
- */
 app.put('/mensajes/leer/:conversacionId/:usuarioId', async (c) => {
   try {
     const conversacionId = c.req.param('conversacionId');
     const usuarioId = c.req.param('usuarioId');
-    const response = await fetch(`${MS_MESSAGING_SERVICE}/mensajeria/mensajes/leer/${conversacionId}/${usuarioId}`, {
+    const response = await fetch(`${MS_MESSAGING_SERVICE}/messaging/messages/read/${conversacionId}/${usuarioId}`, {
       method: 'PUT',
     });
     const data = await response.json();

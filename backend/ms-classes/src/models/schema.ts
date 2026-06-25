@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { pgSchema, serial, integer, text } from 'drizzle-orm/pg-core';
 
-export const classesSchema = pgSchema('clases');
+export const classesSchema = pgSchema('classes');
 
 export const classes = classesSchema.table('classes', {
   id: serial('id').primaryKey(),

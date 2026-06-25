@@ -3,7 +3,7 @@ import { TeachersRepository } from "../repositories/teachers.repository.js";
 import type { ITeacher } from "../types/teacher.js";
 import type { ITeachersService } from "./teachers.service.interface.js";
 import { PROFESSOR_ERRORS } from "../common/consts.js";
-import { hashPassword } from "../common/utils.js";
+import { hashPassword, comparePassword } from "../common/utils.js";
 
 export class TeachersService implements ITeachersService {
     private repo: ITeachersRepository;
@@ -30,8 +30,8 @@ export class TeachersService implements ITeachersService {
             throw new Error(PROFESSOR_ERRORS.NOT_FOUND);
         }
 
-        const hashed = await hashPassword(password);
-        if (profesor.password !== hashed) {
+        const match = await comparePassword(password, profesor.password);
+        if (!match) {
             throw new Error('Contraseña incorrecta');
         }
 

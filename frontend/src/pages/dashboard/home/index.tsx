@@ -40,7 +40,7 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
           const lista = await courseService.getCourses();
           const miCurso: any = lista.find((c: any) => c.nombre === cursoNombre);
           if (miCurso) {
-            const materias = await courseService.getSubjects(miCurso.id);
+            const materias = await courseService.getSubjectsByCourse(miCurso.id);
             setStats({ subjects: materias.length, courses: 1 });
 
             const ids = materias.map((m: any) => m.id);
@@ -56,9 +56,9 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
               const dentroDe7 = new Date();
               dentroDe7.setDate(hoy.getDate() + 7);
               const proximas = todas
-                .filter(c => c.estado === 'pending' && c.fecha >= hoy.toISOString().slice(0, 10))
-                .filter(c => c.fecha <= dentroDe7.toISOString().slice(0, 10))
-                .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.startTime.localeCompare(b.startTime))
+            .filter(c => c.estado === 'pending' && c.fecha >= hoy.toISOString().slice(0, 10))
+                  .filter(c => c.fecha <= dentroDe7.toISOString().slice(0, 10))
+                  .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.horaInicio.localeCompare(b.horaInicio))
                 .slice(0, 5);
               setProximasClases(proximas);
             }
@@ -71,7 +71,7 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
         const ids: number[] = [];
         for (const c of lista) {
           try {
-            const materias = await courseService.getSubjects(c.id);
+            const materias = await courseService.getSubjectsByCourse(c.id);
             const filtradas = materias.filter((m: any) => m.profesorId === profesorId);
             totalSubjects += filtradas.length;
             ids.push(...filtradas.map((m: any) => m.id));
@@ -226,8 +226,8 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
                   {new Date(clase.fecha + 'T12:00:00').getDate()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-700 truncate">{clase.title}</p>
-                  <p className="text-xs text-slate-400 capitalize">{formatDate(clase.fecha)} · {clase.startTime} - {clase.endTime}</p>
+                  <p className="text-sm font-medium text-slate-700 truncate">{clase.titulo}</p>
+                  <p className="text-xs text-slate-400 capitalize">{formatDate(clase.fecha)} · {clase.horaInicio} - {clase.horaTermino}</p>
                 </div>
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full flex-shrink-0 ${estadoBadge[clase.estado] || 'bg-slate-100 text-slate-600'}`}>
                   {estadoLabel[clase.estado] || clase.estado}

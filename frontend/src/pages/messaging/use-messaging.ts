@@ -1,22 +1,22 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import apiClient from '../../api/apiClient';
 import coursesService from '../courses/courses.service';
-import type { Conversacion, Mensaje, Contacto } from './types';
+import type { Conversation, Message, Contact } from './messaging.types';
 
 type Vista = 'conversaciones' | 'nuevo';
 
 export function useMessaging() {
-  const [conversaciones, setConversaciones] = useState<Conversacion[]>([]);
-  const [conversacionActiva, setConversacionActiva] = useState<Conversacion | null>(null);
-  const [mensajes, setMensajes] = useState<Mensaje[]>([]);
+  const [conversaciones, setConversationes] = useState<Conversation[]>([]);
+  const [conversacionActiva, setConversationActiva] = useState<Conversation | null>(null);
+  const [mensajes, setMessages] = useState<Message[]>([]);
   const [loadingConvs, setLoadingConvs] = useState(true);
   const [loadingMsgs, setLoadingMsgs] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [vista, setVista] = useState<Vista>('conversaciones');
-  const [contactos, setContactos] = useState<Contacto[]>([]);
-  const [loadingContactos, setLoadingContactos] = useState(false);
+  const [contactos, setContacts] = useState<Contact[]>([]);
+  const [loadingContacts, setLoadingContacts] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const stored = sessionStorage.getItem('user');
@@ -26,11 +26,11 @@ export function useMessaging() {
   const usuarioApellido: string = user?.apellido || '';
   const usuarioRol: string = sessionStorage.getItem('role') || '';
 
-  const listarConversaciones = useCallback(async () => {
+  const listarConversationes = useCallback(async () => {
     if (!usuarioId) return;
     try {
       const data = await apiClient.get(`/messaging/conversaciones/${usuarioId}`);
-      setConversaciones(data || []);
+      setConversationes(data || []);
     } catch (err) {
       console.error('Error al cargar conversaciones:', err);
       setError('Error al cargar conversaciones');
@@ -39,11 +39,11 @@ export function useMessaging() {
     }
   }, [usuarioId]);
 
-  const cargarMensajes = useCallback(async (conversacionId: number) => {
+  const cargarMessages = useCallback(async (conversacionId: number) => {
     setLoadingMsgs(true);
     try {
       const data = await apiClient.get(`/messaging/mensajes/${conversacionId}`);
-      setMensajes(data || []);
+      setMessages(data || []);
       await apiClient.put(`/messaging/mensajes/leer/${conversacionId}/${usuarioId}`);
     } catch (err) {
       console.error('Error al cargar mensajes:', err);
@@ -53,14 +53,14 @@ export function useMessaging() {
     }
   }, [usuarioId]);
 
-  const seleccionarConversacion = useCallback(async (conv: Conversacion) => {
-    setConversacionActiva(conv);
+  const seleccionarConversation = useCallback(async (conv: Conversation) => {
+    setConversationActiva(conv);
     setVista('conversaciones');
-    await cargarMensajes(conv.id);
-    setConversaciones((prev) =>
+    await cargarMessages(conv.id);
+    setConversationes((prev) =>
       prev.map((c) => (c.id === conv.id ? { ...c, noLeidos: 0 } : c))
     );
-  }, [cargarMensajes]);
+  }, [cargarMessages]);
 
   const handleEnviar = useCallback(async () => {
     if (!nuevoMensaje.trim() || !conversacionActiva || !usuarioId) return;
@@ -74,18 +74,18 @@ export function useMessaging() {
         remitenteRol: usuarioRol,
         contenido: nuevoMensaje.trim(),
       });
-      setMensajes((prev) => [...prev, msg]);
+      setMessages((prev) => [...prev, msg]);
       setNuevoMensaje('');
-      listarConversaciones();
+      listarConversationes();
     } catch (err) {
       console.error('Error al enviar mensaje:', err);
       setError('Error al enviar mensaje');
     } finally {
       setEnviando(false);
     }
-  }, [nuevoMensaje, conversacionActiva, usuarioId, usuarioNombre, usuarioApellido, usuarioRol, listarConversaciones]);
+  }, [nuevoMensaje, conversacionActiva, usuarioId, usuarioNombre, usuarioApellido, usuarioRol, listarConversationes]);
 
-  const iniciarConversacion = useCallback(async (contacto: Contacto) => {
+  const iniciarConversation = useCallback(async (contacto: Contact) => {
     try {
       const conv = await apiClient.post('/messaging/conversaciones', {
         participanteIds: [usuarioId, contacto.id],
@@ -94,9 +94,9 @@ export function useMessaging() {
         participanteRoles: [usuarioRol, contacto.rol],
       });
 
-      await listarConversaciones();
+      await listarConversationes();
 
-      const convData: Conversacion = {
+      const convData: Conversation = {
         id: conv.id,
         otherParticipant: {
           usuarioId: contacto.id,
@@ -110,26 +110,26 @@ export function useMessaging() {
         createdAt: conv.createdAt,
       };
 
-      setConversacionActiva(convData);
+      setConversationActiva(convData);
       setVista('conversaciones');
-      setMensajes([]);
+      setMessages([]);
     } catch (err) {
       console.error('Error al crear conversación:', err);
       setError('Error al crear conversación');
     }
-  }, [usuarioId, usuarioNombre, usuarioApellido, usuarioRol, listarConversaciones]);
+  }, [usuarioId, usuarioNombre, usuarioApellido, usuarioRol, listarConversationes]);
 
-  const cargarContactos = useCallback(async () => {
-    setLoadingContactos(true);
+  const cargarContacts = useCallback(async () => {
+    setLoadingContacts(true);
     try {
-      const lista: Contacto[] = [];
+      const lista: Contact[] = [];
 
       if (usuarioRol === 'estudiante') {
         const cursos = await coursesService.getCourses();
         const cursoNombre = user?.cursos || '';
         const miCurso = cursos.find((c: any) => c.nombre === cursoNombre);
         if (miCurso) {
-          const materias = await coursesService.getSubjects(miCurso.id);
+          const materias = await coursesService.getSubjectsByCourse(miCurso.id);
           for (const m of materias) {
             if (m.profesorRut && m.profesorNombre) {
               lista.push({
@@ -158,7 +158,7 @@ export function useMessaging() {
         const profesorRut = user?.rut;
         const cursos = await coursesService.getCourses();
         for (const c of cursos) {
-          const materias = await coursesService.getSubjects(c.id);
+          const materias = await coursesService.getSubjectsByCourse(c.id);
           const misMaterias = materias.filter((m: any) => m.profesorRut === profesorRut);
           if (misMaterias.length === 0) continue;
 
@@ -175,37 +175,37 @@ export function useMessaging() {
         }
       }
 
-      setContactos(lista);
+      setContacts(lista);
     } catch (err) {
       console.error('Error al cargar contactos:', err);
       setError('Error al cargar contactos');
     } finally {
-      setLoadingContactos(false);
+      setLoadingContacts(false);
     }
   }, [usuarioRol, user]);
 
   const abrirNuevo = useCallback(async () => {
     setVista('nuevo');
-    setConversacionActiva(null);
-    await cargarContactos();
-  }, [cargarContactos]);
+    setConversationActiva(null);
+    await cargarContacts();
+  }, [cargarContacts]);
 
   useEffect(() => {
-    listarConversaciones();
-  }, [listarConversaciones]);
+    listarConversationes();
+  }, [listarConversationes]);
 
   useEffect(() => {
     if (pollingRef.current) clearInterval(pollingRef.current);
     if (conversacionActiva) {
       pollingRef.current = setInterval(() => {
-        cargarMensajes(conversacionActiva.id);
-        listarConversaciones();
+        cargarMessages(conversacionActiva.id);
+        listarConversationes();
       }, 5000);
     }
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
-  }, [conversacionActiva, cargarMensajes, listarConversaciones]);
+  }, [conversacionActiva, cargarMessages, listarConversationes]);
 
   return {
     conversaciones,
@@ -218,12 +218,12 @@ export function useMessaging() {
     enviando,
     vista,
     contactos,
-    loadingContactos,
+    loadingContactos: loadingContacts,
     usuarioId,
     setNuevoMensaje,
-    seleccionarConversacion,
+    seleccionarConversacion: seleccionarConversation,
     handleEnviar,
-    iniciarConversacion,
+    iniciarConversacion: iniciarConversation,
     abrirNuevo,
     setVista,
     setError,

@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { pgSchema, serial, text, integer, boolean } from 'drizzle-orm/pg-core';
 
 /** Schema de PostgreSQL específico para el microservicio de mensajería. */
-export const messagingSchema = pgSchema('mensajeria');
+export const messagingSchema = pgSchema('messaging');
 
 /** Tabla de conversaciones (cabecera). */
 export const conversations = messagingSchema.table('conversaciones', {

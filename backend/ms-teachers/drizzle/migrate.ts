@@ -8,8 +8,8 @@ if (!connectionString) throw new Error('DATABASE_URL is required');
 const sql = postgres(connectionString, { max: 1 });
 
 try {
-  await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "profesores";');
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "profesores"."profesores" (
+  await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "teachers";');
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "teachers"."teachers" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"rut" text NOT NULL,
 	"dv" text NOT NULL,
@@ -20,10 +20,10 @@ try {
 	"telefono" text,
 	"materia" text NOT NULL,
 	"fecha_ingreso" text DEFAULT (now()::text),
-	CONSTRAINT "profesores_rut_unique" UNIQUE ("rut"),
-	CONSTRAINT "profesores_email_unique" UNIQUE ("email")
+	CONSTRAINT "teachers_rut_unique" UNIQUE ("rut"),
+	CONSTRAINT "teachers_email_unique" UNIQUE ("email")
   );`);
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "profesores"."disponibilidad" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "teachers"."disponibilidad" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"profesor_id" integer NOT NULL,
 	"dia" text NOT NULL,
@@ -32,7 +32,7 @@ try {
 	"tipo" text NOT NULL,
 	"ubicacion" text
   );`);
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "profesores"."horarios" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "teachers"."horarios" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"profesor_id" integer NOT NULL,
 	"dia" text NOT NULL,
@@ -41,7 +41,7 @@ try {
 	"sala" text,
 	"curso_id" text NOT NULL
   );`);
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "profesores"."clases" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "teachers"."clases" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"profesor_id" integer NOT NULL,
 	"curso_id" text NOT NULL,
@@ -59,15 +59,15 @@ try {
     }
   };
 
-  await addFk(`ALTER TABLE "profesores"."disponibilidad"
-	ADD CONSTRAINT "disponibilidad_profesor_id_profesores_id_fk"
-	FOREIGN KEY ("profesor_id") REFERENCES "profesores"."profesores"("id") ON DELETE cascade ON UPDATE no action;`);
-  await addFk(`ALTER TABLE "profesores"."horarios"
-	ADD CONSTRAINT "horarios_profesor_id_profesores_id_fk"
-	FOREIGN KEY ("profesor_id") REFERENCES "profesores"."profesores"("id") ON DELETE cascade ON UPDATE no action;`);
-  await addFk(`ALTER TABLE "profesores"."clases"
-	ADD CONSTRAINT "clases_profesor_id_profesores_id_fk"
-	FOREIGN KEY ("profesor_id") REFERENCES "profesores"."profesores"("id") ON DELETE cascade ON UPDATE no action;`);
+  await addFk(`ALTER TABLE "teachers"."disponibilidad"
+	ADD CONSTRAINT "disponibilidad_profesor_id_teachers_id_fk"
+	FOREIGN KEY ("profesor_id") REFERENCES "teachers"."teachers"("id") ON DELETE cascade ON UPDATE no action;`);
+  await addFk(`ALTER TABLE "teachers"."horarios"
+	ADD CONSTRAINT "horarios_profesor_id_teachers_id_fk"
+	FOREIGN KEY ("profesor_id") REFERENCES "teachers"."teachers"("id") ON DELETE cascade ON UPDATE no action;`);
+  await addFk(`ALTER TABLE "teachers"."clases"
+	ADD CONSTRAINT "clases_profesor_id_teachers_id_fk"
+	FOREIGN KEY ("profesor_id") REFERENCES "teachers"."teachers"("id") ON DELETE cascade ON UPDATE no action;`);
 
   console.log('Migraciones de profesores ejecutadas correctamente');
 } finally {

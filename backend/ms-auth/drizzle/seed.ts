@@ -1,4 +1,5 @@
 import postgres from 'postgres';
+import bcrypt from 'bcryptjs';
 
 declare const process: { env: { DATABASE_URL?: string } };
 
@@ -8,12 +9,7 @@ if (!connectionString) throw new Error('DATABASE_URL is required');
 const sql = postgres(connectionString, { max: 1 });
 
 async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
+  return bcrypt.hash(password, 10);
 }
 
 const PROFESORES_AUTH = [

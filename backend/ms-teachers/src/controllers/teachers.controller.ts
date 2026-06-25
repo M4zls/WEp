@@ -24,7 +24,7 @@ teachersController.post('/login', async (c) => {
 teachersController.get('/', async (c) => {
   try {
     const profesores = await service.getAllTeachers();
-    return c.json(profesores);
+    return c.json(profesores.map(p => ({ id: p.id, rut: p.rut, dv: p.dv, nombre: p.name, apellido: p.lastName, email: p.email, telefono: p.phone, especialidad: p.subject, createdAt: p.createdAt })));
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
@@ -33,8 +33,8 @@ teachersController.get('/', async (c) => {
 teachersController.get('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
-    const profesor = await service.getTeacherByRut(rut);
-    return c.json(profesor);
+    const p = await service.getTeacherByRut(rut);
+    return c.json({ id: p.id, rut: p.rut, dv: p.dv, nombre: p.name, apellido: p.lastName, email: p.email, telefono: p.phone, especialidad: p.subject, createdAt: p.createdAt });
   } catch (err: any) {
     return c.json({ error: err.message }, 404);
   }

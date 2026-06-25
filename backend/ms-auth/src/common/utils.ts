@@ -25,11 +25,11 @@ export class Utils {
 
     static buildLoginResponse = (token: string, user: User) => ({
         token,
-        user: {
+        usuario: {
             id: user.id,
             rut: user.rut,
-            name: user.name,
-            lastName: user.lastName,
+            nombre: user.name,
+            apellido: user.lastName,
             email: user.email,
             rol: user.rol,
         },

@@ -1,9 +1,9 @@
 import { sql } from 'drizzle-orm';
 import { pgSchema, serial, integer, text, boolean } from 'drizzle-orm/pg-core';
 
-const notificacionesSchema = pgSchema('notificaciones');
-const estudiantesSchema = pgSchema('estudiantes');
-const autentificacionSchema = pgSchema('autentificacion');
+const notificacionesSchema = pgSchema('notifications');
+const estudiantesSchema = pgSchema('students');
+const autentificacionSchema = pgSchema('auth');
 
 export const notifications = notificacionesSchema.table('notificaciones', {
   id: serial('id').primaryKey(),

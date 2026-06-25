@@ -13,14 +13,14 @@ export class MessagingService {
   async sendMessageNotification(body: MessageBody) {
     try {
       const participantesRes = await fetch(
-        `${MS_MESSAGING_SERVICE}/mensajeria/conversaciones/${body.remitenteId}`
+        `${MS_MESSAGING_SERVICE}/messaging/conversations/${body.remitenteId}`
       );
       if (participantesRes.ok) {
         const conversaciones: any[] = await participantesRes.json();
         const conv = conversaciones.find((c: any) => c.id === body.conversacionId);
         if (conv && conv.otherParticipant) {
           const dest = conv.otherParticipant;
-          fetch(`${MS_NOTIFICATIONS_SERVICE}/notificaciones/aviso-mensaje`, {
+          fetch(`${MS_NOTIFICATIONS_SERVICE}/notifications/aviso-mensaje`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

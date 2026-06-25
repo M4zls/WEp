@@ -1,7 +1,9 @@
-import '../drizzle/migrate.ts';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { scheduleController } from './controllers/schedule.controller.js';
+
+await import('../drizzle/migrate.ts');
+await import('../drizzle/seed.js');
 
 const app = new Hono();
 

@@ -64,7 +64,7 @@ const NEW_CLASSES = [
 
 async function seed() {
   try {
-    const existing = await sql`SELECT COUNT(*) as count FROM "clases"."classes"`;
+    const existing = await sql`SELECT COUNT(*) as count FROM "classes"."classes"`;
     if (existing[0].count > 23) {
       console.log('Ya hay clases cargadas, saltando seed.');
       return;
@@ -72,7 +72,7 @@ async function seed() {
 
     for (const c of NEW_CLASSES) {
       await sql`
-        INSERT INTO "clases"."classes" (course_subject_id, title, date, start_time, end_time, status)
+        INSERT INTO "classes"."classes" (course_subject_id, title, date, start_time, end_time, status)
         VALUES (${c.caId}, ${c.title}, ${c.date}, ${c.startTime}, ${c.endTime}, ${c.status})
       `;
     }

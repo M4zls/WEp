@@ -12,8 +12,8 @@ type Estudiante = { rut: string; nombre: string; apellido: string; cursos: strin
 
 async function seed() {
   try {
-    const clasesRealizadas: ClaseRealizada[] = await sql`SELECT id, curso_asignatura_id, fecha FROM "clases"."clases" WHERE estado = 'realizada' ORDER BY id`;
-    const estudiantes: Estudiante[] = await sql`SELECT rut, nombre, apellido, cursos FROM "estudiantes"."estudiantes" ORDER BY id`;
+    const clasesRealizadas: ClaseRealizada[] = await sql`SELECT id, course_subject_id as "cursoAsignaturaId", date as fecha FROM "classes"."classes" WHERE status = 'completed' ORDER BY id`;
+    const estudiantes: Estudiante[] = await sql`SELECT rut, nombre, apellido, cursos FROM "students"."students" ORDER BY id`;
 
     if (clasesRealizadas.length === 0 || estudiantes.length === 0) {
       console.log('No hay clases realizadas o estudiantes disponibles. Saltando seed de asistencia.');
@@ -21,8 +21,8 @@ async function seed() {
     }
 
     const cursoPorCa: Record<number, string> = {};
-    const caRows = await sql`SELECT id, curso_id FROM "cursos"."curso_asignatura" ORDER BY id`;
-    const cursoRows = await sql`SELECT id, nombre FROM "cursos"."cursos" ORDER BY id`;
+    const caRows = await sql`SELECT id, course_id as "curso_id" FROM "courses"."course_subject" ORDER BY id`;
+    const cursoRows = await sql`SELECT id, name as nombre FROM "courses"."courses" ORDER BY id`;
     const cursoMap: Record<number, string> = {};
     for (const r of cursoRows) cursoMap[r.id] = r.nombre;
     for (const r of caRows) cursoPorCa[r.id] = cursoMap[r.curso_id] || '';

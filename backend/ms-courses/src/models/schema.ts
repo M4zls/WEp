@@ -1,8 +1,8 @@
 import { sql } from 'drizzle-orm';
 import { pgSchema, serial, integer, text } from 'drizzle-orm/pg-core';
 
-const coursesSchema = pgSchema('cursos');
-const professorsSchema = pgSchema('profesores');
+const coursesSchema = pgSchema('courses');
+const professorsSchema = pgSchema('teachers');
 
 export const courses = coursesSchema.table('courses', {
   id: serial('id').primaryKey(),
@@ -21,17 +21,17 @@ export const subjects = coursesSchema.table('subjects', {
   createdAt: text('created_at').default(sql`now()::text`),
 });
 
-export const professors = professorsSchema.table('professors', {
+export const professors = professorsSchema.table('teachers', {
   id: serial('id').primaryKey(),
   rut: text('rut').notNull().unique(),
   dv: text('dv').notNull(),
-  name: text('name').notNull(),
-  lastName: text('last_name').notNull(),
+  name: text('nombre').notNull(),
+  lastName: text('apellido').notNull(),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
-  phone: text('phone'),
-  subject: text('subject').notNull(),
-  startDate: text('start_date').default(sql`now()::text`),
+  phone: text('telefono'),
+  subject: text('materia').notNull(),
+  startDate: text('fecha_ingreso').default(sql`now()::text`),
 });
 
 export const courseSubject = coursesSchema.table('course_subject', {

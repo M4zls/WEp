@@ -1,9 +1,9 @@
 import { sql } from 'drizzle-orm';
 import { pgSchema, serial, text, numeric, integer } from 'drizzle-orm/pg-core';
 
-const gradesSchema = pgSchema('notas');
+const gradesSchema = pgSchema('grades');
 
-export const grades = gradesSchema.table('notas', {
+export const grades = gradesSchema.table('grades', {
   id: serial('id').primaryKey(),
   studentRut: text('estudiante_rut').notNull(),
   subject: text('asignatura').notNull(),

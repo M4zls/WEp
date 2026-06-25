@@ -1,4 +1,5 @@
 import postgres from 'postgres';
+import bcrypt from 'bcryptjs';
 
 declare const process: { env: { DATABASE_URL?: string } };
 
@@ -42,10 +43,11 @@ async function seed() {
       return;
     }
 
+    const password = await bcrypt.hash('123456', 10);
     for (const e of NEW_STUDENTS) {
       await sql`
         INSERT INTO "students"."students" (rut, dv, nombre, apellido, cursos, email, password)
-        VALUES (${e.rut}, ${e.dv}, ${e.name}, ${e.lastName}, ${e.courses}, ${e.email}, '123456')
+        VALUES (${e.rut}, ${e.dv}, ${e.name}, ${e.lastName}, ${e.courses}, ${e.email}, ${password})
       `;
     }
 

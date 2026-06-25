@@ -8,8 +8,8 @@ if (!connectionString) throw new Error('DATABASE_URL is required');
 const sql = postgres(connectionString, { max: 1 });
 
 try {
-  await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "notas";');
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notas"."notas" (
+  await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "grades";');
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "grades"."grades" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"estudiante_rut" text NOT NULL,
 	"asignatura" text NOT NULL,
@@ -22,13 +22,13 @@ try {
   );`);
 
   try {
-    await sql.unsafe(`ALTER TABLE "notas"."notas" ADD COLUMN "coeficiente" integer NOT NULL DEFAULT 1;`);
+    await sql.unsafe(`ALTER TABLE "grades"."grades" ADD COLUMN "coeficiente" integer NOT NULL DEFAULT 1;`);
   } catch {
     // la columna ya existe, ignorar
   }
 
   try {
-    await sql.unsafe(`DROP INDEX IF EXISTS "notas"."uq_notas_estudiante_asignatura";`);
+    await sql.unsafe(`DROP INDEX IF EXISTS "grades"."uq_notas_estudiante_asignatura";`);
     console.log('Índice único eliminado correctamente');
   } catch {
     // no existe, ignorar

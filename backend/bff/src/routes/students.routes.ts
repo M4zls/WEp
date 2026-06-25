@@ -13,7 +13,7 @@ app.post('/login', async (c) => {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
     }
-    const response = await fetch(`${MS_STUDENTS_SERVICE}/estudiantes/login`, {
+    const response = await fetch(`${MS_STUDENTS_SERVICE}/students/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -27,7 +27,7 @@ app.post('/login', async (c) => {
 
 app.get('/', async (c) => {
   try {
-    const response = await fetch(`${MS_STUDENTS_SERVICE}/estudiantes`);
+    const response = await fetch(`${MS_STUDENTS_SERVICE}/students`);
     const data = await response.json();
     return c.json(data);
   } catch (error) {
@@ -38,7 +38,7 @@ app.get('/', async (c) => {
 app.get('/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    const response = await fetch(`${MS_STUDENTS_SERVICE}/estudiantes/${id}`);
+    const response = await fetch(`${MS_STUDENTS_SERVICE}/students/${id}`);
     const data = await response.json();
     return c.json(data);
   } catch (error) {
@@ -49,7 +49,7 @@ app.get('/:id', async (c) => {
 app.post('/', async (c) => {
   try {
     const body = await c.req.json();
-    const response = await fetch(`${MS_STUDENTS_SERVICE}/estudiantes`, {
+    const response = await fetch(`${MS_STUDENTS_SERVICE}/students`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -65,7 +65,7 @@ app.put('/:id', async (c) => {
   const id = c.req.param('id');
   try {
     const body = await c.req.json();
-    const response = await fetch(`${MS_STUDENTS_SERVICE}/estudiantes/${id}`, {
+    const response = await fetch(`${MS_STUDENTS_SERVICE}/students/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -80,7 +80,7 @@ app.put('/:id', async (c) => {
 app.delete('/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    const response = await fetch(`${MS_STUDENTS_SERVICE}/estudiantes/${id}`, {
+    const response = await fetch(`${MS_STUDENTS_SERVICE}/students/${id}`, {
       method: 'DELETE',
     });
     const data = await response.json();
@@ -93,7 +93,7 @@ app.delete('/:id', async (c) => {
 app.get('/curso/:curso', async (c) => {
   const curso = c.req.param('curso');
   try {
-    const response = await fetch(`${MS_STUDENTS_SERVICE}/estudiantes/curso/${curso}`);
+    const response = await fetch(`${MS_STUDENTS_SERVICE}/students/curso/${curso}`);
     const data = await response.json();
     return c.json(data);
   } catch (error) {

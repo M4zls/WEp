@@ -56,7 +56,8 @@ const TeacherDashboard: FC = (): ReactElement => {
   useEffect(() => {
     const stored = sessionStorage.getItem('user');
 
-    const storedUser = stored ? JSON.parse(stored) as UserData : null;
+    let storedUser: UserData | null = null;
+    if (stored) { try { storedUser = JSON.parse(stored) as UserData; } catch { /* ignore */ } }
     setUserData(storedUser);
     const profesorId = storedUser?.id;
 
@@ -66,7 +67,7 @@ const TeacherDashboard: FC = (): ReactElement => {
 
       for (const c of lista) {
         try {
-          const materiasData = await coursesService.getSubjects(c.id);
+          const materiasData = await coursesService.getSubjectsByCourse(c.id);
           const materiasFiltradas = profesorId
             ? materiasData.filter((m: any) => m.profesorId === profesorId)
             : [];

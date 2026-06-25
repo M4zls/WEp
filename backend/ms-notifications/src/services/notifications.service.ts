@@ -25,6 +25,17 @@ export class NotificationsService implements INotificationsService {
         date: data.date,
       },
     });
+
+    const estudiante = await this.repo.findStudentByRut(data.studentRut || '');
+    if (estudiante) {
+      await this.repo.insertNotification({
+        userId: estudiante.id,
+        title: `Inasistencia - ${data.course}`,
+        message: `Se registró tu inasistencia a ${data.course} el ${data.date}`,
+        type: 'asistencia',
+        url: '/asistencia',
+      });
+    }
   }
 
   async sendGradeNotice(data: GradeAlertDto) {

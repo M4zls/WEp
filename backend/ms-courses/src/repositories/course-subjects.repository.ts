@@ -13,14 +13,14 @@ export class CourseSubjectsRepository implements ICourseSubjectsRepository {
     return this.db
       .select({
         id: courseSubject.id,
-        courseId: courseSubject.courseId,
-        subjectId: courseSubject.subjectId,
-        professorId: courseSubject.professorId,
-        subjectName: subjects.name,
-        subjectCode: subjects.code,
-        professorRut: professors.rut,
-        professorName: professors.name,
-        professorLastName: professors.lastName,
+        cursoId: courseSubject.courseId,
+        asignaturaId: courseSubject.subjectId,
+        profesorId: courseSubject.professorId,
+        asignaturaNombre: subjects.name,
+        asignaturaCodigo: subjects.code,
+        profesorRut: professors.rut,
+        profesorNombre: professors.name,
+        profesorApellido: professors.lastName,
       })
       .from(courseSubject)
       .leftJoin(subjects, eq(courseSubject.subjectId, subjects.id))

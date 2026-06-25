@@ -17,7 +17,20 @@ studentsController.post('/login', async (c) => {
 
     const { email, password } = parsed.data;
     const { estudiante, token } = await service.authenticateStudent(email, password);
-    return c.json({ ...estudiante, token });
+    return c.json({
+      id: estudiante.id,
+      rut: estudiante.rut,
+      dv: estudiante.dv,
+      nombre: estudiante.name,
+      apellido: estudiante.lastName,
+      cursos: estudiante.courses,
+      email: estudiante.email,
+      telefono: estudiante.phone,
+      apoderado: estudiante.guardian,
+      apoderado_email: estudiante.guardianEmail,
+      fecha_registro: estudiante.fechaRegistro,
+      token,
+    });
   } catch (err: any) {
     return c.json({ error: err.message }, 401);
   }
@@ -26,7 +39,7 @@ studentsController.post('/login', async (c) => {
 studentsController.get('/', async (c) => {
   try {
     const estudiantes = await service.getAllStudents();
-    return c.json(estudiantes);
+    return c.json(estudiantes.map(e => ({ id: e.id, rut: e.rut, dv: e.dv, nombre: e.name, apellido: e.lastName, email: e.email, telefono: e.phone, cursos: e.courses, apoderado: e.guardian, apoderado_email: e.guardianEmail, fecha_registro: e.fechaRegistro })));
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
@@ -35,8 +48,8 @@ studentsController.get('/', async (c) => {
 studentsController.get('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
-    const estudiante = await service.getStudentByRut(rut);
-    return c.json(estudiante);
+    const e = await service.getStudentByRut(rut);
+    return c.json({ id: e.id, rut: e.rut, dv: e.dv, nombre: e.name, apellido: e.lastName, email: e.email, telefono: e.phone, cursos: e.courses, apoderado: e.guardian, apoderado_email: e.guardianEmail, fecha_registro: e.fechaRegistro });
   } catch (err: any) {
     return c.json({ error: err.message }, 404);
   }
@@ -87,7 +100,7 @@ studentsController.get('/curso/:curso', async (c) => {
   try {
     const curso = c.req.param('curso');
     const estudiantes = await service.getStudentsByCourse(curso);
-    return c.json(estudiantes);
+    return c.json(estudiantes.map(e => ({ id: e.id, rut: e.rut, dv: e.dv, nombre: e.name, apellido: e.lastName, email: e.email, telefono: e.phone, cursos: e.courses, apoderado: e.guardian, apoderado_email: e.guardianEmail, fecha_registro: e.fechaRegistro })));
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }

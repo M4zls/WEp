@@ -1,7 +1,9 @@
-import '../drizzle/migrate.ts';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { messagingController } from './controllers/messaging.controller.js';
+
+await import('../drizzle/migrate.ts');
+await import('../drizzle/seed.js');
 
 /** Punto de entrada del microservicio de mensajería. */
 const app = new Hono();

@@ -4,7 +4,7 @@ import { StudentsRepository } from '../repositories/students.repository.js';
 import type { IStudent } from '../types/student.js';
 import type { IStudentsService } from './students.service.interface.js';
 import { STUDENT_ERRORS, JWT_SECRET, JWT_EXPIRES_IN } from '../common/consts.js';
-import { hashPassword } from '../common/utils.js';
+import { hashPassword, comparePassword } from '../common/utils.js';
 
 export class StudentsService implements IStudentsService {
     private repository: IStudentsRepository;
@@ -31,8 +31,8 @@ export class StudentsService implements IStudentsService {
             throw new Error(STUDENT_ERRORS.NOT_FOUND);
         }
 
-        const hashed = await hashPassword(password);
-        if (estudiante.password !== hashed) {
+        const match = await comparePassword(password, estudiante.password);
+        if (!match) {
             throw new Error('Contraseña incorrecta');
         }
 
