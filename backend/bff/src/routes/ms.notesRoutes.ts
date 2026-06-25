@@ -2,10 +2,10 @@ import { Hono } from 'hono';
 
 const app = new Hono();
 
-const NOTAS_SERVICE = process.env.NOTAS_SERVICE || 'http://localhost:3010';
-const ESTUDIANTES_SERVICE = process.env.ESTUDIANTES_SERVICE || 'http://localhost:3001';
-const PROFESORES_SERVICE = process.env.PROFESORES_SERVICE || 'http://localhost:3004';
-const NOTIFICACIONES_SERVICE = process.env.NOTIFICACIONES_SERVICE || 'http://localhost:3003';
+const NOTAS_SERVICE = process.env.MS_NOTES_SERVICE || 'http://localhost:3010';
+const ESTUDIANTES_SERVICE = process.env.MS_STUDENTS_SERVICE || 'http://localhost:3001';
+const PROFESORES_SERVICE = process.env.MS_TEACHERS_SERVICE || 'http://localhost:3004';
+const NOTIFICACIONES_SERVICE = process.env.MS_NOTIFICATIONS_SERVICE || 'http://localhost:3003';
 
 async function fetchStudentInfo(rut: string) {
   const response = await fetch(`${ESTUDIANTES_SERVICE}/estudiantes/${encodeURIComponent(rut)}`);

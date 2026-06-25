@@ -1,15 +1,15 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import estudiantesRoutes from './routes/estudiantesRoutes.js';
-import profesoresRoutes from './routes/profesoresRoutes.js';
-import autentificacionRoutes from './routes/autentificacionRoutes.js';
-import cursosRoutes from './routes/cursosRoutes.js';
-import clasesRoutes from './routes/clasesRoutes.js';
-import horariosRoutes from './routes/horariosRoutes.js';
-import asistenciaRoutes from './routes/asistenciaRoutes.js';
-import mensajeriaRoutes from './routes/mensajeriaRoutes.js';
-import notasRoutes from './routes/notasRoutes.js';
-import notificacionesRoutes from './routes/notificacionesRoutes.js';
+import estudiantesRoutes from './routes/ms.studentsRoutes.js';
+import profesoresRoutes from './routes/ms.teachersRoutes.js';
+import autentificacionRoutes from './routes/ms.authenticationRoutes.js';
+import cursosRoutes from './routes/ms.coursesRoutes.js';
+import clasesRoutes from './routes/ms.classesRoutes.js';
+import asistenciaRoutes from './routes/ms.attendanceRoutes.js';
+import horariosRoutes from './routes/ms.scheduleRoutes.js';
+import mensajeriaRoutes from './routes/ms.messagingRoutes.js';
+import notasRoutes from './routes/ms.notesRoutes.js';
+import notificacionesRoutes from './routes/ms.notificationsRoutes.js';
 import openapiRoutes from './openapi.js';
 import { authMiddleware } from './middleware/auth.js'
 

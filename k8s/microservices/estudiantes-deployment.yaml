@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: estudiantes
+  name: ms.students
   namespace: wep
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: estudiantes
+      app: ms.students
   template:
     metadata:
       labels:
-        app: estudiantes
+        app: ms.students
     spec:
       containers:
-      - name: estudiantes
-        image: wep-estudiantes:latest
+      - name: ms.students
+        image: wep-ms.students:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3001
@@ -48,11 +48,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: estudiantes-service
+  name: ms.students-service
   namespace: wep
 spec:
   selector:
-    app: estudiantes
+    app: ms.students
   ports:
   - protocol: TCP
     port: 3001

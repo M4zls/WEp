@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 
 const app = new Hono();
 
-const NOTIFICACIONES_SERVICE = process.env.NOTIFICACIONES_SERVICE || 'http://localhost:3003';
+const NOTIFICACIONES_SERVICE = process.env.MS_NOTIFICATIONS_SERVICE || 'http://localhost:3003';
 
 app.post('/aviso-inasistencia', async (c) => {
   const body = await c.req.json();

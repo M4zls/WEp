@@ -3,7 +3,7 @@ import { loginAuthBffSchema } from '../dtos/BffDto.js';
 
 const app = new Hono();
 
-const AUTH_SERVICE = process.env.AUTENTIFICACION_SERVICE || process.env.AUTH_SERVICE || 'http://localhost:3002';
+const AUTH_SERVICE = process.env.MS_AUTHENTICATION_SERVICE || process.env.AUTH_SERVICE || 'http://localhost:3002';
 
 app.post('/login', async (c) => {
   try {

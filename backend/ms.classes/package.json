@@ -1,18 +1,17 @@
 {
-  "name": "notas-microservice",
+  "name": "ms.classes-microservice",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "bun run src/index.ts",
     "migrate": "bun run drizzle/migrate.ts",
-    "seed": "bun run drizzle/seed.ts",
     "test": "bun test",
     "test:coverage": "bun test --coverage"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.12.15",
+    "hono": "^4.12.16",
     "postgres": "^3.4.9",
     "zod": "^4.4.3"
   },

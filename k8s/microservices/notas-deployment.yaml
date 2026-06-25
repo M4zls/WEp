@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: notas
+  name: ms.notes
   namespace: wep
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: notas
+      app: ms.notes
   template:
     metadata:
       labels:
-        app: notas
+        app: ms.notes
     spec:
       containers:
-      - name: notas
-        image: wep-notas:latest
+      - name: ms.notes
+        image: wep-ms.notes:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3010
@@ -48,11 +48,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: notas-service
+  name: ms.notes-service
   namespace: wep
 spec:
   selector:
-    app: notas
+    app: ms.notes
   ports:
   - protocol: TCP
     port: 3010

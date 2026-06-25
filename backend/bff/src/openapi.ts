@@ -31,7 +31,7 @@ const stub = async (c: any) => c.json({ message: 'Ver documentación interactiva
 openapi.openapi(createRoute({
   method: 'post', path: '/auth/login', tags: ['Autenticación'],
   summary: 'Login profesores/admin',
-  description: 'Público. Recibe email+password, delega al microservicio de autentificación, retorna JWT + datos del usuario.',
+  description: 'Público. Recibe email+password, delega al microservicio de autenticación, retorna JWT + datos del usuario.',
   request: { body: { content: { 'application/json': { schema: loginAuthBffSchema } } } },
   responses: { 200: { description: 'Login exitoso, retorna { token, usuario }' }, 400: { description: 'Datos inválidos' }, 401: { description: 'Credenciales incorrectas' } },
 }), stub);

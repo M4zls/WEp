@@ -17,6 +17,6 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "bundler"
   },
-  "include": ["microservicios/*/src/**/*"],
-  "exclude": ["node_modules", "dist", "microservicios/*/data"]
+  "include": ["*/src/**/*"],
+  "exclude": ["node_modules", "dist", "*/data"]
 }

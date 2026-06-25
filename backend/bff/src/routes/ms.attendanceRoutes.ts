@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 
 const app = new Hono();
 
-const ASISTENCIA_SERVICE = process.env.ASISTENCIA_SERVICE || 'http://localhost:3008';
+const ASISTENCIA_SERVICE = process.env.MS_ATTENDANCE_SERVICE || 'http://localhost:3008';
 
 app.get('/clase/:claseId', async (c) => {
   try {
@@ -11,7 +11,7 @@ app.get('/clase/:claseId', async (c) => {
     const data = await response.json();
     return c.json(data, response.status as any);
   } catch (error) {
-    return c.json({ error: 'Error fetching asistencia por clase' }, 500);
+    return c.json({ error: 'Error fetching attendance por clase' }, 500);
   }
 });
 
@@ -22,7 +22,7 @@ app.get('/estudiante/:rut', async (c) => {
     const data = await response.json();
     return c.json(data, response.status as any);
   } catch (error) {
-    return c.json({ error: 'Error fetching asistencia por estudiante' }, 500);
+    return c.json({ error: 'Error fetching attendance por estudiante' }, 500);
   }
 });
 
@@ -33,7 +33,7 @@ app.get('/curso-asignatura/:id', async (c) => {
     const data = await response.json();
     return c.json(data, response.status as any);
   } catch (error) {
-    return c.json({ error: 'Error fetching asistencia por curso-asignatura' }, 500);
+    return c.json({ error: 'Error fetching attendance por curso-asignatura' }, 500);
   }
 });
 
@@ -48,7 +48,7 @@ app.post('/marcar', async (c) => {
     const data = await response.json();
     return c.json(data, response.status as any);
   } catch (error) {
-    return c.json({ error: 'Error marcando asistencia' }, 500);
+    return c.json({ error: 'Error marcando attendance' }, 500);
   }
 });
 
@@ -64,7 +64,7 @@ app.put('/:id', async (c) => {
     const data = await response.json();
     return c.json(data, response.status as any);
   } catch (error) {
-    return c.json({ error: 'Error updating asistencia' }, 500);
+    return c.json({ error: 'Error updating attendance' }, 500);
   }
 });
 

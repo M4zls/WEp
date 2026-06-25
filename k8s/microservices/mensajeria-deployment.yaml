@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mensajeria
+  name: ms.messaging
   namespace: wep
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: mensajeria
+      app: ms.messaging
   template:
     metadata:
       labels:
-        app: mensajeria
+        app: ms.messaging
     spec:
       containers:
-      - name: mensajeria
-        image: wep-mensajeria:latest
+      - name: ms.messaging
+        image: wep-ms.messaging:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3009
@@ -48,11 +48,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mensajeria-service
+  name: ms.messaging-service
   namespace: wep
 spec:
   selector:
-    app: mensajeria
+    app: ms.messaging
   ports:
   - protocol: TCP
     port: 3009

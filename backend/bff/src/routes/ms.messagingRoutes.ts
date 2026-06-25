@@ -2,8 +2,8 @@ import { Hono } from 'hono';
 
 const app = new Hono();
 
-const MENSAJERIA_SERVICE = process.env.MENSAJERIA_SERVICE || 'http://localhost:3009';
-const NOTIFICACIONES_SERVICE = process.env.NOTIFICACIONES_SERVICE || 'http://localhost:3003';
+const MENSAJERIA_SERVICE = process.env.MS_MESSAGING_SERVICE || 'http://localhost:3009';
+const NOTIFICACIONES_SERVICE = process.env.MS_NOTIFICATIONS_SERVICE || 'http://localhost:3003';
 
 /**
  * POST /mensajeria/conversaciones

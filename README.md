@@ -109,16 +109,16 @@ flowchart TB
     end
 
     subgraph Microservices["Microservicios Backend"]
-        Auth["Autentificación<br/>:3002"]
-        Students["Estudiantes<br/>:3001"]
-        Teachers["Profesores<br/>:3004"]
-        Courses["Cursos<br/>:3005"]
-        Classes["Clases<br/>:3006"]
-        Notif["Notificaciones<br/>:3003"]
-        Notas["Notas<br/>:3010"]
-        Horario["Horario<br/>:3007"]
-        Asistencia["Asistencia<br/>:3008"]
-        Mensajeria["Mensajería<br/>:3009"]
+        Auth["ms.authentication<br/>:3002"]
+        Students["ms.students<br/>:3001"]
+        Teachers["ms.teachers<br/>:3004"]
+        Courses["ms.courses<br/>:3005"]
+        Classes["ms.classes<br/>:3006"]
+        Notif["ms.notifications<br/>:3003"]
+        Notas["ms.notes<br/>:3010"]
+        Horario["ms.schedule<br/>:3007"]
+        Asistencia["ms.attendance<br/>:3008"]
+        Mensajeria["ms.messaging<br/>:3009"]
     end
 
     subgraph DB["PostgreSQL 16 (5432 / host :5433)"]
@@ -168,16 +168,16 @@ flowchart TB
 | Servicio | Puerto | Responsabilidad |
 |---|---|---|
 | **BFF** | 3000 | Orquestación — única API que consume el frontend — valida JWT en `/api/*` |
-| **Estudiantes** | 3001 | CRUD de estudiantes |
-| **Autentificación** | 3002 | Login, registro, manejo de sesiones JWT |
-| **Notificaciones** | 3003 | Notificaciones del sistema |
-| **Profesores** | 3004 | CRUD de profesores |
-| **Cursos** | 3005 | Gestión de cursos, asignaturas y asignaciones |
-| **Clases** | 3006 | Gestión de clases |
-| **Horario** | 3007 | Bloques horarios fijos (08:00-16:00) |
-| **Asistencia** | 3008 | Registro de asistencia por clase y estudiante |
-| **Mensajería** | 3009 | Mensajería interna entre usuarios |
-| **Notas** | 3010 | Gestión de calificaciones de alumnos |
+| **ms.students** | 3001 | CRUD de estudiantes |
+| **ms.authentication** | 3002 | Login, registro, manejo de sesiones JWT |
+| **ms.notifications** | 3003 | Notificaciones del sistema |
+| **ms.teachers** | 3004 | CRUD de profesores |
+| **ms.courses** | 3005 | Gestión de cursos, asignaturas y asignaciones |
+| **ms.classes** | 3006 | Gestión de clases |
+| **ms.schedule** | 3007 | Bloques horarios fijos (08:00-16:00) |
+| **ms.attendance** | 3008 | Registro de asistencia por clase y estudiante |
+| **ms.messaging** | 3009 | Mensajería interna entre usuarios |
+| **ms.notes** | 3010 | Gestión de calificaciones de alumnos |
 
 ---
 
@@ -213,7 +213,7 @@ Todas las rutas `/api/*` del BFF están protegidas por un middleware JWT (`backe
 | Capa | Runner | Comando | Docs |
 |---|---|---|---|
 | **Frontend** | Vitest | `cd frontend && npm test` | [frontend/README.md](./frontend/README.md) |
-| **Backend** | Bun test | `cd backend && bun test` (todos) o `cd backend/microservicios/<svc> && bun test` (uno) | [backend/README.md](./backend/README.md) |
+| **Backend** | Bun test | `cd backend && bun test` (todos) o `cd backend/<svc> && bun test` (uno) | [backend/README.md](./backend/README.md) |
 
 Ver README de cada capa para detalles de cobertura y estructura de tests. Reporte completo en [`docs/test-report.md`](./docs/test-report.md).
 
@@ -226,17 +226,16 @@ Wep/
 ├── frontend/           → Aplicación React (Vite + TailwindCSS + Zustand)
 ├── backend/
 │   ├── bff/            → Backend for Frontend (Hono + Zod OpenAPI)
-│   └── microservicios/ → 10 microservicios independientes
-│       ├── autentificacion/
-│       ├── estudiantes/
-│       ├── profesores/
-│       ├── cursos/
-│       ├── clases/
-│       ├── horario/
-│       ├── asistencia/
-│       ├── notificaciones/
-│       ├── mensajeria/
-│       └── notas/
+│   ├── ms.attendance/  → Microservicio de asistencia
+│   ├── ms.authentication/→ Microservicio de autenticación
+│   ├── ms.classes/     → Microservicio de clases
+│   ├── ms.courses/     → Microservicio de cursos
+│   ├── ms.students/     → Microservicio de estudiantes
+│   ├── ms.schedule/     → Microservicio de horario
+│   ├── ms.messaging/    → Microservicio de mensajería
+│   ├── ms.notes/        → Microservicio de notas
+│   ├── ms.notifications/→ Microservicio de notificaciones
+│   └── ms.teachers/     → Microservicio de profesores
 ├── k8s/                → Manifiestos de Kubernetes
 │   ├── config/         →   Namespace, ConfigMap, Secret
 │   ├── database/       →   PostgreSQL deployment + service

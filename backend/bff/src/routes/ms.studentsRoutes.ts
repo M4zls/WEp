@@ -4,7 +4,7 @@ import { loginBffSchema } from '../dtos/BffDto.js';
 
 const app = new Hono();
 
-const ESTUDIANTES_SERVICE = process.env.ESTUDIANTES_SERVICE || 'http://localhost:3001';
+const ESTUDIANTES_SERVICE = process.env.MS_STUDENTS_SERVICE || 'http://localhost:3001';
 const JWT_SECRET = process.env.JWT_SECRET ?? 'colegio_ohiggins_secret_changeme';
 
 app.post('/login', async (c) => {

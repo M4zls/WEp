@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cursos
+  name: ms.courses
   namespace: wep
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: cursos
+      app: ms.courses
   template:
     metadata:
       labels:
-        app: cursos
+        app: ms.courses
     spec:
       containers:
-      - name: cursos
-        image: wep-cursos:latest
+      - name: ms.courses
+        image: wep-ms.courses:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3005
@@ -48,11 +48,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cursos-service
+  name: ms.courses-service
   namespace: wep
 spec:
   selector:
-    app: cursos
+    app: ms.courses
   ports:
   - protocol: TCP
     port: 3005

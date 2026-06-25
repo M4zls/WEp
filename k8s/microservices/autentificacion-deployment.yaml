@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: autentificacion
+  name: ms.authentication
   namespace: wep
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: autentificacion
+      app: ms.authentication
   template:
     metadata:
       labels:
-        app: autentificacion
+        app: ms.authentication
     spec:
       containers:
-      - name: autentificacion
-        image: wep-autentificacion:latest
+      - name: ms.authentication
+        image: wep-ms.authentication:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3002
@@ -48,11 +48,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: autentificacion-service
+  name: ms.authentication-service
   namespace: wep
 spec:
   selector:
-    app: autentificacion
+    app: ms.authentication
   ports:
   - protocol: TCP
     port: 3002

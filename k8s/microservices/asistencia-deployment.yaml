@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: asistencia
+  name: ms.attendance
   namespace: wep
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: asistencia
+      app: ms.attendance
   template:
     metadata:
       labels:
-        app: asistencia
+        app: ms.attendance
     spec:
       containers:
-      - name: asistencia
-        image: wep-asistencia:latest
+      - name: ms.attendance
+        image: wep-ms.attendance:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3008
@@ -48,11 +48,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: asistencia-service
+  name: ms.attendance-service
   namespace: wep
 spec:
   selector:
-    app: asistencia
+    app: ms.attendance
   ports:
   - protocol: TCP
     port: 3008

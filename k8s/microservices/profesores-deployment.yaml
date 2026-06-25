@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: profesores
+  name: ms.teachers
   namespace: wep
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: profesores
+      app: ms.teachers
   template:
     metadata:
       labels:
-        app: profesores
+        app: ms.teachers
     spec:
       containers:
-      - name: profesores
-        image: wep-profesores:latest
+      - name: ms.teachers
+        image: wep-ms.teachers:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3004
@@ -48,11 +48,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: profesores-service
+  name: ms.teachers-service
   namespace: wep
 spec:
   selector:
-    app: profesores
+    app: ms.teachers
   ports:
   - protocol: TCP
     port: 3004

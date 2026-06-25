@@ -3,7 +3,7 @@ import { crearCursoBffSchema, crearAsignaturaBffSchema, asignarMateriaBffSchema 
 
 const app = new Hono();
 
-const CURSOS_SERVICE = process.env.CURSOS_SERVICE || 'http://localhost:3005';
+const CURSOS_SERVICE = process.env.MS_COURSES_SERVICE || 'http://localhost:3005';
 
 app.get('/', async (c) => {
   try {

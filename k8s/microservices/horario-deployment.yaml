@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: horario
+  name: ms.schedule
   namespace: wep
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: horario
+      app: ms.schedule
   template:
     metadata:
       labels:
-        app: horario
+        app: ms.schedule
     spec:
       containers:
-      - name: horario
-        image: wep-horario:latest
+      - name: ms.schedule
+        image: wep-ms.schedule:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3007
@@ -48,11 +48,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: horario-service
+  name: ms.schedule-service
   namespace: wep
 spec:
   selector:
-    app: horario
+    app: ms.schedule
   ports:
   - protocol: TCP
     port: 3007

@@ -1,11 +1,12 @@
 {
-  "name": "autentificacion-microservice",
+  "name": "ms.notes-microservice",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "bun run src/index.ts",
     "migrate": "bun run drizzle/migrate.ts",
+    "seed": "bun run drizzle/seed.ts",
     "test": "bun test",
     "test:coverage": "bun test --coverage"
   },

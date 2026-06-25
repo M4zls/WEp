@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 
 const app = new Hono();
 
-const PROFESORES_SERVICE = process.env.PROFESORES_SERVICE || 'http://localhost:3004';
+const PROFESORES_SERVICE = process.env.MS_TEACHERS_SERVICE || 'http://localhost:3004';
 
 // GET todos los profesores
 app.get('/', async (c) => {

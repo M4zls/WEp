@@ -22,8 +22,8 @@ Conjunto de microservicios que proveen la API para la gestión académica del Co
 ## Arquitectura
 
 ```
-Frontend (:8080 / :8081 dev) → BFF (:3000) → [autentificacion, estudiantes, profesores, cursos,
-    clases, horario, asistencia, notificaciones, notas, mensajeria]
+Frontend (:8080 / :8081 dev) → BFF (:3000) → [ms.authentication, ms.students, ms.teachers, ms.courses,
+    ms.classes, ms.schedule, ms.attendance, ms.notifications, ms.notes, ms.messaging]
                                                          │
                                                  PostgreSQL 16 (:5432 / host :5433)
 ```
@@ -48,16 +48,16 @@ src/
 | Servicio | Puerto | Schema DB | Responsabilidad |
 |---|---|---|---|---|
 | **BFF** | 3000 | — | BFF: única puerta de entrada del frontend |
-| **Estudiantes** | 3001 | `estudiantes` | CRUD de estudiantes |
-| **Autentificación** | 3002 | `autentificacion` | Login, registro, JWT, sesiones |
-| **Notificaciones** | 3003 | `notificaciones` | Notificaciones del sistema |
-| **Profesores** | 3004 | `profesores` | CRUD de profesores |
-| **Cursos** | 3005 | `cursos` | Cursos, asignaturas, asignaciones |
-| **Clases** | 3006 | `clases` | Clases |
-| **Horario** | 3007 | `horario` | Bloques horarios fijos (08:00-16:00) |
-| **Asistencia** | 3008 | `asistencia` | Registro de asistencia por clase y estudiante |
-| **Mensajería** | 3009 | `mensajeria` | Mensajería interna entre usuarios |
-| **Notas** | 3010 | `notas` | Gestión de calificaciones de alumnos |
+| **ms.students** | 3001 | `estudiantes` | CRUD de estudiantes |
+| **ms.authentication** | 3002 | `autentificacion` | Login, registro, JWT, sesiones |
+| **ms.notifications** | 3003 | `notificaciones` | Notificaciones del sistema |
+| **ms.teachers** | 3004 | `profesores` | CRUD de profesores |
+| **ms.courses** | 3005 | `cursos` | Cursos, asignaturas, asignaciones |
+| **ms.classes** | 3006 | `clases` | Clases |
+| **ms.schedule** | 3007 | `horario` | Bloques horarios fijos (08:00-16:00) |
+| **ms.attendance** | 3008 | `asistencia` | Registro de asistencia por clase y estudiante |
+| **ms.messaging** | 3009 | `mensajeria` | Mensajería interna entre usuarios |
+| **ms.notes** | 3010 | `notas` | Gestión de calificaciones de alumnos |
 
 ---
 
@@ -71,7 +71,7 @@ cd backend
 bun test
 
 # Ejecutar tests de un microservicio específico
-cd backend/microservicios/<servicio>
+cd backend/<servicio>
 bun test
 
 # Con cobertura
@@ -88,7 +88,7 @@ Cada microservicio incluye tests unitarios para:
 
 ```bash
 # Desarrollo (ejecutar un microservicio específico)
-cd backend/microservicios/<servicio>
+cd backend/<servicio>
 bun install
 bun run dev
 ```
@@ -102,7 +102,7 @@ Cada microservicio requiere:
 # Desde fuera del contenedor se usa localhost:5433
 DATABASE_URL_DEV=postgresql://postgres:postgres@localhost:5433/wep
 PORT=3000                    # Puerto del servicio
-JWT_SECRET=tu_secreto_jwt    # Solo autentificacion
+JWT_SECRET=tu_secreto_jwt    # Solo ms.authentication
 NOVU_SECRET_KEY=tu_key       # Solo notificaciones
 ```
 
@@ -144,19 +144,19 @@ app.use('/api/*', authMiddleware);
 | **Rutas públicas** | `/api/auth/login`, `/api/auth/register`, `/api/estudiantes/login`, `/health`, `/docs` |
 | **401** | `Token no proporcionado` / `Token inválido o expirado` |
 
-### Microservicio de Autentificación
+### Microservicio ms.authentication
 
 | Aspecto | Detalle |
 |---|---|
 | **Firma** | `sign(payload, JWT_SECRET)` con `hono/jwt` |
-| **Sesiones** | cada token se persiste en `autentificacion.sesiones` |
+| **Sesiones** | cada token se persiste en `autentificacion.sesiones` (schema DB) |
 | **Verificación** | firma + existencia en DB + vigencia |
 | **Contraseñas** | hasheadas con bcrypt |
 | **JWT_SECRET** | requerido desde entorno (`Consts.JWT_SECRET`) |
 
 ### Nota
 
-El BFF solo verifica firma (stateless, no consulta DB). El microservicio de autentificación (para profesores) verifica firma + DB. El BFF genera el JWT para estudiantes directamente porque su microservicio no maneja autenticación.
+El BFF solo verifica firma (stateless, no consulta DB). El microservicio ms.authentication (para profesores) verifica firma + DB. El BFF genera el JWT para estudiantes directamente porque su microservicio no maneja autenticación.
 
 ---
 
