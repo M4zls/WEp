@@ -30,8 +30,8 @@ export class NotificationsService implements INotificationsService {
     if (estudiante) {
       await this.repo.insertNotification({
         userId: estudiante.id,
-        title: `Inasistencia - ${data.course}`,
-        message: `Se registró tu inasistencia a ${data.course} el ${data.date}`,
+        title: 'Inasistencia',
+        message: `Se registró una inasistencia el día ${data.date}`,
         type: 'asistencia',
         url: '/asistencia',
       });

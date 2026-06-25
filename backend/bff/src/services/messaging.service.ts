@@ -17,19 +17,19 @@ export class MessagingService {
       );
       if (participantesRes.ok) {
         const conversaciones: any[] = await participantesRes.json();
-        const conv = conversaciones.find((c: any) => c.id === body.conversacionId);
+        const conv = conversaciones.find((c: any) => c.id === Number(body.conversacionId));
         if (conv && conv.otherParticipant) {
           const dest = conv.otherParticipant;
           fetch(`${MS_NOTIFICATIONS_SERVICE}/notifications/aviso-mensaje`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              destinatarioRut: dest.usuarioId,
-              destinatarioRol: dest.usuarioRol,
-              remitenteNombre: body.remitenteNombre,
-              remitenteApellido: body.remitenteApellido,
-              contenidoPreview: body.contenido,
-              conversacionId: body.conversacionId,
+              recipientRut: dest.userId,
+              recipientRole: dest.userRole,
+              senderName: body.remitenteNombre,
+              senderLastName: body.remitenteApellido,
+              contentPreview: body.contenido,
+              conversationId: Number(body.conversacionId),
             }),
           }).catch((err: any) => {
             console.error('[mensajes] notification failed:', err.message);

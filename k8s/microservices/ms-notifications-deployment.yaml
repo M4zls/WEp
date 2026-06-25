@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ms-notifications
-        image: wep-ms-notifications:latest
+        image: docker.io/library/wep-ms-notifications:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3003

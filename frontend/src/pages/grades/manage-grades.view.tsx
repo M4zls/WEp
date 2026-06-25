@@ -255,20 +255,6 @@ const ManageGradesView: FC = (): ReactElement => {
     setMensaje(null);
   };
 
-  const handleEliminarColumna = (colKey: string) => {
-    setColumnas((prev) => prev.filter((c) => c.key !== colKey));
-    setGrid((prev) => {
-      const nuevo = { ...prev };
-      for (const est of estudiantes) {
-        if (nuevo[est.rut]) {
-          const { [colKey]: _, ...resto } = nuevo[est.rut];
-          nuevo[est.rut] = resto;
-        }
-      }
-      return nuevo;
-    });
-  };
-
   const handleGuardarTodo = async () => {
     const stored = sessionStorage.getItem('user');
     const userData = stored ? JSON.parse(stored) : null;
@@ -309,7 +295,7 @@ const ManageGradesView: FC = (): ReactElement => {
       return;
     }
 
-    setGuardando(true);
+      setGuardando(true);
     setMensaje(null);
 
     try {
@@ -319,6 +305,8 @@ const ManageGradesView: FC = (): ReactElement => {
       for (const item of aActualizar) {
         await gradesService.updateGrade(item.id, item.datos);
       }
+
+      await handleSeleccionarMateria(selectedMateria);
       setMensaje(`Guardadas ${aCrear.length + aActualizar.length} nota(s) correctamente`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error al guardar notas';
@@ -402,17 +390,10 @@ const ManageGradesView: FC = (): ReactElement => {
                     <th className="px-3 py-2 text-left text-slate-500 font-medium whitespace-nowrap">RUT</th>
                     <th className="px-3 py-2 text-left text-slate-500 font-medium whitespace-nowrap">Nombre</th>
                     {columnas.map((col) => (
-                      <th key={col.key} className={`px-3 py-2 text-center whitespace-nowrap min-w-[110px] ${col.coeficiente >= 2 ? 'bg-amber-50' : ''}`}>
-                        <div className="flex items-center justify-center gap-1">
-                          <span className="text-xs font-bold text-slate-700">{EVAL_LABELS[col.tipoEvaluacion] || col.tipoEvaluacion}</span>
-                          <button
-                            onClick={() => handleEliminarColumna(col.key)}
-                            className="text-red-400 hover:text-red-600 text-xs ml-1"
-                            title="Eliminar columna"
-                          >
-                            ✕
-                          </button>
-                        </div>
+                        <th key={col.key} className={`px-3 py-2 text-center whitespace-nowrap min-w-[110px] ${col.coeficiente >= 2 ? 'bg-amber-50' : ''}`}>
+                          <div className="flex items-center justify-center gap-1">
+                            <span className="text-xs font-bold text-slate-700">{EVAL_LABELS[col.tipoEvaluacion] || col.tipoEvaluacion}</span>
+                          </div>
                         <div className="text-[10px] text-slate-400">{formatearFecha(col.fecha)}</div>
                         <div className={`text-[10px] font-semibold ${col.coeficiente >= 2 ? 'text-amber-600' : 'text-slate-400'}`}>
                           coef {col.coeficiente}

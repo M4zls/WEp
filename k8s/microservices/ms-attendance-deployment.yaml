@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ms-attendance
-        image: wep-ms-attendance:latest
+        image: docker.io/library/wep-ms-attendance:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3008

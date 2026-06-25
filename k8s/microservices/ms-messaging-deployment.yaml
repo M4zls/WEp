@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ms-messaging
-        image: wep-ms-messaging:latest
+        image: docker.io/library/wep-ms-messaging:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3009

@@ -82,20 +82,17 @@ app.post('/marcar', async (c) => {
     if (body.registros) {
       for (const r of body.registros) {
         if (r.presente === false) {
+          const payload: any = {
+            subscriberId: r.estudianteRut || 'unknown',
+            studentName: r.estudianteNombre || '',
+            studentRut: r.estudianteRut || '',
+            course: body.cursoAsignaturaId?.toString() || '',
+            date: new Date().toISOString().split('T')[0],
+          };
           fetch(`${MS_NOTIFICATIONS_SERVICE}/notifications/aviso-inasistencia`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              subscriberId: r.estudianteRut || 'unknown',
-              studentName: r.estudianteNombre || '',
-              studentRut: r.estudianteRut || '',
-              course: body.cursoAsignaturaId?.toString() || '',
-              date: new Date().toISOString().split('T')[0],
-              guardianName: '',
-              firstName: '',
-              lastName: '',
-              email: '',
-            }),
+            body: JSON.stringify(payload),
           }).catch(err => console.error('Error sending attendance notification:', err));
         }
       }

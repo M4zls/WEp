@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ms-teachers
-        image: wep-ms-teachers:latest
+        image: docker.io/library/wep-ms-teachers:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3004

@@ -18,21 +18,21 @@ export class GradesService {
   private sendGradeNotification(grade: any, estudiante: any, profesor: any) {
     const payload: any = {
       subscriberId: grade.estudianteRut,
-      estudianteRut: grade.estudianteRut,
-      nombreAlumno: `${estudiante.nombre ?? ''} ${estudiante.apellido ?? ''}`.trim(),
-      emailAlumno: estudiante.email ?? '',
-      asignatura: grade.asignatura,
-      nota: grade.nota,
-      tipoEvaluacion: grade.tipoEvaluacion,
-      nombreProfesor: profesor ? `${profesor.nombre ?? ''} ${profesor.apellido ?? ''}`.trim() : '',
-      curso: grade.curso,
+      studentRut: grade.estudianteRut,
+      studentName: `${estudiante.nombre ?? ''} ${estudiante.apellido ?? ''}`.trim(),
+      studentEmail: estudiante.email ?? '',
+      subject: grade.asignatura,
+      grade: grade.nota,
+      evaluationType: grade.tipoEvaluacion,
+      professorName: profesor ? `${profesor.nombre ?? ''} ${profesor.apellido ?? ''}`.trim() : '',
+      course: grade.curso,
     };
 
     if (estudiante.apoderado) {
-      payload.nombreApoderado = estudiante.apoderado;
+      payload.guardianName = estudiante.apoderado;
     }
     if (estudiante.apoderadoEmail) {
-      payload.emailApoderado = estudiante.apoderadoEmail;
+      payload.guardianEmail = estudiante.apoderadoEmail;
     }
 
     fetch(`${MS_NOTIFICATIONS_SERVICE}/notifications/aviso-nota`, {

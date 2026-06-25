@@ -16,11 +16,14 @@ async function seed() {
     return;
   }
 
+  const students = await sql`SELECT id FROM "students"."students" WHERE rut = '23232323' LIMIT 1`;
+  const studentId = students.length > 0 ? students[0].id : 1;
+
   await sql`
     INSERT INTO "notifications"."notificaciones" (usuario_id, tipo, titulo, mensaje, leida, fecha_creacion) VALUES
-    (23232323, 'asistencia', 'Inasistencia', 'Su hijo Mateo Sánchez faltó a clase de Matemáticas', false, now()::text),
-    (23232323, 'nota', 'Nueva Nota', 'Se ha registrado una nueva calificación para Mateo Sánchez', false, (now() + interval '1 hour')::text),
-    (23232323, 'mensaje', 'Nuevo Mensaje', 'Tiene un nuevo mensaje del profesor Carlos Muñoz', false, (now() + interval '2 hours')::text)
+    (${studentId}, 'asistencia', 'Inasistencia', 'Su hijo Mateo Sánchez faltó a clase de Matemáticas', false, now()::text),
+    (${studentId}, 'nota', 'Nueva Nota', 'Se ha registrado una nueva calificación para Mateo Sánchez', false, (now() + interval '1 hour')::text),
+    (${studentId}, 'mensaje', 'Nuevo Mensaje', 'Tiene un nuevo mensaje del profesor Carlos Muñoz', false, (now() + interval '2 hours')::text)
   `;
 
   console.log('notifications seeded successfully.');

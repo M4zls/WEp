@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ms-classes
-        image: wep-ms-classes:latest
+        image: docker.io/library/wep-ms-classes:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3006

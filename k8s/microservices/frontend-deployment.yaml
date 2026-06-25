@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: wep-frontend:fix-serve
+        image: docker.io/library/wep-frontend:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -47,4 +47,5 @@ spec:
   - protocol: TCP
     port: 8080
     targetPort: 8080
-  type: LoadBalancer
+    nodePort: 30080
+  type: NodePort

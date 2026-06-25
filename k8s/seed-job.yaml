@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-seed
+  namespace: wep
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: seed
+        image: docker.io/library/wep-ms-auth:latest
+        command:
+          - sh
+          - -c
+          - |
+            DATABASE_URL="postgresql://postgres:postgres@postgres-service:5432/wep"
+            echo "=== Seeding ms- courses ==="
+            cd /app && bun run drizzle/seed.ts

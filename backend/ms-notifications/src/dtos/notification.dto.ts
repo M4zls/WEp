@@ -2,8 +2,9 @@ import { z } from 'zod';
 
 export const absenceAlertSchema = z.object({
   subscriberId: z.string().min(1),
-  guardianName: z.string().min(1),
+  guardianName: z.string().optional(),
   studentName: z.string().min(1),
+  studentRut: z.string().optional(),
   course: z.string().min(1),
   date: z.string().min(1),
   firstName: z.string().optional(),

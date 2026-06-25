@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ms-schedule
-        image: wep-ms-schedule:latest
+        image: docker.io/library/wep-ms-schedule:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3007

@@ -28,12 +28,12 @@ export const eventos = notificacionesSchema.table('eventos', {
   fechaProgramada: text('fecha_programada'),
 });
 
-export const estudiantes = estudiantesSchema.table('estudiantes', {
+export const estudiantes = estudiantesSchema.table('students', {
   id: serial('id').primaryKey(),
   rut: text('rut').notNull(),
 });
 
-export const usuarios = autentificacionSchema.table('usuarios', {
+export const usuarios = autentificacionSchema.table('users', {
   id: serial('id').primaryKey(),
   rut: text('rut').notNull(),
 });

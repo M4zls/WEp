@@ -1,0 +1,13 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraPortMappings:
+  # Mapea el puerto 80 del PC al NodePort 30080 (Frontend)
+  - containerPort: 30080
+    hostPort: 80
+    protocol: TCP
+  # Mapea el puerto 3000 del PC al NodePort de tu BFF (Revisa si en tu YAML le pusiste un nodePort fijo, si no, pon el que te asigne, ej. 32754 o configúrale uno fijo en el YAML del servicio como 30000)
+  - containerPort: 32754 
+    hostPort: 3000
+    protocol: TCP
