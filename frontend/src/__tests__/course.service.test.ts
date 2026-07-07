@@ -13,7 +13,7 @@ describe('CourseService', () => {
   });
 
   it('should fetch all courses', async () => {
-    const mockCursos = [{ id: 1, nombre: '1A', nivel: 'Primero', letra: 'A' }];
+    const mockCursos = [{ id: 1, name: '1A', level: 'Primero', letter: 'A' }];
     vi.mocked(apiClient.get).mockResolvedValue(mockCursos);
 
     const result = await courseService.getCourses();
@@ -25,8 +25,8 @@ describe('CourseService', () => {
   it('should fetch a single course with subjects', async () => {
     const mockCurso = {
       id: 1,
-      nombre: '1A',
-      materias: [{ id: 1, asignatura_nombre: 'Matemáticas' }],
+      name: '1A',
+      subjects: [{ id: 1, subjectName: 'Matemáticas' }],
     };
     vi.mocked(apiClient.get).mockResolvedValue(mockCurso);
 
@@ -37,7 +37,7 @@ describe('CourseService', () => {
   });
 
   it('should fetch subjects by course id', async () => {
-    const mockMaterias = [{ id: 1, asignatura_nombre: 'Matemáticas' }];
+    const mockMaterias = [{ id: 1, subjectName: 'Matemáticas' }];
     vi.mocked(apiClient.get).mockResolvedValue(mockMaterias);
 
     const result = await courseService.getSubjectsByCourse(1);
@@ -47,7 +47,7 @@ describe('CourseService', () => {
   });
 
   it('should fetch all subjects', async () => {
-    const mockAsignaturas = [{ id: 1, nombre: 'Matemáticas', codigo: 'MAT101' }];
+    const mockAsignaturas = [{ id: 1, name: 'Matemáticas', code: 'MAT101' }];
     vi.mocked(apiClient.get).mockResolvedValue(mockAsignaturas);
 
     const result = await courseService.getSubjects();

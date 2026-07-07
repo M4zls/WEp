@@ -6,7 +6,7 @@ export interface Attendance {
   studentName: string;
   present: boolean;
   justification?: string | null;
-  fecha?: string | null;
+  date?: string | null;
   createdAt?: string | null;
 }
 

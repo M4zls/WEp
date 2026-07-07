@@ -1,27 +1,34 @@
 import { eq, and } from 'drizzle-orm';
 import { getDatabaseInstance } from '../models/data.js';
-import { notifications, estudiantes, usuarios } from '../models/schema.js';
+import { notifications } from '../models/schema.js';
 import type { INotificationsRepository } from './notifications.repository.interface.js';
+
+const MS_STUDENTS_SERVICE = process.env.MS_STUDENTS_SERVICE ?? 'http://ms-students-service:3001';
+const MS_AUTH_SERVICE = process.env.MS_AUTH_SERVICE ?? 'http://ms-auth-service:3002';
 
 export class NotificationsRepository implements INotificationsRepository {
   private get db() { return getDatabaseInstance(); }
 
   async findStudentByRut(rut: string) {
-    const result = await this.db
-      .select({ id: estudiantes.id })
-      .from(estudiantes)
-      .where(eq(estudiantes.rut, rut))
-      .limit(1);
-    return result[0] ?? null;
+    try {
+      const res = await fetch(`${MS_STUDENTS_SERVICE}/students/${rut}`);
+      if (!res.ok) return null;
+      const data = await res.json() as any;
+      return { id: data.id };
+    } catch {
+      return null;
+    }
   }
 
   async findUserByRut(rut: string) {
-    const result = await this.db
-      .select({ id: usuarios.id })
-      .from(usuarios)
-      .where(eq(usuarios.rut, rut))
-      .limit(1);
-    return result[0] ?? null;
+    try {
+      const res = await fetch(`${MS_AUTH_SERVICE}/auth/users/${rut}`);
+      if (!res.ok) return null;
+      const data = await res.json() as any;
+      return { id: data.id };
+    } catch {
+      return null;
+    }
   }
 
   async insertNotification(values: { userId: number; title: string; message: string; type: string; url: string }) {

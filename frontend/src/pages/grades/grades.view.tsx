@@ -12,7 +12,7 @@ const GradesView: FC = (): ReactElement => {
       try {
         const stored = sessionStorage.getItem('user');
         if (!stored) {
-          setError('No hay sesión activa');
+          setError('Sin sesión activa');
           setLoading(false);
           return;
         }
@@ -26,7 +26,7 @@ const GradesView: FC = (): ReactElement => {
         const data = await gradesService.getStudentGrades(rut);
         setGrades(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error al cargar calificaciones');
+        setError(err instanceof Error ? err.message : 'Error al cargar notas');
       } finally {
         setLoading(false);
       }
@@ -37,9 +37,9 @@ const GradesView: FC = (): ReactElement => {
   return (
     <>
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-slate-800">Mis Calificaciones</h3>
+        <h3 className="text-lg font-semibold text-slate-800">Mis Notas</h3>
         <p className="text-sm text-slate-500 mt-1">
-          {grades ? `Curso: ${grades.curso}` : 'Cargando...'}
+          {grades ? `Curso: ${grades.course}` : 'Cargando...'}
         </p>
       </div>
 
@@ -58,15 +58,15 @@ const GradesView: FC = (): ReactElement => {
         </div>
       ) : grades ? (
         <div className="space-y-6">
-          {grades.asignaturas.map((asig, idx) => {
+          {grades.subjects.map((subj, idx) => {
             const colores = ['bg-emerald-50 border-emerald-200', 'bg-sky-50 border-sky-200', 'bg-violet-50 border-violet-200', 'bg-rose-50 border-rose-200', 'bg-amber-50 border-amber-200'];
             const color = colores[idx % colores.length];
             return (
-              <div key={asig.asignatura} className={`rounded-2xl border p-5 ${color}`}>
+              <div key={subj.subject} className={`rounded-2xl border p-5 ${color}`}>
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-lg font-semibold text-slate-800">{asig.asignatura}</h4>
+                  <h4 className="text-lg font-semibold text-slate-800">{subj.subject}</h4>
                   <span className="text-sm font-bold text-slate-600">
-                    Promedio: <span className="text-lg">{asig.promedio}</span>
+                    Promedio: <span className="text-lg">{subj.average}</span>
                   </span>
                 </div>
                 <div className="overflow-x-auto">
@@ -79,11 +79,11 @@ const GradesView: FC = (): ReactElement => {
                       </tr>
                     </thead>
                     <tbody>
-                      {asig.notas.map((nota) => (
-                        <tr key={nota.id} className="border-b border-slate-100">
-                          <td className="py-2 font-semibold text-slate-800">{nota.nota}</td>
-                          <td className="py-2 text-slate-600 capitalize">{nota.tipoEvaluacion}</td>
-                          <td className="py-2 text-slate-600">{nota.fecha}</td>
+                      {subj.grades.map((grade) => (
+                        <tr key={grade.id} className="border-b border-slate-100">
+                          <td className="py-2 font-semibold text-slate-800">{grade.grade}</td>
+                          <td className="py-2 text-slate-600 capitalize">{grade.evaluationType}</td>
+                          <td className="py-2 text-slate-600">{grade.date}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -95,7 +95,7 @@ const GradesView: FC = (): ReactElement => {
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-          <p className="text-slate-500 font-medium">No tienes calificaciones registradas</p>
+          <p className="text-slate-500 font-medium">No hay notas registradas</p>
         </div>
       )}
     </>

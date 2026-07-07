@@ -9,7 +9,7 @@ export const coursesController = new Hono();
 coursesController.get('/', async (c) => {
   try {
     const courses = await service.listCourses();
-    return c.json(courses.map(c => ({ id: c.id, nombre: c.name, nivel: c.level, letra: c.letter, year: c.year })));
+    return c.json(courses.map(c => ({ id: c.id, name: c.name, level: c.level, letter: c.letter, year: c.year })));
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
@@ -18,7 +18,7 @@ coursesController.get('/', async (c) => {
 coursesController.get('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
-    if (isNaN(id)) return c.json({ error: 'ID de curso inválido' }, 400);
+    if (isNaN(id)) return c.json({ error: 'Invalid course ID' }, 400);
     const course = await service.getCourse(id);
     return c.json(course);
   } catch (err: any) {
@@ -28,8 +28,8 @@ coursesController.get('/:id', async (c) => {
 
 coursesController.post('/', async (c) => {
   try {
-    const data = await c.req.json();
-    const parsed = createCourseSchema.safeParse(data);
+    const raw = await c.req.json();
+    const parsed = createCourseSchema.safeParse(raw);
     if (!parsed.success) {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
@@ -44,15 +44,15 @@ coursesController.post('/', async (c) => {
 coursesController.put('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
-    if (isNaN(id)) return c.json({ error: 'ID de curso inválido' }, 400);
-    const data = await c.req.json();
-    const parsed = createCourseSchema.partial().safeParse(data);
+    if (isNaN(id)) return c.json({ error: 'Invalid course ID' }, 400);
+    const raw = await c.req.json();
+    const parsed = createCourseSchema.partial().safeParse(raw);
     if (!parsed.success) {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
     }
     await service.updateCourse(id, parsed.data);
-    return c.json({ message: 'Curso actualizado correctamente' });
+    return c.json({ message: 'Course updated successfully' });
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }
@@ -61,9 +61,9 @@ coursesController.put('/:id', async (c) => {
 coursesController.delete('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
-    if (isNaN(id)) return c.json({ error: 'ID de curso inválido' }, 400);
+    if (isNaN(id)) return c.json({ error: 'Invalid course ID' }, 400);
     await service.deleteCourse(id);
-    return c.json({ message: 'Curso eliminado correctamente' });
+    return c.json({ message: 'Course deleted successfully' });
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }

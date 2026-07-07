@@ -30,14 +30,14 @@ export class GradesService implements IGradesService {
             throw new Error(NOTA_ERRORS.ESTUDIANTE_NOT_FOUND);
         }
 
-        const subjects = this.groupByAsignatura(notas);
-        const curso = notas[0].curso;
+        const subjects = this.groupBySubject(notas);
+        const course = notas[0].course;
 
         return {
             rut,
-            nombre: notas[0].studentName ?? '',
-            apellido: notas[0].studentLastName ?? '',
-            curso,
+            firstName: notas[0].studentFirstName ?? '',
+            lastName: notas[0].studentLastName ?? '',
+            course,
             subjects,
         };
     }
@@ -48,14 +48,14 @@ export class GradesService implements IGradesService {
      * @param professorRut RUT del profesor
      * @returns Lista de notas agrupadas por alumno
      */
-    async getCourseGrades(curso: string, professorRut: string): Promise<IGrade[]> {
-        if (!curso || curso.trim() === '') {
+    async getCourseGrades(course: string, professorRut: string): Promise<IGrade[]> {
+        if (!course || course.trim() === '') {
             throw new Error(NOTA_ERRORS.CURSO_REQUIRED_QUERY);
         }
         if (!professorRut || professorRut.trim() === '') {
             throw new Error(NOTA_ERRORS.PROFESOR_RUT_REQUIRED);
         }
-        return  this.repository.findByCursoAndProfesor(curso, professorRut);
+        return  this.repository.findByCursoAndProfesor(course, professorRut);
     }
 
     /** Obtiene todas las notas registradas por un profesor */
@@ -81,7 +81,7 @@ export class GradesService implements IGradesService {
         if (!datos.subject || datos.subject.trim() === '') {
             throw new Error(NOTA_ERRORS.ASIGNATURA_REQUIRED);
         }
-        if (!datos.curso || datos.curso.trim() === '') {
+        if (!datos.course || datos.course.trim() === '') {
             throw new Error(NOTA_ERRORS.CURSO_REQUIRED);
         }
         if (!datos.evaluationType || datos.evaluationType.trim() === '') {
@@ -143,7 +143,7 @@ export class GradesService implements IGradesService {
      * @param notas Lista plana de notas
      * @returns Array de asignaturas con sus notas y promedio
      */
-    private groupByAsignatura(notas: IGrade[]): ISubjectGrades[] {
+    private groupBySubject(notas: IGrade[]): ISubjectGrades[] {
         const grouped = new Map<string, IGrade[]>();
 
         for (const nota of notas) {
@@ -162,7 +162,7 @@ export class GradesService implements IGradesService {
         sumaCoeficientes += coef;
       }
       const promedio = sumaCoeficientes > 0 ? (sumaPonderada / sumaCoeficientes).toFixed(1) : '0.0';
-      result.push({ subject, grades: gradeList, promedio });
+      result.push({ subject, grades: gradeList, average: promedio });
     }
 
         return result;

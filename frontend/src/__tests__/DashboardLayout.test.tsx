@@ -34,8 +34,8 @@ vi.mock('../pages/notifications/index', () => ({
 }));
 
 const defaultProps = {
-  userData: { nombre: 'Juan', apellido: 'Pérez', email: 'juan@test.com' },
-  role: 'profesor' as const,
+  userData: { firstName: 'Juan', lastName: 'Pérez', email: 'juan@test.com' },
+  role: 'professor' as const,
   onLogout: vi.fn(),
 };
 

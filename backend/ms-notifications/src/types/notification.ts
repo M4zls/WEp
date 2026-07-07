@@ -26,8 +26,8 @@ export type GradeAlertDto = {
 
 export type MessageAlertDto = {
   recipientRut: string;
-  recipientRole: 'estudiante' | 'profesor';
-  senderName: string;
+  recipientRole: 'student' | 'teacher';
+  senderFirstName: string;
   senderLastName: string;
   contentPreview: string;
   conversationId: number;

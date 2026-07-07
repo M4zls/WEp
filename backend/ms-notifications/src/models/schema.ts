@@ -1,50 +1,38 @@
 import { sql } from 'drizzle-orm';
 import { pgSchema, serial, integer, text, boolean } from 'drizzle-orm/pg-core';
 
-const notificacionesSchema = pgSchema('notifications');
-const estudiantesSchema = pgSchema('students');
-const autentificacionSchema = pgSchema('auth');
+const schema = pgSchema('notifications');
 
-export const notifications = notificacionesSchema.table('notificaciones', {
+export const notifications = schema.table('notifications', {
   id: serial('id').primaryKey(),
-  userId: integer('usuario_id').notNull(),
-  title: text('titulo').notNull(),
-  message: text('mensaje').notNull(),
-  type: text('tipo').notNull(),
-  read: boolean('leida').default(false),
+  userId: integer('user_id').notNull(),
+  title: text('title').notNull(),
+  message: text('message').notNull(),
+  type: text('type').notNull(),
+  read: boolean('read').default(false),
   url: text('url'),
-  createdAt: text('fecha_creacion').default(sql`now()::text`),
-  readAt: text('fecha_lectura'),
+  createdAt: text('created_at').default(sql`now()::text`),
+  readAt: text('read_at'),
 });
 
-export const eventos = notificacionesSchema.table('eventos', {
+export const events = schema.table('events', {
   id: serial('id').primaryKey(),
-  titulo: text('titulo').notNull(),
-  descripcion: text('descripcion'),
-  tipo: text('tipo').notNull(),
-  datos: text('datos'),
-  activo: boolean('activo').default(true),
-  fechaCreacion: text('fecha_creacion').default(sql`now()::text`),
-  fechaProgramada: text('fecha_programada'),
+  title: text('title').notNull(),
+  description: text('description'),
+  type: text('type').notNull(),
+  data: text('data'),
+  active: boolean('active').default(true),
+  createdAt: text('created_at').default(sql`now()::text`),
+  scheduledAt: text('scheduled_at'),
 });
 
-export const estudiantes = estudiantesSchema.table('students', {
+export const logs = schema.table('logs', {
   id: serial('id').primaryKey(),
-  rut: text('rut').notNull(),
-});
-
-export const usuarios = autentificacionSchema.table('users', {
-  id: serial('id').primaryKey(),
-  rut: text('rut').notNull(),
-});
-
-export const logs = notificacionesSchema.table('logs', {
-  id: serial('id').primaryKey(),
-  usuarioId: integer('usuario_id'),
-  accion: text('accion').notNull(),
-  modulo: text('modulo').notNull(),
-  detalles: text('detalles'),
+  userId: integer('user_id'),
+  action: text('action').notNull(),
+  module: text('module').notNull(),
+  details: text('details'),
   ip: text('ip'),
-  estado: text('estado').notNull(),
-  fechaCreacion: text('fecha_creacion').default(sql`now()::text`),
+  status: text('status').notNull(),
+  createdAt: text('created_at').default(sql`now()::text`),
 });

@@ -22,7 +22,7 @@ describe('StudentService', () => {
     const result = await studentService.login('juan@alumnocbo.cl', '123456');
 
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/students/login',
+      'http://localhost:3100/api/students/login',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ email: 'juan@alumnocbo.cl', password: '123456' }),
@@ -51,7 +51,7 @@ describe('StudentService', () => {
 
     const result = await studentService.getAll();
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/students/',
+      'http://localhost:3100/api/students/',
       expect.objectContaining({ method: 'GET' }),
     );
     expect(result).toEqual(mockStudents);
@@ -113,7 +113,7 @@ describe('StudentService', () => {
 
     await studentService.deleteStudent('12345678-9');
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/students/12345678-9',
+      'http://localhost:3100/api/students/12345678-9',
       expect.objectContaining({ method: 'DELETE' }),
     );
   });

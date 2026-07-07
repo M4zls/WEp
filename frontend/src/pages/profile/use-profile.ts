@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import apiClient from '../../api/apiClient';
-import type { PerfilData, MensajeEstado } from './types';
+import type { ProfileData, StatusMessage } from './profile.types';
 
 export function useProfile(
-  userData: { nombre?: string; apellido?: string; email?: string; rut?: string } | null,
-  role: 'estudiante' | 'profesor'
+  userData: { firstName?: string; lastName?: string; email?: string; rut?: string } | null,
+  role: 'student' | 'professor'
 ) {
-  const [profile, setProfile] = useState<PerfilData | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [message, setMessage] = useState<MensajeEstado | null>(null);
+  const [message, setMessage] = useState<StatusMessage | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -24,30 +24,30 @@ export function useProfile(
       return;
     }
 
-    const fetchPerfil = async () => {
+    const fetchProfile = async () => {
       try {
-        const endpoint = role === 'estudiante' ? `/students/${rut}` : `/teachers/${rut}`;
+        const endpoint = role === 'student' ? `/students/${rut}` : `/teachers/${rut}`;
         const data = await apiClient.get(endpoint);
         setProfile(data);
       } catch {
-        setMessage({ tipo: 'error', texto: 'Error al cargar el perfil' });
+        setMessage({ type: 'error', text: 'Error loading profile' });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPerfil();
+    fetchProfile();
   }, [userData, role]);
 
-  const handleChange = useCallback((campo: keyof PerfilData, valor: string) => {
-    setProfile((prev) => (prev ? { ...prev, [campo]: valor } : prev));
+  const handleChange = useCallback((field: keyof ProfileData, value: string) => {
+    setProfile((prev) => (prev ? { ...prev, [field]: value } : prev));
   }, []);
 
   const handleSave = useCallback(async () => {
     if (!profile) return;
 
     if (newPassword && newPassword !== confirmPassword) {
-      setMessage({ tipo: 'error', texto: 'Las contraseñas no coinciden' });
+      setMessage({ type: 'error', text: 'Passwords do not match' });
       return;
     }
 
@@ -55,37 +55,37 @@ export function useProfile(
     setMessage(null);
 
     try {
-      const datos: Record<string, unknown> = {
-        nombre: profile.nombre,
-        apellido: profile.apellido,
+      const data: Record<string, unknown> = {
+        firstName: profile.firstName,
+        lastName: profile.lastName,
         email: profile.email,
-        telefono: profile.telefono || null,
+        phone: profile.phone || null,
       };
 
-      if (role === 'estudiante') {
-        datos.apoderado = profile.apoderado || null;
+      if (role === 'student') {
+        data.guardian = profile.guardian || null;
       }
 
       if (newPassword) {
-        datos.password = newPassword;
+        data.password = newPassword;
       }
 
-      const endpoint = role === 'estudiante' ? `/students/${profile.rut}` : `/teachers/${profile.rut}`;
-      await apiClient.put(endpoint, datos);
+      const endpoint = role === 'student' ? `/students/${profile.rut}` : `/teachers/${profile.rut}`;
+      await apiClient.put(endpoint, data);
 
       sessionStorage.setItem('user', JSON.stringify({
         ...JSON.parse(sessionStorage.getItem('user') || '{}'),
-        nombre: profile.nombre,
-        apellido: profile.apellido,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
         email: profile.email,
       }));
 
       setEditing(false);
       setNewPassword('');
       setConfirmPassword('');
-      setMessage({ tipo: 'ok', texto: 'Perfil actualizado correctamente' });
+      setMessage({ type: 'ok', text: 'Profile updated successfully' });
     } catch {
-      setMessage({ tipo: 'error', texto: 'Error al guardar los cambios' });
+      setMessage({ type: 'error', text: 'Error saving changes' });
     } finally {
       setSaving(false);
     }

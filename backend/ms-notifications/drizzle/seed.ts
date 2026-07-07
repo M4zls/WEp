@@ -10,20 +10,19 @@ const sql = postgres(connectionString, { max: 1 });
 async function seed() {
   console.log('--- seeding notifications ---');
 
-  const existing = await sql`SELECT COUNT(*) as count FROM "notifications"."notificaciones"`;
+  const existing = await sql`SELECT COUNT(*) as count FROM "notifications"."notifications"`;
   if (existing[0].count > 0) {
     console.log('notifications already exist, skipping.');
     return;
   }
 
-  const students = await sql`SELECT id FROM "students"."students" WHERE rut = '23232323' LIMIT 1`;
-  const studentId = students.length > 0 ? students[0].id : 1;
+  const studentId = 1;
 
   await sql`
-    INSERT INTO "notifications"."notificaciones" (usuario_id, tipo, titulo, mensaje, leida, fecha_creacion) VALUES
-    (${studentId}, 'asistencia', 'Inasistencia', 'Su hijo Mateo Sánchez faltó a clase de Matemáticas', false, now()::text),
-    (${studentId}, 'nota', 'Nueva Nota', 'Se ha registrado una nueva calificación para Mateo Sánchez', false, (now() + interval '1 hour')::text),
-    (${studentId}, 'mensaje', 'Nuevo Mensaje', 'Tiene un nuevo mensaje del profesor Carlos Muñoz', false, (now() + interval '2 hours')::text)
+    INSERT INTO "notifications"."notifications" (user_id, type, title, message, read, created_at) VALUES
+    (${studentId}, 'attendance', 'Inasistencia', 'Su hijo Mateo Sánchez faltó a clase de Matemáticas', false, now()::text),
+    (${studentId}, 'grade', 'Nueva Nota', 'Se ha registrado una nueva calificación para Mateo Sánchez', false, (now() + interval '1 hour')::text),
+    (${studentId}, 'message', 'Nuevo Mensaje', 'Tiene un nuevo mensaje del profesor Carlos Muñoz', false, (now() + interval '2 hours')::text)
   `;
 
   console.log('notifications seeded successfully.');

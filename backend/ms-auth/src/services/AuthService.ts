@@ -26,7 +26,7 @@ export class AuthService implements AuthServiceContract {
       : await this.repo.findByRut(identifier);
 
     if (!user) throw new Error('Credenciales inválidas');
-    if (!user.activo) throw new Error('Usuario desactivado');
+    if (!user.active) throw new Error('Usuario desactivado');
 
     const valid = await Utils.verifyPassword(password, user.password);
     if (!valid) throw new Error('Credenciales inválidas');
@@ -78,6 +78,12 @@ export class AuthService implements AuthServiceContract {
    * @param {string} token - Token JWT a verificar.
    * @returns {Promise<any>} Payload del JWT verificado.
    */
+  async getUserByRut(rut: string) {
+    const user = await this.repo.findByRut(rut);
+    if (!user) throw new Error('Usuario no encontrado');
+    return user;
+  }
+
   async verifyToken(token: string) {
     const payload = await verify(token, Consts.JWT_SECRET, {} as any);
 

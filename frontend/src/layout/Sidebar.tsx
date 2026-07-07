@@ -6,7 +6,7 @@ interface SidebarProps {
   onLogout: () => void;
   userName?: string;
   userInitials?: string;
-  role?: 'estudiante' | 'profesor';
+  role?: 'student' | 'professor';
   unreadCount?: number;
 }
 
@@ -23,7 +23,7 @@ const Sidebar: FC<SidebarProps> = ({ selectedSection, onSectionChange, onLogout,
   const getNavItems = () => {
     const items = [];
     items.push(baseNavItems[0]);
-    if (role === 'estudiante') {
+    if (role === 'student') {
       items.push({ id: 'classes', label: 'Clases', icon: '📚' });
       items.push({ id: 'grades', label: 'Calificaciones', icon: '📊' });
     } else {

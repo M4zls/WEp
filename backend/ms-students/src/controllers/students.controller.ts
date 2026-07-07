@@ -8,8 +8,8 @@ export const studentsController = new Hono();
 
 studentsController.post('/login', async (c) => {
   try {
-    const datos = await c.req.json();
-    const parsed = loginStudentSchema.safeParse(datos);
+    const data = await c.req.json();
+    const parsed = loginStudentSchema.safeParse(data);
     if (!parsed.success) {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
@@ -21,14 +21,14 @@ studentsController.post('/login', async (c) => {
       id: estudiante.id,
       rut: estudiante.rut,
       dv: estudiante.dv,
-      nombre: estudiante.name,
-      apellido: estudiante.lastName,
-      cursos: estudiante.courses,
+      firstName: estudiante.firstName,
+      lastName: estudiante.lastName,
+      courses: estudiante.courses,
       email: estudiante.email,
-      telefono: estudiante.phone,
-      apoderado: estudiante.guardian,
-      apoderado_email: estudiante.guardianEmail,
-      fecha_registro: estudiante.fechaRegistro,
+      phone: estudiante.phone,
+      guardian: estudiante.guardian,
+      guardianEmail: estudiante.guardianEmail,
+      registrationDate: estudiante.registrationDate,
       token,
     });
   } catch (err: any) {
@@ -39,7 +39,7 @@ studentsController.post('/login', async (c) => {
 studentsController.get('/', async (c) => {
   try {
     const estudiantes = await service.getAllStudents();
-    return c.json(estudiantes.map(e => ({ id: e.id, rut: e.rut, dv: e.dv, nombre: e.name, apellido: e.lastName, email: e.email, telefono: e.phone, cursos: e.courses, apoderado: e.guardian, apoderado_email: e.guardianEmail, fecha_registro: e.fechaRegistro })));
+    return c.json(estudiantes.map(e => ({ id: e.id, rut: e.rut, dv: e.dv, firstName: e.firstName, lastName: e.lastName, email: e.email, phone: e.phone, courses: e.courses, guardian: e.guardian, guardianEmail: e.guardianEmail, registrationDate: e.registrationDate })));
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
@@ -49,7 +49,7 @@ studentsController.get('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
     const e = await service.getStudentByRut(rut);
-    return c.json({ id: e.id, rut: e.rut, dv: e.dv, nombre: e.name, apellido: e.lastName, email: e.email, telefono: e.phone, cursos: e.courses, apoderado: e.guardian, apoderado_email: e.guardianEmail, fecha_registro: e.fechaRegistro });
+    return c.json({ id: e.id, rut: e.rut, dv: e.dv, firstName: e.firstName, lastName: e.lastName, email: e.email, phone: e.phone, courses: e.courses, guardian: e.guardian, guardianEmail: e.guardianEmail, registrationDate: e.registrationDate });
   } catch (err: any) {
     return c.json({ error: err.message }, 404);
   }
@@ -57,14 +57,14 @@ studentsController.get('/:rut', async (c) => {
 
 studentsController.post('/', async (c) => {
   try {
-    const datos = await c.req.json();
-    const parsed = createStudentSchema.safeParse(datos);
+    const data = await c.req.json();
+    const parsed = createStudentSchema.safeParse(data);
     if (!parsed.success) {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
     }
     await service.createStudent(parsed.data);
-    return c.json({ message: 'Estudiante creado correctamente', datos: parsed.data }, 201);
+    return c.json({ message: 'Student created successfully', data: parsed.data }, 201);
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }
@@ -73,14 +73,14 @@ studentsController.post('/', async (c) => {
 studentsController.put('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
-    const datos = await c.req.json();
-    const parsed = updateStudentSchema.safeParse(datos);
+    const data = await c.req.json();
+    const parsed = updateStudentSchema.safeParse(data);
     if (!parsed.success) {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
     }
     await service.updateStudent(rut, parsed.data);
-    return c.json({ message: 'Estudiante actualizado correctamente', datos: parsed.data });
+    return c.json({ message: 'Student updated successfully', data: parsed.data });
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }
@@ -90,17 +90,17 @@ studentsController.delete('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
     await service.deleteStudent(rut);
-    return c.json({ message: 'Estudiante eliminado correctamente' });
+    return c.json({ message: 'Student deleted successfully' });
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }
 });
 
-studentsController.get('/curso/:curso', async (c) => {
+studentsController.get('/course/:course', async (c) => {
   try {
-    const curso = c.req.param('curso');
-    const estudiantes = await service.getStudentsByCourse(curso);
-    return c.json(estudiantes.map(e => ({ id: e.id, rut: e.rut, dv: e.dv, nombre: e.name, apellido: e.lastName, email: e.email, telefono: e.phone, cursos: e.courses, apoderado: e.guardian, apoderado_email: e.guardianEmail, fecha_registro: e.fechaRegistro })));
+    const course = c.req.param('course');
+    const estudiantes = await service.getStudentsByCourse(course);
+    return c.json(estudiantes.map(e => ({ id: e.id, rut: e.rut, dv: e.dv, firstName: e.firstName, lastName: e.lastName, email: e.email, phone: e.phone, courses: e.courses, guardian: e.guardian, guardianEmail: e.guardianEmail, registrationDate: e.registrationDate })));
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }

@@ -3,30 +3,30 @@ import coursesService from '../courses/courses.service';
 import gradesService from './services/grades.service';
 import type { Grade, GradeInput } from './services/grades.service';
 
-interface FlatMateria {
+interface FlatSubject {
   id: number;
-  asignatura_nombre: string;
-  asignatura_codigo?: string;
-  estudiantes: number;
-  curso_nombre: string;
-  curso_id: number;
+  subjectName: string;
+  subjectCode?: string;
+  students: number;
+  courseName: string;
+  courseId: number;
 }
 
-interface EstudianteInfo {
+interface StudentInfo {
   rut: string;
-  nombre: string;
-  apellido: string;
+  firstName: string;
+  lastName: string;
 }
 
-interface ColumnaEval {
+interface EvalColumn {
   key: string;
-  tipoEvaluacion: string;
-  fecha: string;
-  coeficiente: number;
+  evaluationType: string;
+  date: string;
+  coefficient: number;
 }
 
-type GridCelda = { valor: string; id?: number };
-type GridData = Record<string, Record<string, GridCelda>>;
+type GridCell = { value: string; id?: number };
+type GridData = Record<string, Record<string, GridCell>>;
 
 const cardColors = [
   { bar: 'bg-emerald-500', light: 'bg-emerald-50', text: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-700' },
@@ -57,10 +57,10 @@ const getSubjectIcon = (name: string): string => {
 };
 
 const EVAL_OPTIONS = [
-  { value: 'prueba', label: 'Prueba' },
-  { value: 'prueba_sintesis', label: 'Prueba de Síntesis' },
-  { value: 'presentacion', label: 'Presentación' },
-  { value: 'trabajo', label: 'Trabajo' },
+  { value: 'test', label: 'Prueba' },
+  { value: 'synthesis_test', label: 'Prueba de Síntesis' },
+  { value: 'presentation', label: 'Presentación' },
+  { value: 'assignment', label: 'Trabajo' },
 ];
 
 const EVAL_LABELS: Record<string, string> = {};
@@ -68,22 +68,22 @@ for (const opt of EVAL_OPTIONS) {
   EVAL_LABELS[opt.value] = opt.label;
 }
 
-const formatearFecha = (f: string): string => {
+const formatDate = (f: string): string => {
   const partes = f.split('-');
   if (partes.length !== 3) return f;
   return `${partes[2]}/${partes[1]}/${partes[0]}`;
 };
 
-const calcularPromedioPonderado = (rut: string, columnas: ColumnaEval[], grid: GridData): string => {
+const calcWeightedAverage = (rut: string, columns: EvalColumn[], grid: GridData): string => {
   let sumaPonderada = 0;
   let sumaCoefs = 0;
-  for (const col of columnas) {
+  for (const col of columns) {
     const cell = grid[rut]?.[col.key];
-    if (cell && cell.valor.trim()) {
-      const n = parseFloat(cell.valor);
+    if (cell && cell.value.trim()) {
+      const n = parseFloat(cell.value);
       if (!isNaN(n) && n >= 1.0 && n <= 7.0) {
-        sumaPonderada += n * col.coeficiente;
-        sumaCoefs += col.coeficiente;
+        sumaPonderada += n * col.coefficient;
+        sumaCoefs += col.coefficient;
       }
     }
   }
@@ -91,7 +91,7 @@ const calcularPromedioPonderado = (rut: string, columnas: ColumnaEval[], grid: G
   return (sumaPonderada / sumaCoefs).toFixed(1);
 };
 
-const getSituacionFinal = (prom: string): { label: string; color: string } => {
+const getFinalStatus = (prom: string): { label: string; color: string } => {
   if (prom === '-') return { label: '—', color: 'text-slate-400' };
   const num = parseFloat(prom);
   if (num >= 4.0) return { label: 'Aprobado', color: 'text-emerald-600' };
@@ -99,53 +99,53 @@ const getSituacionFinal = (prom: string): { label: string; color: string } => {
 };
 
 const ManageGradesView: FC = (): ReactElement => {
-  const [materias, setMaterias] = useState<FlatMateria[]>([]);
-  const [loadingMaterias, setLoadingMaterias] = useState(true);
+  const [subjects, setSubjects] = useState<FlatSubject[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
 
-  const [selectedMateria, setSelectedMateria] = useState<FlatMateria | null>(null);
-  const [estudiantes, setEstudiantes] = useState<EstudianteInfo[]>([]);
-  const [notasExistentes, setNotasExistentes] = useState<Grade[]>([]);
-  const [columnas, setColumnas] = useState<ColumnaEval[]>([]);
+  const [selectedSubject, setSelectedSubject] = useState<FlatSubject | null>(null);
+  const [students, setStudents] = useState<StudentInfo[]>([]);
+  const [existingGrades, setExistingGrades] = useState<Grade[]>([]);
+  const [columns, setColumns] = useState<EvalColumn[]>([]);
   const [grid, setGrid] = useState<GridData>({});
   const [loadingTable, setLoadingTable] = useState(false);
 
-  const [mensaje, setMensaje] = useState<string | null>(null);
-  const [guardando, setGuardando] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const [newEvalTipo, setNewEvalTipo] = useState('prueba');
-  const [newEvalFecha, setNewEvalFecha] = useState(new Date().toISOString().split('T')[0]);
+  const [newEvalType, setNewEvalType] = useState('test');
+  const [newEvalDate, setNewEvalDate] = useState(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
     const stored = sessionStorage.getItem('user');
     const userData = stored ? JSON.parse(stored) : null;
-    const profesorId = userData?.id;
+    const professorId = userData?.id;
 
     coursesService.getCourses().then(async (lista) => {
-      const todasMaterias: FlatMateria[] = [];
+      const allSubjects: FlatSubject[] = [];
 
       for (const c of lista) {
         try {
-          const materiasData = await coursesService.getSubjectsByCourse(c.id);
-          const materiasFiltradas = profesorId
-            ? materiasData.filter((m: any) => m.profesorId === profesorId)
+          const subjectsData = await coursesService.getSubjectsByCourse(c.id);
+          const filteredSubjects = professorId
+            ? subjectsData.filter((m: any) => m.professorId === professorId)
             : [];
 
-          for (const raw of materiasFiltradas) {
+          for (const raw of filteredSubjects) {
             const m = raw as any;
-            let estudiantesCount = 0;
+            let studentsCount = 0;
             try {
-              const estudiantesData = await coursesService.getStudentsByCourse(c.nombre);
-              estudiantesCount = Array.isArray(estudiantesData) ? estudiantesData.length : 0;
+              const studentsData = await coursesService.getStudentsByCourse(c.name);
+              studentsCount = Array.isArray(studentsData) ? studentsData.length : 0;
             } catch {
-              estudiantesCount = 0;
+              studentsCount = 0;
             }
-            todasMaterias.push({
+            allSubjects.push({
               id: m.id,
-              asignatura_nombre: m.asignaturaNombre,
-              asignatura_codigo: m.asignaturaCodigo,
-              estudiantes: estudiantesCount,
-              curso_nombre: c.nombre,
-              curso_id: c.id,
+              subjectName: m.subjectName,
+              subjectCode: m.subjectCode,
+              students: studentsCount,
+              courseName: c.name,
+              courseId: c.id,
             });
           }
         } catch {
@@ -153,133 +153,133 @@ const ManageGradesView: FC = (): ReactElement => {
         }
       }
 
-      setMaterias(todasMaterias);
-      setLoadingMaterias(false);
-    }).catch(() => setLoadingMaterias(false));
+      setSubjects(allSubjects);
+      setLoadingSubjects(false);
+    }).catch(() => setLoadingSubjects(false));
   }, []);
 
-  const construirGrid = useCallback((estudiantesLista: EstudianteInfo[], notas: Grade[], cols: ColumnaEval[]): GridData => {
-    const nuevoGrid: GridData = {};
-    for (const est of estudiantesLista) {
-      nuevoGrid[est.rut] = {};
+  const buildGrid = useCallback((studentsList: StudentInfo[], grades: Grade[], cols: EvalColumn[]): GridData => {
+    const newGrid: GridData = {};
+    for (const est of studentsList) {
+      newGrid[est.rut] = {};
       for (const col of cols) {
-        const match = notas.find(
-          (n) => n.estudianteRut === est.rut && n.tipoEvaluacion === col.tipoEvaluacion && n.fecha === col.fecha,
+        const match = grades.find(
+          (n) => n.studentRut === est.rut && n.evaluationType === col.evaluationType && n.date === col.date,
         );
-        nuevoGrid[est.rut][col.key] = match ? { valor: match.nota, id: match.id } : { valor: '' };
+        newGrid[est.rut][col.key] = match ? { value: match.grade, id: match.id } : { value: '' };
       }
     }
-    return nuevoGrid;
+    return newGrid;
   }, []);
 
-  const handleSeleccionarMateria = useCallback(async (mat: FlatMateria) => {
-    setSelectedMateria(mat);
+  const handleSelectSubject = useCallback(async (mat: FlatSubject) => {
+    setSelectedSubject(mat);
     setLoadingTable(true);
-    setMensaje(null);
+    setMessage(null);
 
     try {
       const stored = sessionStorage.getItem('user');
       const userData = stored ? JSON.parse(stored) : null;
-      const profesorRut = userData?.rut || '';
+      const professorRut = userData?.rut || '';
 
-      const [estudiantesData, notasData] = await Promise.all([
-        coursesService.getStudentsByCourse(mat.curso_nombre),
-        gradesService.getCourseGrades(mat.curso_nombre, profesorRut),
+      const [studentsData, gradesData] = await Promise.all([
+        coursesService.getStudentsByCourse(mat.courseName),
+        gradesService.getCourseGrades(mat.courseName, professorRut),
       ]);
 
-      const lista = Array.isArray(estudiantesData) ? estudiantesData as EstudianteInfo[] : [];
-      setEstudiantes(lista);
+      const list = Array.isArray(studentsData) ? studentsData as StudentInfo[] : [];
+      setStudents(list);
 
-      const notasFiltradas = (Array.isArray(notasData) ? notasData : []).filter(
-        (n: Grade) => n.asignatura === mat.asignatura_nombre,
+      const filteredGrades = (Array.isArray(gradesData) ? gradesData : []).filter(
+        (n: Grade) => n.subject === mat.subjectName,
       );
-      setNotasExistentes(notasFiltradas);
+      setExistingGrades(filteredGrades);
 
-      const colsMap = new Map<string, ColumnaEval>();
-      for (const n of notasFiltradas) {
-        const key = `${n.tipoEvaluacion}_${n.fecha}`;
+      const colsMap = new Map<string, EvalColumn>();
+      for (const n of filteredGrades) {
+        const key = `${n.evaluationType}_${n.date}`;
         if (!colsMap.has(key)) {
-          colsMap.set(key, { key, tipoEvaluacion: n.tipoEvaluacion, fecha: n.fecha, coeficiente: n.coeficiente ?? 1 });
+          colsMap.set(key, { key, evaluationType: n.evaluationType, date: n.date, coefficient: n.coefficient ?? 1 });
         }
       }
       const cols = Array.from(colsMap.values());
-      setColumnas(cols);
-      setGrid(construirGrid(lista, notasFiltradas, cols));
+      setColumns(cols);
+      setGrid(buildGrid(list, filteredGrades, cols));
     } catch (err) {
-      setMensaje('Error al cargar estudiantes');
+      setMessage('Error al cargar estudiantes');
     } finally {
       setLoadingTable(false);
     }
-  }, [construirGrid]);
+  }, [buildGrid]);
 
-  const handleVolver = () => {
-    setSelectedMateria(null);
-    setEstudiantes([]);
-    setNotasExistentes([]);
-    setColumnas([]);
+  const handleBack = () => {
+    setSelectedSubject(null);
+    setStudents([]);
+    setExistingGrades([]);
+    setColumns([]);
     setGrid({});
-    setMensaje(null);
+    setMessage(null);
   };
 
-  const handleCellChange = (rut: string, colKey: string, valor: string) => {
-    if (valor === '' || (parseFloat(valor) >= 0 && parseFloat(valor) <= 7)) {
+  const handleCellChange = (rut: string, colKey: string, value: string) => {
+    if (value === '' || (parseFloat(value) >= 0 && parseFloat(value) <= 7)) {
       setGrid((prev) => ({
         ...prev,
         [rut]: {
           ...prev[rut],
-          [colKey]: { ...prev[rut]?.[colKey], valor },
+          [colKey]: { ...prev[rut]?.[colKey], value },
         },
       }));
     }
   };
 
-  const handleAgregarColumna = () => {
-    if (!newEvalFecha) return;
-    const key = `${newEvalTipo}_${newEvalFecha}`;
-    const existe = columnas.some((c) => c.key === key);
+  const handleAddColumn = () => {
+    if (!newEvalDate) return;
+    const key = `${newEvalType}_${newEvalDate}`;
+    const existe = columns.some((c) => c.key === key);
     if (existe) {
-      setMensaje('Ya existe una evaluación con ese tipo y fecha');
+      setMessage('Ya existe una evaluación con ese tipo y fecha');
       return;
     }
-    const coef = newEvalTipo === 'prueba_sintesis' ? 2 : 1;
-    const nuevaCol: ColumnaEval = { key, tipoEvaluacion: newEvalTipo, fecha: newEvalFecha, coeficiente: coef };
-    const colsActualizadas = [...columnas, nuevaCol];
-    setColumnas(colsActualizadas);
+    const coef = newEvalType === 'synthesis_test' ? 2 : 1;
+    const newCol: EvalColumn = { key, evaluationType: newEvalType, date: newEvalDate, coefficient: coef };
+    const updatedColumns = [...columns, newCol];
+    setColumns(updatedColumns);
     setGrid((prev) => {
-      const nuevo = { ...prev };
-      for (const est of estudiantes) {
-        nuevo[est.rut] = { ...nuevo[est.rut], [key]: { valor: '' } };
+      const newGrid = { ...prev };
+      for (const est of students) {
+        newGrid[est.rut] = { ...newGrid[est.rut], [key]: { value: '' } };
       }
-      return nuevo;
+      return newGrid;
     });
-    setMensaje(null);
+    setMessage(null);
   };
 
-  const handleGuardarTodo = async () => {
+  const handleSaveAll = async () => {
     const stored = sessionStorage.getItem('user');
     const userData = stored ? JSON.parse(stored) : null;
-    const profesorRut = userData?.rut || '';
-    if (!selectedMateria) return;
+    const professorRut = userData?.rut || '';
+    if (!selectedSubject) return;
 
     const aCrear: GradeInput[] = [];
     const aActualizar: { id: number; datos: Partial<Grade> }[] = [];
 
-    for (const est of estudiantes) {
-      for (const col of columnas) {
+    for (const est of students) {
+      for (const col of columns) {
         const cell = grid[est.rut]?.[col.key];
-        if (!cell || !cell.valor.trim()) continue;
-        const notaNum = parseFloat(cell.valor);
-        if (isNaN(notaNum) || notaNum < 1.0 || notaNum > 7.0) continue;
+        if (!cell || !cell.value.trim()) continue;
+        const gradeNum = parseFloat(cell.value);
+        if (isNaN(gradeNum) || gradeNum < 1.0 || gradeNum > 7.0) continue;
 
         const payload = {
-          estudianteRut: est.rut,
-          asignatura: selectedMateria.asignatura_nombre,
-          curso: selectedMateria.curso_nombre,
-          nota: cell.valor,
-          tipoEvaluacion: col.tipoEvaluacion,
-          fecha: col.fecha,
-          profesorRut,
-          coeficiente: col.coeficiente,
+          studentRut: est.rut,
+          subject: selectedSubject.subjectName,
+          course: selectedSubject.courseName,
+          grade: cell.value,
+          evaluationType: col.evaluationType,
+          date: col.date,
+          professorRut,
+          coefficient: col.coefficient,
         };
 
         if (cell.id) {
@@ -291,12 +291,12 @@ const ManageGradesView: FC = (): ReactElement => {
     }
 
     if (aCrear.length === 0 && aActualizar.length === 0) {
-      setMensaje('Ingresa al menos una nota válida (1.0 - 7.0)');
+      setMessage('Ingresa al menos una nota válida (1.0 - 7.0)');
       return;
     }
 
-      setGuardando(true);
-    setMensaje(null);
+      setSaving(true);
+    setMessage(null);
 
     try {
       if (aCrear.length > 0) {
@@ -306,38 +306,38 @@ const ManageGradesView: FC = (): ReactElement => {
         await gradesService.updateGrade(item.id, item.datos);
       }
 
-      await handleSeleccionarMateria(selectedMateria);
-      setMensaje(`Guardadas ${aCrear.length + aActualizar.length} nota(s) correctamente`);
+      await handleSelectSubject(selectedSubject);
+      setMessage(`Guardadas ${aCrear.length + aActualizar.length} nota(s) correctamente`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error al guardar notas';
-      setMensaje(msg);
+      setMessage(msg);
     } finally {
-      setGuardando(false);
+      setSaving(false);
     }
   };
 
-  if (selectedMateria) {
-    const promedioRut = (rut: string) => calcularPromedioPonderado(rut, columnas, grid);
+  if (selectedSubject) {
+    const averageRut = (rut: string) => calcWeightedAverage(rut, columns, grid);
 
     return (
       <>
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-slate-800">
-              {selectedMateria.asignatura_nombre}
+              {selectedSubject.subjectName}
             </h3>
             <p className="text-sm text-slate-500 mt-1">
-              Curso: {selectedMateria.curso_nombre} — {estudiantes.length} estudiante(s)
+              Curso: {selectedSubject.courseName} — {students.length} estudiante(s)
             </p>
           </div>
-          <button onClick={handleVolver} className="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
+          <button onClick={handleBack} className="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
             Volver
           </button>
         </div>
 
-        {mensaje && (
-          <div className={`mb-4 px-4 py-3 rounded-lg text-sm font-medium ${mensaje.includes('Error') ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'}`}>
-            {mensaje}
+        {message && (
+          <div className={`mb-4 px-4 py-3 rounded-lg text-sm font-medium ${message.includes('Error') ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'}`}>
+            {message}
           </div>
         )}
 
@@ -346,8 +346,8 @@ const ManageGradesView: FC = (): ReactElement => {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Nueva Evaluación</label>
               <select
-                value={newEvalTipo}
-                onChange={(e) => setNewEvalTipo(e.target.value)}
+                value={newEvalType}
+                onChange={(e) => setNewEvalType(e.target.value)}
                 className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
                 {EVAL_OPTIONS.map((opt) => (
@@ -355,20 +355,20 @@ const ManageGradesView: FC = (): ReactElement => {
                 ))}
               </select>
               <span className="text-xs text-slate-400 ml-1">
-                coef {newEvalTipo === 'prueba_sintesis' ? 2 : 1}
+                coef {newEvalType === 'synthesis_test' ? 2 : 1}
               </span>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Fecha</label>
               <input
                 type="date"
-                value={newEvalFecha}
-                onChange={(e) => setNewEvalFecha(e.target.value)}
+                value={newEvalDate}
+                onChange={(e) => setNewEvalDate(e.target.value)}
                 className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
             <button
-              onClick={handleAgregarColumna}
+              onClick={handleAddColumn}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm font-medium"
             >
               Agregar
@@ -381,7 +381,7 @@ const ManageGradesView: FC = (): ReactElement => {
                 <div key={i} className="h-12 bg-slate-100 rounded-lg animate-pulse" />
               ))}
             </div>
-          ) : estudiantes.length > 0 ? (
+          ) : students.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
@@ -389,14 +389,14 @@ const ManageGradesView: FC = (): ReactElement => {
                     <th className="px-3 py-2 text-left text-slate-500 font-medium whitespace-nowrap w-10">N°</th>
                     <th className="px-3 py-2 text-left text-slate-500 font-medium whitespace-nowrap">RUT</th>
                     <th className="px-3 py-2 text-left text-slate-500 font-medium whitespace-nowrap">Nombre</th>
-                    {columnas.map((col) => (
-                        <th key={col.key} className={`px-3 py-2 text-center whitespace-nowrap min-w-[110px] ${col.coeficiente >= 2 ? 'bg-amber-50' : ''}`}>
+                    {columns.map((col) => (
+                        <th key={col.key} className={`px-3 py-2 text-center whitespace-nowrap min-w-[110px] ${col.coefficient >= 2 ? 'bg-amber-50' : ''}`}>
                           <div className="flex items-center justify-center gap-1">
-                            <span className="text-xs font-bold text-slate-700">{EVAL_LABELS[col.tipoEvaluacion] || col.tipoEvaluacion}</span>
+                            <span className="text-xs font-bold text-slate-700">{EVAL_LABELS[col.evaluationType] || col.evaluationType}</span>
                           </div>
-                        <div className="text-[10px] text-slate-400">{formatearFecha(col.fecha)}</div>
-                        <div className={`text-[10px] font-semibold ${col.coeficiente >= 2 ? 'text-amber-600' : 'text-slate-400'}`}>
-                          coef {col.coeficiente}
+                        <div className="text-[10px] text-slate-400">{formatDate(col.date)}</div>
+                        <div className={`text-[10px] font-semibold ${col.coefficient >= 2 ? 'text-amber-600' : 'text-slate-400'}`}>
+                          coef {col.coefficient}
                         </div>
                       </th>
                     ))}
@@ -405,25 +405,25 @@ const ManageGradesView: FC = (): ReactElement => {
                   </tr>
                 </thead>
                 <tbody>
-                  {estudiantes.map((est, idx) => {
-                    const prom = promedioRut(est.rut);
-                    const sit = getSituacionFinal(prom);
+                  {students.map((est, idx) => {
+                    const prom = averageRut(est.rut);
+                    const sit = getFinalStatus(prom);
                     return (
                       <tr key={est.rut} className="border-b border-slate-100 hover:bg-slate-50 transition">
                         <td className="px-3 py-2 text-slate-400 text-xs">{idx + 1}</td>
                         <td className="px-3 py-2 text-slate-600 text-xs font-mono">{est.rut}</td>
-                        <td className="px-3 py-2 text-slate-800 font-medium whitespace-nowrap">{est.nombre} {est.apellido}</td>
-                        {columnas.map((col) => {
+                        <td className="px-3 py-2 text-slate-800 font-medium whitespace-nowrap">{est.firstName} {est.lastName}</td>
+                        {columns.map((col) => {
                           const cell = grid[est.rut]?.[col.key];
                           return (
-                            <td key={col.key} className={`px-2 py-1 ${col.coeficiente >= 2 ? 'bg-amber-50/50' : ''}`}>
+                            <td key={col.key} className={`px-2 py-1 ${col.coefficient >= 2 ? 'bg-amber-50/50' : ''}`}>
                               <input
                                 type="number"
                                 step="0.1"
                                 min="1.0"
                                 max="7.0"
                                 placeholder="—"
-                                value={cell?.valor || ''}
+                                value={cell?.value || ''}
                                 onChange={(e) => handleCellChange(est.rut, col.key, e.target.value)}
                                 className="w-full px-2 py-1.5 border border-slate-200 rounded text-sm text-center focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
                               />
@@ -451,11 +451,11 @@ const ManageGradesView: FC = (): ReactElement => {
 
         <div className="flex justify-end">
           <button
-            onClick={handleGuardarTodo}
-            disabled={guardando}
+            onClick={handleSaveAll}
+            disabled={saving}
             className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm font-medium disabled:opacity-50"
           >
-            {guardando ? 'Guardando...' : 'Guardar Todas'}
+            {saving ? 'Guardando...' : 'Guardar Todas'}
           </button>
         </div>
       </>
@@ -469,7 +469,7 @@ const ManageGradesView: FC = (): ReactElement => {
         <p className="text-sm text-slate-500 mt-1">Selecciona una asignatura para ingresar notas</p>
       </div>
 
-      {loadingMaterias ? (
+      {loadingSubjects ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="bg-white rounded-2xl p-6 border border-slate-200 animate-pulse flex gap-4">
@@ -481,34 +481,34 @@ const ManageGradesView: FC = (): ReactElement => {
             </div>
           ))}
         </div>
-      ) : materias.length > 0 ? (
+      ) : subjects.length > 0 ? (
         <div className="space-y-4">
-          {materias.map((mat, idx) => {
+          {subjects.map((mat, idx) => {
             const color = cardColors[idx % cardColors.length];
             return (
               <div
                 key={mat.id}
-                onClick={() => handleSeleccionarMateria(mat)}
+                onClick={() => handleSelectSubject(mat)}
                 className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-200 flex cursor-pointer"
               >
                 <div className={`w-1.5 flex-shrink-0 ${color.bar}`} />
                 <div className="flex-1 p-5 flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-xl ${color.light} flex items-center justify-center text-2xl flex-shrink-0`}>
-                    {getSubjectIcon(mat.asignatura_nombre)}
+                    {getSubjectIcon(mat.subjectName)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h4 className="text-lg font-semibold text-slate-800">{mat.asignatura_nombre}</h4>
-                      {mat.asignatura_codigo && (
+                      <h4 className="text-lg font-semibold text-slate-800">{mat.subjectName}</h4>
+                      {mat.subjectCode && (
                         <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${color.badge}`}>
-                          {mat.asignatura_codigo}
+                          {mat.subjectCode}
                         </span>
                       )}
                     </div>
                     <p className="text-sm text-slate-500 mt-1">
-                      Curso: <span className="font-medium text-slate-600">{mat.curso_nombre}</span>
+                      Course: <span className="font-medium text-slate-600">{mat.courseName}</span>
                       <span className="mx-2">·</span>
-                      {mat.estudiantes} estudiante(s)
+                      {mat.students} student(s)
                     </p>
                   </div>
                 </div>
@@ -518,8 +518,8 @@ const ManageGradesView: FC = (): ReactElement => {
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-          <p className="text-slate-500 font-medium">No tienes asignaturas asignadas</p>
-          <p className="text-slate-400 text-sm mt-1">Espera a que te asignen cursos</p>
+          <p className="text-slate-500 font-medium">You have no assigned subjects</p>
+          <p className="text-slate-400 text-sm mt-1">Wait until you are assigned courses</p>
         </div>
       )}
     </>

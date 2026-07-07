@@ -1,9 +1,3 @@
-/**
- * Tests for useProfile hook.
- *
- * @module useProfile.test
- */
-
 vi.mock('../api/apiClient', () => ({
   default: { get: vi.fn(), put: vi.fn() },
 }));
@@ -14,8 +8,8 @@ import apiClient from '../api/apiClient';
 
 describe('useProfile', () => {
   const mockUserData = {
-    nombre: 'Juan',
-    apellido: 'Perez',
+    firstName: 'Juan',
+    lastName: 'Perez',
     email: 'j@test.com',
     rut: '123-4',
   };
@@ -25,70 +19,58 @@ describe('useProfile', () => {
     sessionStorage.clear();
   });
 
-  /**
-   * Should load the perfil data on mount for an estudiante role.
-   */
-  it('should load perfil on mount for estudiante', async () => {
+  it('should load profile on mount for student', async () => {
     sessionStorage.setItem('user', JSON.stringify({ rut: '123-4' }));
-    const mockPerfil = {
-      nombre: 'Juan',
-      apellido: 'Perez',
+    const mockProfile = {
+      firstName: 'Juan',
+      lastName: 'Perez',
       email: 'j@test.com',
       rut: '123-4',
-      telefono: null,
+      phone: null,
     };
-    vi.mocked(apiClient.get).mockResolvedValue(mockPerfil);
+    vi.mocked(apiClient.get).mockResolvedValue(mockProfile);
 
-    const { result } = renderHook(() => useProfile(mockUserData, 'estudiante'));
+    const { result } = renderHook(() => useProfile(mockUserData, 'student'));
 
     expect(result.current.loading).toBe(true);
     await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.profile).toEqual(mockPerfil);
+    expect(result.current.profile).toEqual(mockProfile);
     expect(apiClient.get).toHaveBeenCalledWith('/students/123-4');
   });
 
-  /**
-   * Should return null perfil when no rut is available.
-   */
-  it('should error when no rut', async () => {
-    const { result } = renderHook(() => useProfile(null, 'estudiante'));
+  it('should return null profile when no rut', async () => {
+    const { result } = renderHook(() => useProfile(null, 'student'));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.profile).toBeNull();
   });
 
-  /**
-   * Should update a field in perfil via handleChange.
-   */
   it('should handleChange', async () => {
     sessionStorage.setItem('user', JSON.stringify({ rut: '123-4' }));
     vi.mocked(apiClient.get).mockResolvedValue({
-      nombre: 'Juan',
-      apellido: 'Perez',
+      firstName: 'Juan',
+      lastName: 'Perez',
       email: 'j@test.com',
       rut: '123-4',
     });
 
-    const { result } = renderHook(() => useProfile(mockUserData, 'estudiante'));
+    const { result } = renderHook(() => useProfile(mockUserData, 'student'));
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     act(() => {
-      result.current.handleChange('nombre', 'Pedro');
+      result.current.handleChange('firstName', 'Pedro');
     });
-    expect(result.current.profile?.nombre).toBe('Pedro');
+    expect(result.current.profile?.firstName).toBe('Pedro');
   });
 
-  /**
-   * Should reset edit state and password fields via handleCancel.
-   */
   it('should handleCancel reset state', async () => {
     sessionStorage.setItem('user', JSON.stringify({ rut: '123-4' }));
     vi.mocked(apiClient.get).mockResolvedValue({
-      nombre: 'Juan',
+      firstName: 'Juan',
       email: 'j@test.com',
       rut: '123-4',
     });
 
-    const { result } = renderHook(() => useProfile(mockUserData, 'estudiante'));
+    const { result } = renderHook(() => useProfile(mockUserData, 'student'));
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     act(() => {
@@ -102,21 +84,18 @@ describe('useProfile', () => {
     expect(result.current.newPassword).toBe('');
   });
 
-  /**
-   * Should save the profile and show a success message.
-   */
   it('should handleSave and show success message', async () => {
     sessionStorage.setItem('user', JSON.stringify({ rut: '123-4' }));
     vi.mocked(apiClient.get).mockResolvedValue({
-      nombre: 'Juan',
-      apellido: 'Perez',
+      firstName: 'Juan',
+      lastName: 'Perez',
       email: 'j@test.com',
       rut: '123-4',
-      telefono: null,
+      phone: null,
     });
     vi.mocked(apiClient.put).mockResolvedValue(undefined);
 
-    const { result } = renderHook(() => useProfile(mockUserData, 'estudiante'));
+    const { result } = renderHook(() => useProfile(mockUserData, 'student'));
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     act(() => {
@@ -125,22 +104,19 @@ describe('useProfile', () => {
     await act(async () => {
       await result.current.handleSave();
     });
-    expect(result.current.message?.tipo).toBe('ok');
+    expect(result.current.message?.type).toBe('ok');
     expect(result.current.editing).toBe(false);
   });
 
-  /**
-   * Should show an error when the new password and confirmation do not match.
-   */
   it('should show error on password mismatch', async () => {
     sessionStorage.setItem('user', JSON.stringify({ rut: '123-4' }));
     vi.mocked(apiClient.get).mockResolvedValue({
-      nombre: 'Juan',
+      firstName: 'Juan',
       email: 'j@test.com',
       rut: '123-4',
     });
 
-    const { result } = renderHook(() => useProfile(mockUserData, 'estudiante'));
+    const { result } = renderHook(() => useProfile(mockUserData, 'student'));
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     act(() => {
@@ -150,7 +126,7 @@ describe('useProfile', () => {
     await act(async () => {
       await result.current.handleSave();
     });
-    expect(result.current.message?.tipo).toBe('error');
-    expect(result.current.message?.texto).toContain('no coinciden');
+    expect(result.current.message?.type).toBe('error');
+    expect(result.current.message?.text).toContain('do not match');
   });
 });

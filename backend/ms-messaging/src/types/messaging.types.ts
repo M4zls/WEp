@@ -9,7 +9,7 @@ export interface ConversationParticipant {
   id?: number;
   conversationId: number;
   userId: string;
-  userName: string;
+  userFirstName: string;
   userLastName: string;
   userRole: string;
 }
@@ -19,7 +19,7 @@ export interface Message {
   id?: number;
   conversationId: number;
   senderId: string;
-  senderName: string;
+  senderFirstName: string;
   senderLastName: string;
   senderRole: string;
   content: string;
@@ -30,7 +30,7 @@ export interface Message {
 /** Datos necesarios para crear una nueva conversación. */
 export interface CreateConversation {
   participantIds: string[];
-  participantNames: string[];
+  participantFirstNames: string[];
   participantLastNames: string[];
   participantRoles: string[];
 }
@@ -39,7 +39,7 @@ export interface CreateConversation {
 export interface SendMessage {
   conversationId: number;
   senderId: string;
-  senderName: string;
+  senderFirstName: string;
   senderLastName: string;
   senderRole: string;
   content: string;
@@ -49,8 +49,8 @@ export interface SendMessage {
 export interface ConversationListEntry {
   id: number;
   otherParticipant: ConversationParticipant | undefined;
-  ultimoMensaje: Message | null;
-  noLeidos: number;
+  lastMessage: Message | null;
+  unreadCount: number;
   createdAt: string | null;
   participants?: ConversationParticipant[];
 }

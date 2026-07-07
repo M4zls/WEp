@@ -10,29 +10,29 @@ const sql = postgres(connectionString, { max: 1 });
 try {
   await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "messaging";');
 
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "messaging"."conversaciones" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "messaging"."conversations" (
     "id" serial PRIMARY KEY NOT NULL,
     "created_at" text DEFAULT (now()::text)
   );`);
 
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "messaging"."conversacion_participantes" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "messaging"."conversation_participants" (
     "id" serial PRIMARY KEY NOT NULL,
-    "conversacion_id" integer NOT NULL,
-    "usuario_id" text NOT NULL,
-    "usuario_nombre" text NOT NULL,
-    "usuario_apellido" text NOT NULL,
-    "usuario_rol" text NOT NULL
+    "conversation_id" integer NOT NULL,
+    "user_id" text NOT NULL,
+    "user_name" text NOT NULL,
+    "user_last_name" text NOT NULL,
+    "user_role" text NOT NULL
   );`);
 
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "messaging"."mensajes" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "messaging"."messages" (
     "id" serial PRIMARY KEY NOT NULL,
-    "conversacion_id" integer NOT NULL,
-    "remitente_id" text NOT NULL,
-    "remitente_nombre" text NOT NULL,
-    "remitente_apellido" text NOT NULL,
-    "remitente_rol" text NOT NULL,
-    "contenido" text NOT NULL,
-    "leido" boolean DEFAULT false,
+    "conversation_id" integer NOT NULL,
+    "sender_id" text NOT NULL,
+    "sender_name" text NOT NULL,
+    "sender_last_name" text NOT NULL,
+    "sender_role" text NOT NULL,
+    "content" text NOT NULL,
+    "read" boolean DEFAULT false,
     "created_at" text DEFAULT (now()::text)
   );`);
 

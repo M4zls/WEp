@@ -54,7 +54,7 @@ classesController.put('/:id', async (c) => {
       return c.json({ error: msgs }, 400);
     }
     await service.updateClass(id, parsed.data);
-    return c.json({ message: 'Clase actualizada correctamente' });
+    return c.json({ message: 'Class updated successfully' });
   } catch (err: any) {
     const status = err.message === CLASS_ERRORS.NOT_FOUND ? 404 : 400;
     return c.json({ error: err.message }, status);
@@ -65,7 +65,7 @@ classesController.delete('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
     await service.deleteClass(id);
-    return c.json({ message: 'Clase eliminada correctamente' });
+    return c.json({ message: 'Class deleted successfully' });
   } catch (err: any) {
     const status = err.message === CLASS_ERRORS.NOT_FOUND ? 404 : 400;
     return c.json({ error: err.message }, status);

@@ -109,7 +109,7 @@ async function seed() {
 
     for (const [caId, dia, bloqueIdx] of SCHEDULE) {
       await sql`
-        INSERT INTO "schedule"."schedules" (curso_asignatura_id, dia_semana, hora_inicio, hora_termino)
+        INSERT INTO "schedule"."schedules" (course_subject_id, week_day, start_time, end_time)
         VALUES (${caId}, ${dia}, ${BLOQUES[bloqueIdx].startTime}, ${BLOQUES[bloqueIdx].endTime})
       `;
     }

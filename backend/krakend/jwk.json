@@ -1,0 +1,9 @@
+{
+  "keys": [
+    {
+      "kty": "oct",
+      "alg": "HS256",
+      "k": "Y29sZWdpb19vaGlnZ2luc19zZWNyZXRfY2hhbmdlbWU"
+    }
+  ]
+}

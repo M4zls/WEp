@@ -18,7 +18,7 @@ try {
     "student_name" text NOT NULL,
     "present" boolean NOT NULL DEFAULT false,
     "justification" text,
-    "fecha" text NOT NULL DEFAULT (now()::text),
+    "date" text NOT NULL DEFAULT (now()::text),
     "created_at" text DEFAULT (now()::text),
     UNIQUE("class_id", "student_rut")
   );`);

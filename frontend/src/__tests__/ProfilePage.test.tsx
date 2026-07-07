@@ -9,14 +9,14 @@ import ProfilePage from '../pages/profile/profile.page';
 const mockUseProfile = vi.mocked(useProfile);
 
 const defaultProfile = {
-  nombre: 'Carlos',
-  apellido: 'Muñoz',
+  firstName: 'Carlos',
+  lastName: 'Muñoz',
   email: 'carlos@example.com',
   rut: '12.345.678-9',
-  telefono: '+56 9 1234 5678',
-  cursos: '3°A',
-  apoderado: 'María Muñoz',
-  fechaRegistro: '2024-03-15T00:00:00.000Z',
+  phone: '+56 9 1234 5678',
+  courses: '3°A',
+  guardian: 'María Muñoz',
+  registrationDate: '2024-03-15T00:00:00.000Z',
 };
 
 function defaultProfileState(overrides: Record<string, unknown> = {}) {
@@ -41,8 +41,8 @@ function defaultProfileState(overrides: Record<string, unknown> = {}) {
 function renderProfilePage(props: Record<string, unknown> = {}) {
   return render(
     <ProfilePage
-      userData={{ nombre: 'Carlos', apellido: 'Muñoz', email: 'carlos@example.com', rut: '12.345.678-9' }}
-      role="estudiante"
+      userData={{ firstName: 'Carlos', lastName: 'Muñoz', email: 'carlos@example.com', rut: '12.345.678-9' }}
+      role="student"
       {...props}
     />
   );
@@ -59,10 +59,10 @@ describe('ProfilePage', () => {
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
-  it('should show error state when perfil is null', () => {
+  it('should show error state when profile is null', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({ profile: null }));
     renderProfilePage();
-    expect(screen.getByText('No se pudo cargar la información del perfil.')).toBeInTheDocument();
+    expect(screen.getByText('Could not load profile information.')).toBeInTheDocument();
   });
 
   it('should display profile name and initials', () => {
@@ -72,21 +72,21 @@ describe('ProfilePage', () => {
     expect(screen.getByText('CM')).toBeInTheDocument();
   });
 
-  it('should display role badge for estudiante', () => {
+  it('should display role badge for student', () => {
     mockUseProfile.mockReturnValue(defaultProfileState());
     renderProfilePage();
-    expect(screen.getByText('Estudiante')).toBeInTheDocument();
+    expect(screen.getByText('Student')).toBeInTheDocument();
   });
 
-  it('should display role badge for profesor', () => {
+  it('should display role badge for professor', () => {
     mockUseProfile.mockReturnValue(defaultProfileState());
     render(
       <ProfilePage
-        userData={{ nombre: 'Ana', apellido: 'López', email: 'ana@example.com', rut: '98.765.432-1' }}
-        role="profesor"
+        userData={{ firstName: 'Ana', lastName: 'López', email: 'ana@example.com', rut: '98.765.432-1' }}
+        role="professor"
       />
     );
-    expect(screen.getByText('Profesor')).toBeInTheDocument();
+    expect(screen.getByText('Professor')).toBeInTheDocument();
   });
 
   it('should display profile fields', () => {
@@ -100,37 +100,37 @@ describe('ProfilePage', () => {
     expect(screen.getByText('María Muñoz')).toBeInTheDocument();
   });
 
-  it('should show registration date for estudiante', () => {
+  it('should show registration date for student', () => {
     mockUseProfile.mockReturnValue(defaultProfileState());
     renderProfilePage();
-    expect(screen.getByText(/Registrado el/)).toBeInTheDocument();
+    expect(screen.getByText(/Registered:/)).toBeInTheDocument();
   });
 
-  it('should show ingresó date for profesor', () => {
-    const profile = { ...defaultProfile, fechaRegistro: undefined, fechaIngreso: '2023-01-10T00:00:00.000Z' };
+  it('should show started date for professor', () => {
+    const profile = { ...defaultProfile, registrationDate: undefined, admissionDate: '2023-01-10T00:00:00.000Z' };
     mockUseProfile.mockReturnValue(defaultProfileState({ profile }));
     render(
       <ProfilePage
-        userData={{ nombre: 'Ana', apellido: 'López', email: 'ana@example.com', rut: '98.765.432-1' }}
-        role="profesor"
+        userData={{ firstName: 'Ana', lastName: 'López', email: 'ana@example.com', rut: '98.765.432-1' }}
+        role="professor"
       />
     );
-    expect(screen.getByText(/Ingresó el/)).toBeInTheDocument();
+    expect(screen.getByText(/Started:/)).toBeInTheDocument();
   });
 
-  it('should render "No registrado" for empty optional fields', () => {
-    const profile = { ...defaultProfile, telefono: null, apoderado: null };
+  it('should render "Not registered" for empty optional fields', () => {
+    const profile = { ...defaultProfile, phone: null, guardian: null };
     mockUseProfile.mockReturnValue(defaultProfileState({ profile }));
     renderProfilePage();
-    const noRegistrados = screen.getAllByText('No registrado');
-    expect(noRegistrados.length).toBeGreaterThanOrEqual(1);
+    const notRegistered = screen.getAllByText('Not registered');
+    expect(notRegistered.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('should show Editar Perfil button when not editing', () => {
+  it('should show Edit Profile button when not editing', () => {
     const setEditing = vi.fn();
     mockUseProfile.mockReturnValue(defaultProfileState({ setEditing }));
     renderProfilePage();
-    const btn = screen.getByText('Editar Perfil');
+    const btn = screen.getByText('Edit Profile');
     fireEvent.click(btn);
     expect(setEditing).toHaveBeenCalledWith(true);
   });
@@ -142,33 +142,33 @@ describe('ProfilePage', () => {
     expect(inputs.length).toBeGreaterThanOrEqual(3);
   });
 
-  it('should show Guardar Cambios and Cancelar buttons when editing', () => {
+  it('should show Save Changes and Cancel buttons when editing', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: true }));
     renderProfilePage();
-    expect(screen.getByText('Guardar Cambios')).toBeInTheDocument();
-    expect(screen.getByText('Cancelar')).toBeInTheDocument();
+    expect(screen.getByText('Save Changes')).toBeInTheDocument();
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
-  it('should call handleSave when clicking Guardar Cambios', () => {
+  it('should call handleSave when clicking Save Changes', () => {
     const handleSave = vi.fn();
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: true, handleSave }));
     renderProfilePage();
-    fireEvent.click(screen.getByText('Guardar Cambios'));
+    fireEvent.click(screen.getByText('Save Changes'));
     expect(handleSave).toHaveBeenCalled();
   });
 
-  it('should call handleCancel when clicking Cancelar', () => {
+  it('should call handleCancel when clicking Cancel', () => {
     const handleCancel = vi.fn();
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: true, handleCancel }));
     renderProfilePage();
-    fireEvent.click(screen.getByText('Cancelar'));
+    fireEvent.click(screen.getByText('Cancel'));
     expect(handleCancel).toHaveBeenCalled();
   });
 
-  it('should disable Guardar Cambios when saving', () => {
+  it('should disable Save Changes when saving', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: true, saving: true }));
     renderProfilePage();
-    const btn = screen.getByText('Guardando...');
+    const btn = screen.getByText('Saving...');
     expect(btn).toBeDisabled();
   });
 
@@ -183,26 +183,26 @@ describe('ProfilePage', () => {
 
   it('should show success message', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({
-      message: { tipo: 'ok', texto: 'Perfil actualizado correctamente' },
+      message: { type: 'ok', text: 'Profile updated successfully' },
     }));
     renderProfilePage();
-    expect(screen.getByText('Perfil actualizado correctamente')).toBeInTheDocument();
+    expect(screen.getByText('Profile updated successfully')).toBeInTheDocument();
   });
 
   it('should show error message', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({
-      message: { tipo: 'error', texto: 'Error al guardar los cambios' },
+      message: { type: 'error', text: 'Error saving changes' },
     }));
     renderProfilePage();
-    expect(screen.getByText('Error al guardar los cambios')).toBeInTheDocument();
+    expect(screen.getByText('Error saving changes')).toBeInTheDocument();
   });
 
   it('should show password change section when editing', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: true }));
     renderProfilePage();
-    expect(screen.getByText('Cambiar Contraseña')).toBeInTheDocument();
-    expect(screen.getByText('Nueva Contraseña')).toBeInTheDocument();
-    expect(screen.getByText('Confirmar Contraseña')).toBeInTheDocument();
+    expect(screen.getByText('Change Password')).toBeInTheDocument();
+    expect(screen.getByText('New Password')).toBeInTheDocument();
+    expect(screen.getByText('Confirm Password')).toBeInTheDocument();
   });
 
   it('should call setNewPassword when typing in password field', () => {
@@ -232,16 +232,16 @@ describe('ProfilePage', () => {
   it('should hide password section when not editing', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: false }));
     renderProfilePage();
-    expect(screen.queryByText('Cambiar Contraseña')).not.toBeInTheDocument();
+    expect(screen.queryByText('Change Password')).not.toBeInTheDocument();
   });
 
-  it('should display materia for profesor role', () => {
-    const profile = { ...defaultProfile, materia: 'Matemáticas', cursos: undefined };
+  it('should display subject for professor role', () => {
+    const profile = { ...defaultProfile, subject: 'Matemáticas', courses: undefined };
     mockUseProfile.mockReturnValue(defaultProfileState({ profile }));
     render(
       <ProfilePage
-        userData={{ nombre: 'Ana', apellido: 'López', email: 'ana@example.com', rut: '98.765.432-1' }}
-        role="profesor"
+        userData={{ firstName: 'Ana', lastName: 'López', email: 'ana@example.com', rut: '98.765.432-1' }}
+        role="professor"
       />
     );
     expect(screen.getByText('Matemáticas')).toBeInTheDocument();

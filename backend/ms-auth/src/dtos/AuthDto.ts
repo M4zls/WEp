@@ -20,7 +20,7 @@ export const registerSchema = z.object({
     .string()
     .min(1, 'El dígito verificador es obligatorio')
     .length(1, 'El dígito verificador debe ser un solo carácter'),
-  name: z
+  firstName: z
     .string()
     .min(1, 'El nombre es obligatorio'),
   lastName: z
@@ -34,10 +34,10 @@ export const registerSchema = z.object({
     .string()
     .min(1, 'La contraseña es obligatoria')
     .min(6, 'La contraseña debe tener al menos 6 caracteres'),
-  rol: z
+  role: z
     .string()
     .min(1, 'El rol es obligatorio')
-    .refine((val) => ['admin', 'profesor'].includes(val), 'El rol debe ser admin o profesor'),
+    .refine((val) => ['admin', 'teacher'].includes(val), 'El rol debe ser admin o teacher'),
 });
 
 export type LoginAuthDto = z.infer<typeof loginAuthSchema>;

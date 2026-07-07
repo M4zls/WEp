@@ -10,7 +10,7 @@ describe('Sidebar', () => {
     onLogout: vi.fn(),
     userName: 'Juan Pérez',
     userInitials: 'JP',
-    role: 'profesor' as const,
+    role: 'professor' as const,
   };
 
   it('should render user info', () => {
@@ -20,13 +20,13 @@ describe('Sidebar', () => {
     expect(screen.getByText('Portal Educativo')).toBeInTheDocument();
   });
 
-  it('should show Cursos item for profesor role', () => {
+  it('should show Cursos item for professor role', () => {
     render(<Sidebar {...defaultProps} />);
     expect(screen.getByText('Cursos')).toBeInTheDocument();
   });
 
-  it('should show Clases item for estudiante role', () => {
-    render(<Sidebar {...defaultProps} role="estudiante" />);
+  it('should show Clases item for student role', () => {
+    render(<Sidebar {...defaultProps} role="student" />);
     expect(screen.getByText('Clases')).toBeInTheDocument();
   });
 

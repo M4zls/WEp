@@ -12,10 +12,10 @@ try {
 
   await sql.unsafe(`CREATE TABLE IF NOT EXISTS "schedule"."schedules" (
     "id" serial PRIMARY KEY NOT NULL,
-    "curso_asignatura_id" integer NOT NULL,
-    "dia_semana" integer NOT NULL,
-    "hora_inicio" text NOT NULL,
-    "hora_termino" text NOT NULL,
+    "course_subject_id" integer NOT NULL,
+    "week_day" integer NOT NULL,
+    "start_time" text NOT NULL,
+    "end_time" text NOT NULL,
     "created_at" text DEFAULT (now()::text)
   );`);
 

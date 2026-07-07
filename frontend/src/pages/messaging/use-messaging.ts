@@ -3,229 +3,229 @@ import apiClient from '../../api/apiClient';
 import coursesService from '../courses/courses.service';
 import type { Conversation, Message, Contact } from './messaging.types';
 
-type Vista = 'conversaciones' | 'nuevo';
+type View = 'conversations' | 'new';
 
 export function useMessaging() {
-  const [conversaciones, setConversationes] = useState<Conversation[]>([]);
-  const [conversacionActiva, setConversationActiva] = useState<Conversation | null>(null);
-  const [mensajes, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loadingConvs, setLoadingConvs] = useState(true);
   const [loadingMsgs, setLoadingMsgs] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [nuevoMensaje, setNuevoMensaje] = useState('');
-  const [enviando, setEnviando] = useState(false);
-  const [vista, setVista] = useState<Vista>('conversaciones');
-  const [contactos, setContacts] = useState<Contact[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [sending, setSending] = useState(false);
+  const [view, setView] = useState<View>('conversations');
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [loadingContacts, setLoadingContacts] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const stored = sessionStorage.getItem('user');
   const user = stored ? JSON.parse(stored) : null;
-  const usuarioId: string = user?.rut || '';
-  const usuarioNombre: string = user?.nombre || '';
-  const usuarioApellido: string = user?.apellido || '';
-  const usuarioRol: string = sessionStorage.getItem('role') || '';
+  const userId: string = user?.rut || '';
+  const userFirstName: string = user?.firstName || '';
+  const userLastName: string = user?.lastName || '';
+  const userRole: string = sessionStorage.getItem('role') || '';
 
-  const listarConversationes = useCallback(async () => {
-    if (!usuarioId) return;
+  const listConversations = useCallback(async () => {
+    if (!userId) return;
     try {
-      const data = await apiClient.get(`/messaging/conversaciones/${usuarioId}`);
-      setConversationes(data || []);
+      const data = await apiClient.get(`/messaging/conversations/${userId}`);
+      setConversations(data || []);
     } catch (err) {
-      console.error('Error al cargar conversaciones:', err);
+      console.error('Error loading conversations:', err);
       setError('Error al cargar conversaciones');
     } finally {
       setLoadingConvs(false);
     }
-  }, [usuarioId]);
+  }, [userId]);
 
-  const cargarMessages = useCallback(async (conversacionId: number) => {
+  const loadMessages = useCallback(async (conversationId: number) => {
     setLoadingMsgs(true);
     try {
-      const data = await apiClient.get(`/messaging/mensajes/${conversacionId}`);
+      const data = await apiClient.get(`/messaging/messages/${conversationId}`);
       setMessages(data || []);
-      await apiClient.put(`/messaging/mensajes/leer/${conversacionId}/${usuarioId}`);
+      await apiClient.put(`/messaging/messages/read/${conversationId}/${userId}`, {});
     } catch (err) {
-      console.error('Error al cargar mensajes:', err);
+      console.error('Error loading messages:', err);
       setError('Error al cargar mensajes');
     } finally {
       setLoadingMsgs(false);
     }
-  }, [usuarioId]);
+  }, [userId]);
 
-  const seleccionarConversation = useCallback(async (conv: Conversation) => {
-    setConversationActiva(conv);
-    setVista('conversaciones');
-    await cargarMessages(conv.id);
-    setConversationes((prev) =>
-      prev.map((c) => (c.id === conv.id ? { ...c, noLeidos: 0 } : c))
+  const selectConversation = useCallback(async (conv: Conversation) => {
+    setActiveConversation(conv);
+    setView('conversations');
+    await loadMessages(conv.id);
+    setConversations((prev) =>
+      prev.map((c) => (c.id === conv.id ? { ...c, unreadCount: 0 } : c))
     );
-  }, [cargarMessages]);
+  }, [loadMessages]);
 
-  const handleEnviar = useCallback(async () => {
-    if (!nuevoMensaje.trim() || !conversacionActiva || !usuarioId) return;
-    setEnviando(true);
+  const handleSend = useCallback(async () => {
+    if (!newMessage.trim() || !activeConversation || !userId) return;
+    setSending(true);
     try {
-      const msg = await apiClient.post('/messaging/mensajes', {
-        conversacionId: conversacionActiva.id,
-        remitenteId: usuarioId,
-        remitenteNombre: usuarioNombre,
-        remitenteApellido: usuarioApellido,
-        remitenteRol: usuarioRol,
-        contenido: nuevoMensaje.trim(),
+      const msg = await apiClient.post('/messaging/messages', {
+        conversationId: activeConversation.id,
+        senderId: userId,
+        senderFirstName: userFirstName,
+        senderLastName: userLastName,
+        senderRole: userRole,
+        content: newMessage.trim(),
       });
       setMessages((prev) => [...prev, msg]);
-      setNuevoMensaje('');
-      listarConversationes();
+      setNewMessage('');
+      listConversations();
     } catch (err) {
-      console.error('Error al enviar mensaje:', err);
+      console.error('Error sending message:', err);
       setError('Error al enviar mensaje');
     } finally {
-      setEnviando(false);
+      setSending(false);
     }
-  }, [nuevoMensaje, conversacionActiva, usuarioId, usuarioNombre, usuarioApellido, usuarioRol, listarConversationes]);
+  }, [newMessage, activeConversation, userId, userFirstName, userLastName, userRole, listConversations]);
 
-  const iniciarConversation = useCallback(async (contacto: Contact) => {
+  const startConversation = useCallback(async (contact: Contact) => {
     try {
-      const conv = await apiClient.post('/messaging/conversaciones', {
-        participanteIds: [usuarioId, contacto.id],
-        participanteNombres: [usuarioNombre, contacto.nombre],
-        participanteApellidos: [usuarioApellido, contacto.apellido],
-        participanteRoles: [usuarioRol, contacto.rol],
+      const conv = await apiClient.post('/messaging/conversations', {
+        participantIds: [userId, contact.id],
+        participantFirstNames: [userFirstName, contact.firstName],
+        participantLastNames: [userLastName, contact.lastName],
+        participantRoles: [userRole, contact.role],
       });
 
-      await listarConversationes();
+      await listConversations();
 
       const convData: Conversation = {
         id: conv.id,
         otherParticipant: {
-          usuarioId: contacto.id,
-          usuarioNombre: contacto.nombre,
-          usuarioApellido: contacto.apellido,
-          usuarioRol: contacto.rol,
+          userId: contact.id,
+          userFirstName: contact.firstName,
+          userLastName: contact.lastName,
+          userRole: contact.role,
         },
-        participantes: [],
-        ultimoMensaje: null,
-        noLeidos: 0,
+        participants: [],
+        lastMessage: null,
+        unreadCount: 0,
         createdAt: conv.createdAt,
       };
 
-      setConversationActiva(convData);
-      setVista('conversaciones');
+      setActiveConversation(convData);
+      setView('conversations');
       setMessages([]);
     } catch (err) {
-      console.error('Error al crear conversación:', err);
+      console.error('Error creating conversation:', err);
       setError('Error al crear conversación');
     }
-  }, [usuarioId, usuarioNombre, usuarioApellido, usuarioRol, listarConversationes]);
+  }, [userId, userFirstName, userLastName, userRole, listConversations]);
 
-  const cargarContacts = useCallback(async () => {
+  const loadContacts = useCallback(async () => {
     setLoadingContacts(true);
     try {
-      const lista: Contact[] = [];
+      const list: Contact[] = [];
 
-      if (usuarioRol === 'estudiante') {
+      if (userRole === 'student') {
         const cursos = await coursesService.getCourses();
-        const cursoNombre = user?.cursos || '';
-        const miCurso = cursos.find((c: any) => c.nombre === cursoNombre);
-        if (miCurso) {
-          const materias = await coursesService.getSubjectsByCourse(miCurso.id);
-          for (const m of materias) {
-            if (m.profesorRut && m.profesorNombre) {
-              lista.push({
-                id: m.profesorRut,
-                nombre: m.profesorNombre,
-                apellido: m.profesorApellido || '',
-                rol: 'profesor',
-                contexto: `${m.asignaturaNombre} - ${miCurso.nombre}`,
+        const courseName = user?.courses || '';
+        const myCourse = cursos.find((c: any) => c.name === courseName);
+        if (myCourse) {
+          const subjects = await coursesService.getSubjectsByCourse(myCourse.id);
+          for (const m of subjects) {
+            if (m.professorRut && m.professorFirstName) {
+              list.push({
+                id: m.professorRut,
+                firstName: m.professorFirstName,
+                lastName: m.professorLastName || '',
+                role: 'professor',
+                context: `${m.subjectName} - ${myCourse.name}`,
               });
             }
           }
-          const companeros = await coursesService.getStudentsByCourse(cursoNombre);
-          for (const c of companeros) {
-            if (c.rut !== usuarioId) {
-              lista.push({
+          const classmates = await coursesService.getStudentsByCourse(courseName);
+          for (const c of classmates) {
+            if (c.rut !== userId) {
+              list.push({
                 id: c.rut,
-                nombre: c.nombre,
-                apellido: c.apellido,
-                rol: 'estudiante',
-                contexto: miCurso.nombre,
+                firstName: c.firstName,
+                lastName: c.lastName,
+                role: 'student',
+                context: myCourse.name,
               });
             }
           }
         }
-      } else if (usuarioRol === 'profesor') {
-        const profesorRut = user?.rut;
+      } else if (userRole === 'professor') {
+        const professorRut = user?.rut;
         const cursos = await coursesService.getCourses();
         for (const c of cursos) {
-          const materias = await coursesService.getSubjectsByCourse(c.id);
-          const misMaterias = materias.filter((m: any) => m.profesorRut === profesorRut);
-          if (misMaterias.length === 0) continue;
+          const subjects = await coursesService.getSubjectsByCourse(c.id);
+          const mySubjects = subjects.filter((m: any) => m.professorRut === professorRut);
+          if (mySubjects.length === 0) continue;
 
-          const estudiantes = await coursesService.getStudentsByCourse(c.nombre);
-          for (const est of estudiantes) {
-            lista.push({
+          const students = await coursesService.getStudentsByCourse(c.name);
+          for (const est of students) {
+            list.push({
               id: est.rut,
-              nombre: est.nombre,
-              apellido: est.apellido,
-              rol: 'estudiante',
-              contexto: `${c.nombre} - ${misMaterias.map((m: any) => m.asignaturaNombre).join(', ')}`,
+              firstName: est.firstName,
+              lastName: est.lastName,
+              role: 'student',
+              context: `${c.name} - ${mySubjects.map((m: any) => m.subjectName).join(', ')}`,
             });
           }
         }
       }
 
-      setContacts(lista);
+      setContacts(list);
     } catch (err) {
-      console.error('Error al cargar contactos:', err);
+      console.error('Error loading contacts:', err);
       setError('Error al cargar contactos');
     } finally {
       setLoadingContacts(false);
     }
-  }, [usuarioRol, user]);
+  }, [userRole, user]);
 
-  const abrirNuevo = useCallback(async () => {
-    setVista('nuevo');
-    setConversationActiva(null);
-    await cargarContacts();
-  }, [cargarContacts]);
+  const openNew = useCallback(async () => {
+    setView('new');
+    setActiveConversation(null);
+    await loadContacts();
+  }, [loadContacts]);
 
   useEffect(() => {
-    listarConversationes();
-  }, [listarConversationes]);
+    listConversations();
+  }, [listConversations]);
 
   useEffect(() => {
     if (pollingRef.current) clearInterval(pollingRef.current);
-    if (conversacionActiva) {
+    if (activeConversation) {
       pollingRef.current = setInterval(() => {
-        cargarMessages(conversacionActiva.id);
-        listarConversationes();
+        loadMessages(activeConversation.id);
+        listConversations();
       }, 5000);
     }
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
-  }, [conversacionActiva, cargarMessages, listarConversationes]);
+  }, [activeConversation, loadMessages, listConversations]);
 
   return {
-    conversaciones,
-    conversacionActiva,
-    mensajes,
+    conversations,
+    activeConversation,
+    messages,
     loadingConvs,
     loadingMsgs,
     error,
-    nuevoMensaje,
-    enviando,
-    vista,
-    contactos,
-    loadingContactos: loadingContacts,
-    usuarioId,
-    setNuevoMensaje,
-    seleccionarConversacion: seleccionarConversation,
-    handleEnviar,
-    iniciarConversacion: iniciarConversation,
-    abrirNuevo,
-    setVista,
+    newMessage,
+    sending,
+    view,
+    contacts,
+    loadingContacts,
+    userId,
+    setNewMessage,
+    selectConversation,
+    handleSend,
+    startConversation,
+    openNew,
+    setView,
     setError,
   };
 }

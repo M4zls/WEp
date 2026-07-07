@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import notificationsService from './notifications.service';
-import type { InAppNotificacion } from './notifications.service';
+import type { InAppNotification } from './notifications.service';
 
 export function useNotifications() {
-  const [notifications, setNotifications] = useState<InAppNotificacion[]>([]);
+  const [notifications, setNotifications] = useState<InAppNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const usuarioId = (() => {
+  const userId = (() => {
     try {
       const stored = sessionStorage.getItem('user');
       if (!stored) return null;
@@ -19,21 +19,21 @@ export function useNotifications() {
   })();
 
   const load = useCallback(async () => {
-    if (!usuarioId) {
+    if (!userId) {
       setLoading(false);
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const data = await notificationsService.getByUsuario(usuarioId);
+      const data = await notificationsService.getByUser(userId);
       setNotifications(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar notificaciones');
+      setError(err instanceof Error ? err.message : 'Error loading notifications');
     } finally {
       setLoading(false);
     }
-  }, [usuarioId]);
+  }, [userId]);
 
   useEffect(() => {
     load();
@@ -50,5 +50,5 @@ export function useNotifications() {
     }
   };
 
-  return { notifications, loading, error, markAsRead, reload: load, usuarioId };
+  return { notifications, loading, error, markAsRead, reload: load, userId };
 }

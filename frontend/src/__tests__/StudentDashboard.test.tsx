@@ -39,13 +39,13 @@ describe('StudentDashboard', () => {
   });
 
   it('should show loading skeletons initially', () => {
-    sessionStorage.setItem('user', JSON.stringify({ cursos: '3A' }));
+    sessionStorage.setItem('user', JSON.stringify({ courses: '3A' }));
     vi.mocked(courseService.getCourses).mockReturnValue(new Promise(() => {}));
 
     render(<StudentDashboard />);
 
-    expect(screen.getByText('Mis Asignaturas')).toBeInTheDocument();
-    expect(screen.queryByText('No tienes asignaturas asignadas')).not.toBeInTheDocument();
+    expect(screen.getByText('My Subjects')).toBeInTheDocument();
+    expect(screen.queryByText('You have no assigned subjects')).not.toBeInTheDocument();
     expect(document.querySelectorAll('.animate-pulse').length).toBe(3);
   });
 
@@ -53,58 +53,58 @@ describe('StudentDashboard', () => {
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('No tienes asignaturas asignadas')).toBeInTheDocument();
+      expect(screen.getByText('You have no assigned subjects')).toBeInTheDocument();
     });
-    expect(screen.getByText('Espera a que te asignen un curso')).toBeInTheDocument();
-    expect(screen.getByText('Curso no asignado')).toBeInTheDocument();
+    expect(screen.getByText('Wait until you are assigned courses')).toBeInTheDocument();
+    expect(screen.getByText('Course not assigned')).toBeInTheDocument();
   });
 
-  it('should show empty state when user has no cursos field', async () => {
-    sessionStorage.setItem('user', JSON.stringify({ nombre: 'Juan', apellido: 'Pérez' }));
+  it('should show empty state when user has no courses field', async () => {
+    sessionStorage.setItem('user', JSON.stringify({ firstName: 'Juan', lastName: 'Pérez' }));
 
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('No tienes asignaturas asignadas')).toBeInTheDocument();
+      expect(screen.getByText('You have no assigned subjects')).toBeInTheDocument();
     });
   });
 
-  it('should show empty state when no curso matches user cursos', async () => {
-    sessionStorage.setItem('user', JSON.stringify({ cursos: '3A' }));
+  it('should show empty state when no course matches user courses', async () => {
+    sessionStorage.setItem('user', JSON.stringify({ courses: '3A' }));
     vi.mocked(courseService.getCourses).mockResolvedValue([
-      { id: 1, nombre: '1A', nivel: 'Primero', letra: 'A' },
-      { id: 2, nombre: '2B', nivel: 'Segundo', letra: 'B' },
+      { id: 1, name: '1A', level: 'Primero', letter: 'A' },
+      { id: 2, name: '2B', level: 'Segundo', letter: 'B' },
     ]);
 
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('No tienes asignaturas asignadas')).toBeInTheDocument();
+      expect(screen.getByText('You have no assigned subjects')).toBeInTheDocument();
     });
   });
 
-  it('should show empty state when curso has no materias', async () => {
-    sessionStorage.setItem('user', JSON.stringify({ cursos: '3A' }));
+  it('should show empty state when course has no subjects', async () => {
+    sessionStorage.setItem('user', JSON.stringify({ courses: '3A' }));
     vi.mocked(courseService.getCourses).mockResolvedValue([
-      { id: 1, nombre: '3A', nivel: 'Tercero', letra: 'A' },
+      { id: 1, name: '3A', level: 'Tercero', letter: 'A' },
     ]);
     vi.mocked(courseService.getSubjects).mockResolvedValue([]);
 
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('No tienes asignaturas asignadas')).toBeInTheDocument();
+      expect(screen.getByText('You have no assigned subjects')).toBeInTheDocument();
     });
   });
 
   it('should render subject cards with correct data', async () => {
-    sessionStorage.setItem('user', JSON.stringify({ cursos: '3A' }));
+    sessionStorage.setItem('user', JSON.stringify({ courses: '3A' }));
     vi.mocked(courseService.getCourses).mockResolvedValue([
-      { id: 1, nombre: '3A', nivel: 'Tercero', letra: 'A' },
+      { id: 1, name: '3A', level: 'Tercero', letter: 'A' },
     ]);
     vi.mocked(courseService.getSubjects).mockResolvedValue([
-      { id: 1, cursoId: 1, asignaturaId: 10, profesorId: 5, profesorNombre: 'María', profesorApellido: 'López', asignaturaNombre: 'Matemáticas', asignaturaCodigo: 'MAT101' },
-      { id: 2, cursoId: 1, asignaturaId: 11, profesorId: 6, profesorNombre: 'Carlos', asignaturaNombre: 'Lenguaje', asignaturaCodigo: 'LEN101' },
+      { id: 1, courseId: 1, subjectId: 10, professorId: 5, professorFirstName: 'María', professorLastName: 'López', subjectName: 'Matemáticas', subjectCode: 'MAT101' },
+      { id: 2, courseId: 1, subjectId: 11, professorId: 6, professorFirstName: 'Carlos', subjectName: 'Lenguaje', subjectCode: 'LEN101' },
     ]);
 
     render(<StudentDashboard />);
@@ -117,32 +117,32 @@ describe('StudentDashboard', () => {
       expect(screen.getByText('LEN101')).toBeInTheDocument();
       expect(screen.getByText(/Carlos/)).toBeInTheDocument();
     });
-    expect(screen.getByText('Curso: 3A')).toBeInTheDocument();
+    expect(screen.getByText('Course: 3A')).toBeInTheDocument();
   });
 
-  it('should render subject with sin profesor when no profesor assigned', async () => {
-    sessionStorage.setItem('user', JSON.stringify({ cursos: '3A' }));
+  it('should render subject with no teacher when no teacher assigned', async () => {
+    sessionStorage.setItem('user', JSON.stringify({ courses: '3A' }));
     vi.mocked(courseService.getCourses).mockResolvedValue([
-      { id: 1, nombre: '3A', nivel: 'Tercero', letra: 'A' },
+      { id: 1, name: '3A', level: 'Tercero', letter: 'A' },
     ]);
     vi.mocked(courseService.getSubjects).mockResolvedValue([
-      { id: 1, cursoId: 1, asignaturaId: 10, profesorId: null, asignaturaNombre: 'Arte', asignaturaCodigo: 'ART101' },
+      { id: 1, courseId: 1, subjectId: 10, professorId: null, subjectName: 'Arte', subjectCode: 'ART101' },
     ]);
 
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('Sin profesor')).toBeInTheDocument();
+      expect(screen.getByText('No teacher')).toBeInTheDocument();
     });
   });
 
-  it('should navigate to materia detail on card click', async () => {
-    sessionStorage.setItem('user', JSON.stringify({ cursos: '3A' }));
+  it('should navigate to subject detail on card click', async () => {
+    sessionStorage.setItem('user', JSON.stringify({ courses: '3A' }));
     vi.mocked(courseService.getCourses).mockResolvedValue([
-      { id: 1, nombre: '3A', nivel: 'Tercero', letra: 'A' },
+      { id: 1, name: '3A', level: 'Tercero', letter: 'A' },
     ]);
     vi.mocked(courseService.getSubjects).mockResolvedValue([
-      { id: 1, cursoId: 1, asignaturaId: 10, profesorId: 5, profesorNombre: 'María', asignaturaNombre: 'Matemáticas', asignaturaCodigo: 'MAT101' },
+      { id: 1, courseId: 1, subjectId: 10, professorId: 5, professorFirstName: 'María', subjectName: 'Matemáticas', subjectCode: 'MAT101' },
     ]);
 
     render(<StudentDashboard />);
@@ -153,7 +153,7 @@ describe('StudentDashboard', () => {
 
     fireEvent.click(screen.getByText('Matemáticas'));
     expect(mockNavigate).toHaveBeenCalledWith(
-      '/dashboard/materia/1',
+      '/dashboard/subject/1',
       expect.objectContaining({
         state: expect.objectContaining({ subjectName: 'Matemáticas', subjectCode: 'MAT101' }),
       }),
@@ -161,18 +161,18 @@ describe('StudentDashboard', () => {
   });
 
   it('should show empty state when API call fails', async () => {
-    sessionStorage.setItem('user', JSON.stringify({ cursos: '3A' }));
+    sessionStorage.setItem('user', JSON.stringify({ courses: '3A' }));
     vi.mocked(courseService.getCourses).mockRejectedValue(new Error('Network error'));
 
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('No tienes asignaturas asignadas')).toBeInTheDocument();
+      expect(screen.getByText('You have no assigned subjects')).toBeInTheDocument();
     });
   });
 
   it('should render inside DashboardLayout', () => {
-    sessionStorage.setItem('user', JSON.stringify({ cursos: '3A' }));
+    sessionStorage.setItem('user', JSON.stringify({ courses: '3A' }));
     vi.mocked(courseService.getCourses).mockReturnValue(new Promise(() => {}));
 
     render(<StudentDashboard />);

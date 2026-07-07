@@ -13,20 +13,20 @@ try {
 	"id" serial PRIMARY KEY NOT NULL,
 	"rut" text NOT NULL,
 	"dv" text NOT NULL,
-	"nombre" text NOT NULL,
-	"apellido" text NOT NULL,
-	"cursos" text NOT NULL,
+  "first_name" text NOT NULL,
+	"last_name" text NOT NULL,
+	"courses" text NOT NULL,
 	"email" text NOT NULL,
 	"password" text NOT NULL,
-	"telefono" text,
-	"apoderado" text,
-	"fecha_registro" text DEFAULT (now()::text),
-	CONSTRAINT "estudiantes_rut_unique" UNIQUE ("rut"),
-	CONSTRAINT "estudiantes_email_unique" UNIQUE ("email")
+	"phone" text,
+	"guardian" text,
+	"registration_date" text DEFAULT (now()::text),
+	CONSTRAINT "students_rut_unique" UNIQUE ("rut"),
+	CONSTRAINT "students_email_unique" UNIQUE ("email")
   );`);
 
   try {
-    await sql.unsafe(`ALTER TABLE "students"."students" ADD COLUMN "apoderado_email" text;`);
+    await sql.unsafe(`ALTER TABLE "students"."students" ADD COLUMN "guardian_email" text;`);
   } catch {
     // la columna ya existe, ignorar
   }

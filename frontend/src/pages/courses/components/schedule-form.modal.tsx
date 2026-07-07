@@ -1,49 +1,49 @@
 import React, { FC, ReactElement, useEffect, useState } from 'react';
-import type { Horario } from '../../schedule/schedule.types';
+import type { Schedule } from '../../schedule/schedule.types';
 import { WEEK_DAYS } from '../../schedule/schedule.types';
 
-interface HorarioFormModalProps {
+interface ScheduleFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: { diaSemana: number; horaInicio: string; horaTermino: string }) => Promise<void>;
-  editingHorario?: Horario | null;
+  onSave: (data: { weekDay: number; startTime: string; endTime: string }) => Promise<void>;
+  editingSchedule?: Schedule | null;
 }
 
-const HorarioFormModal: FC<HorarioFormModalProps> = ({ isOpen, onClose, onSave, editingHorario }): ReactElement | null => {
-  const [diaSemana, setDiaSemana] = useState(1);
-  const [horaInicio, setHoraInicio] = useState('08:00');
-  const [horaTermino, setHoraTermino] = useState('09:30');
+const ScheduleFormModal: FC<ScheduleFormModalProps> = ({ isOpen, onClose, onSave, editingSchedule }): ReactElement | null => {
+  const [weekDay, setWeekDay] = useState(1);
+  const [startTime, setStartTime] = useState('08:00');
+  const [endTime, setEndTime] = useState('09:30');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (editingHorario) {
-      setDiaSemana(editingHorario.diaSemana);
-      setHoraInicio(editingHorario.horaInicio);
-      setHoraTermino(editingHorario.horaTermino);
+    if (editingSchedule) {
+      setWeekDay(editingSchedule.weekDay);
+      setStartTime(editingSchedule.startTime);
+      setEndTime(editingSchedule.endTime);
     } else {
-      setDiaSemana(1);
-      setHoraInicio('08:00');
-      setHoraTermino('09:30');
+      setWeekDay(1);
+      setStartTime('08:00');
+      setEndTime('09:30');
     }
     setError('');
-  }, [editingHorario, isOpen]);
+  }, [editingSchedule, isOpen]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!horaInicio || !horaTermino) {
-      setError('Completa todos los campos');
+    if (!startTime || !endTime) {
+      setError('Complete all fields');
       return;
     }
     setSaving(true);
     setError('');
     try {
-      await onSave({ diaSemana, horaInicio, horaTermino });
+      await onSave({ weekDay, startTime, endTime });
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Error al guardar el horario');
+      setError(err.message || 'Error saving schedule');
     } finally {
       setSaving(false);
     }
@@ -54,7 +54,7 @@ const HorarioFormModal: FC<HorarioFormModalProps> = ({ isOpen, onClose, onSave, 
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
         <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-slate-800">
-            {editingHorario ? 'Editar Bloque Horario' : 'Agregar Bloque Horario'}
+            {editingSchedule ? 'Edit Schedule Block' : 'Add Schedule Block'}
           </h3>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
         </div>
@@ -67,10 +67,10 @@ const HorarioFormModal: FC<HorarioFormModalProps> = ({ isOpen, onClose, onSave, 
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Día *</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Day *</label>
             <select
-              value={diaSemana}
-              onChange={e => setDiaSemana(Number(e.target.value))}
+              value={weekDay}
+              onChange={e => setWeekDay(Number(e.target.value))}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition bg-white"
             >
               {Object.entries(WEEK_DAYS).map(([val, label]) => (
@@ -81,20 +81,20 @@ const HorarioFormModal: FC<HorarioFormModalProps> = ({ isOpen, onClose, onSave, 
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Hora Inicio *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Start Time *</label>
               <input
                 type="time"
-                value={horaInicio}
-                onChange={e => setHoraInicio(e.target.value)}
+                value={startTime}
+                onChange={e => setStartTime(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Hora Término *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">End Time *</label>
               <input
                 type="time"
-                value={horaTermino}
-                onChange={e => setHoraTermino(e.target.value)}
+                value={endTime}
+                onChange={e => setEndTime(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition"
               />
             </div>
@@ -106,14 +106,14 @@ const HorarioFormModal: FC<HorarioFormModalProps> = ({ isOpen, onClose, onSave, 
               onClick={onClose}
               className="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition"
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
               className="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition disabled:opacity-50"
             >
-              {saving ? 'Guardando...' : editingHorario ? 'Guardar Cambios' : 'Agregar'}
+              {saving ? 'Saving...' : editingSchedule ? 'Save Changes' : 'Add'}
             </button>
           </div>
         </form>
@@ -122,4 +122,4 @@ const HorarioFormModal: FC<HorarioFormModalProps> = ({ isOpen, onClose, onSave, 
   );
 };
 
-export default HorarioFormModal;
+export default ScheduleFormModal;

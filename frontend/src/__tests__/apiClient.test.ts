@@ -28,7 +28,7 @@ describe('ApiClient', () => {
     const result = await apiClient.get('/cursos');
 
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/cursos',
+      'http://localhost:3100/api/cursos',
       expect.objectContaining({
         method: 'GET',
         headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
@@ -65,7 +65,7 @@ describe('ApiClient', () => {
     const result = await apiClient.post('/clases', { titulo: 'Test' });
 
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/clases',
+      'http://localhost:3100/api/clases',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ titulo: 'Test' }),
@@ -83,7 +83,7 @@ describe('ApiClient', () => {
     await apiClient.put('/clases/1', { titulo: 'Updated' });
 
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/clases/1',
+      'http://localhost:3100/api/clases/1',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ titulo: 'Updated' }),
@@ -100,7 +100,7 @@ describe('ApiClient', () => {
     await apiClient.delete('/clases/1');
 
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/clases/1',
+      'http://localhost:3100/api/clases/1',
       expect.objectContaining({ method: 'DELETE' }),
     );
   });
@@ -116,7 +116,7 @@ describe('ApiClient', () => {
     });
 
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/test',
+      'http://localhost:3100/api/test',
       expect.objectContaining({
         headers: expect.objectContaining({
           'Content-Type': 'application/json',

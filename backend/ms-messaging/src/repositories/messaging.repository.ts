@@ -98,8 +98,8 @@ export class MessagingRepository implements IMessagingRepository {
     return convIds.map((convId) => ({
       id: convId,
       otherParticipant: allParticipants.find((p) => p.conversationId === convId && p.userId !== userId),
-      ultimoMensaje: lastMsgMap.get(convId) ?? null,
-      noLeidos: unreadMap.get(convId) ?? 0,
+      lastMessage: lastMsgMap.get(convId) ?? null,
+      unreadCount: unreadMap.get(convId) ?? 0,
       createdAt: userConvs.find((c) => c.conversationId === convId)?.createdAt ?? null,
     }));
   }

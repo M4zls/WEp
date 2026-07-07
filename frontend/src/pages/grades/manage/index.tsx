@@ -15,7 +15,7 @@ const ManageGradesPage: FC = (): ReactElement => {
   };
 
   return (
-    <DashboardLayout userData={user} role="profesor" onLogout={handleLogout}>
+    <DashboardLayout userData={user} role="professor" onLogout={handleLogout}>
       <ManageGradesView />
     </DashboardLayout>
   );

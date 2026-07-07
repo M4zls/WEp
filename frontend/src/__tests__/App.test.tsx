@@ -57,35 +57,35 @@ describe('App', () => {
     expect(screen.getByTestId('welcome-page')).toBeInTheDocument();
   });
 
-  it('should render StudentDashboard when role is estudiante', () => {
+  it('should render StudentDashboard when role is student', () => {
     useAuthStore.setState({
       isAuthenticated: true,
-      role: 'estudiante',
-      user: { email: 'test@alumnocbo.cl', role: 'estudiante' },
+      role: 'student',
+      user: { email: 'test@alumnocbo.cl', role: 'student' },
     });
     window.history.pushState({}, '', '/dashboard');
     render(<App />);
     expect(screen.getByTestId('student-dashboard')).toBeInTheDocument();
   });
 
-  it('should render ProfessorDashboard when role is profesor', () => {
+  it('should render ProfessorDashboard when role is professor', () => {
     useAuthStore.setState({
       isAuthenticated: true,
-      role: 'profesor',
-      user: { email: 'test@profesorcbo.cl', role: 'profesor' },
+      role: 'professor',
+      user: { email: 'test@profesorcbo.cl', role: 'professor' },
     });
     window.history.pushState({}, '', '/dashboard');
     render(<App />);
     expect(screen.getByTestId('professor-dashboard')).toBeInTheDocument();
   });
 
-  it('should render SubjectDetail on materia route', () => {
+  it('should render SubjectDetail on subject route', () => {
     useAuthStore.setState({
       isAuthenticated: true,
-      role: 'profesor',
-      user: { email: 'test@test.com', role: 'profesor' },
+      role: 'professor',
+      user: { email: 'test@test.com', role: 'professor' },
     });
-    window.history.pushState({}, '', '/dashboard/materia/1');
+    window.history.pushState({}, '', '/dashboard/subject/1');
     render(<App />);
     expect(screen.getByTestId('subject-detail')).toBeInTheDocument();
   });

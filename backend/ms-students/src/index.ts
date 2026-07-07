@@ -1,13 +1,10 @@
 import { Hono } from 'hono'
-import { cors } from 'hono/cors';
 import { studentsController } from './controllers/students.controller.js';
 
 await import('../drizzle/migrate.js');
 await import('../drizzle/seed.js');
 
 const app = new Hono()
-
-app.use(cors());
 app.get('/health', (c) => c.json({ status: 'ok' }));
 
 app.route('/students', studentsController)

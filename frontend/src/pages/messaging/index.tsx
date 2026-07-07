@@ -3,18 +3,18 @@ import { useMessaging } from './use-messaging';
 
 const MessagingPage: FC = (): ReactElement => {
   const {
-    conversaciones, conversacionActiva, mensajes,
+    conversations, activeConversation, messages,
     loadingConvs, loadingMsgs, error,
-    nuevoMensaje, enviando,
-    vista, contactos, loadingContactos,
-    usuarioId,
-    setNuevoMensaje, seleccionarConversacion, handleEnviar,
-    iniciarConversacion, abrirNuevo, setVista, setError,
+    newMessage, sending,
+    view, contacts, loadingContacts,
+    userId,
+    setNewMessage, selectConversation, handleSend,
+    startConversation, openNew, setView, setError,
   } = useMessaging();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    handleEnviar();
+    handleSend();
   };
 
   const formatTime = (dateStr?: string | null): string => {
@@ -50,18 +50,18 @@ const MessagingPage: FC = (): ReactElement => {
       <div className="w-80 border-r border-slate-200 flex flex-col">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <h3 className="font-semibold text-slate-800">
-            {vista === 'nuevo' ? 'Nueva Conversación' : 'Mensajes'}
+            {view === 'new' ? 'Nueva conversación' : 'Mensajes'}
           </h3>
-          {vista === 'conversaciones' ? (
+          {view === 'conversations' ? (
             <button
-              onClick={abrirNuevo}
+              onClick={openNew}
               className="text-sm px-3 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
             >
-              + Nuevo
+              + Nueva
             </button>
           ) : (
             <button
-              onClick={() => setVista('conversaciones')}
+              onClick={() => setView('conversations')}
               className="text-sm text-slate-500 hover:text-slate-700"
             >
               Volver
@@ -70,73 +70,73 @@ const MessagingPage: FC = (): ReactElement => {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {vista === 'conversaciones' ? (
+          {view === 'conversations' ? (
             loadingConvs ? (
               <div className="flex justify-center py-10">
                 <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
               </div>
-            ) : conversaciones.length === 0 ? (
-              <p className="text-center text-slate-400 text-sm py-10">Sin conversaciones</p>
+            ) : conversations.length === 0 ? (
+              <p className="text-center text-slate-400 text-sm py-10">No hay conversaciones</p>
             ) : (
-              conversaciones.map((conv) => {
-                const otro = conv.otherParticipant || conv.participantes?.find((p) => p.usuarioId !== usuarioId);
-                const activa = conversacionActiva?.id === conv.id;
+              conversations.map((conv) => {
+                const otro = conv.otherParticipant || conv.participants?.find((p) => p.userId !== userId);
+                const activa = activeConversation?.id === conv.id;
                 return (
                   <button
                     key={conv.id}
-                    onClick={() => seleccionarConversacion(conv)}
+                    onClick={() => selectConversation(conv)}
                     className={`w-full text-left px-4 py-3 border-b border-slate-50 transition-colors ${
                       activa ? 'bg-emerald-50' : 'hover:bg-slate-50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-sm text-slate-800 truncate">
-                        {otro ? `${otro.usuarioNombre} ${otro.usuarioApellido}` : 'Usuario'}
+                        {otro ? `${otro.userFirstName} ${otro.userLastName}` : 'Usuario'}
                       </span>
                       <span className="text-xs text-slate-400 shrink-0 ml-2">
-                        {formatDate(conv.ultimoMensaje?.createdAt)}
+                        {formatDate(conv.lastMessage?.createdAt)}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 truncate mt-0.5">
-                      {conv.ultimoMensaje?.contenido || 'Sin mensajes'}
+                      {conv.lastMessage?.content || 'Sin mensajes'}
                     </p>
-                    {conv.noLeidos > 0 && (
+                    {conv.unreadCount > 0 && (
                       <span className="inline-block mt-1 px-2 py-0.5 bg-emerald-500 text-white text-xs rounded-full">
-                        {conv.noLeidos}
+                        {conv.unreadCount}
                       </span>
                     )}
                   </button>
                 );
               })
             )
-          ) : vista === 'nuevo' ? (
-            loadingContactos ? (
+          ) : view === 'new' ? (
+            loadingContacts ? (
               <div className="flex justify-center py-10">
                 <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
               </div>
-            ) : contactos.length === 0 ? (
+            ) : contacts.length === 0 ? (
               <p className="text-center text-slate-400 text-sm py-10">No hay contactos disponibles</p>
             ) : (
-              contactos.map((contacto, i) => (
+              contacts.map((contact, i) => (
                 <button
-                  key={`${contacto.id}-${i}`}
-                  onClick={() => iniciarConversacion(contacto)}
+                  key={`${contact.id}-${i}`}
+                  onClick={() => startConversation(contact)}
                   className="w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                      {(contacto.nombre?.charAt(0) || '') + (contacto.apellido?.charAt(0) || '')}
+                      {(contact.firstName?.charAt(0) || '') + (contact.lastName?.charAt(0) || '')}
                     </div>
                     <div className="min-w-0">
                       <p className="font-medium text-sm text-slate-800 truncate">
-                        {contacto.nombre} {contacto.apellido}
+                        {contact.firstName} {contact.lastName}
                       </p>
-                      <p className="text-xs text-slate-400 truncate">{contacto.contexto}</p>
+                      <p className="text-xs text-slate-400 truncate">{contact.context}</p>
                     </div>
                     <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full ${
-                      contacto.rol === 'profesor' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
+                      contact.role === 'professor' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
                     }`}>
-                      {contacto.rol === 'profesor' ? 'Prof' : 'Est'}
+                      {contact.role === 'professor' ? 'Prof' : 'Est'}
                     </span>
                   </div>
                 </button>
@@ -147,29 +147,29 @@ const MessagingPage: FC = (): ReactElement => {
       </div>
 
       <div className="flex-1 flex flex-col">
-        {!conversacionActiva ? (
+        {!activeConversation ? (
           <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
-            {vista === 'nuevo' ? 'Selecciona un contacto' : 'Selecciona una conversación'}
+            {view === 'new' ? 'Seleccionar un contacto' : 'Seleccionar una conversación'}
           </div>
         ) : (
           <>
             <div className="px-5 py-3 border-b border-slate-100 bg-slate-50">
               {(() => {
-                const otro = conversacionActiva.otherParticipant ||
-                  conversacionActiva.participantes?.find((p) => p.usuarioId !== usuarioId);
+                const otro = activeConversation.otherParticipant ||
+                  activeConversation.participants?.find((p) => p.userId !== userId);
                 return (
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
-                      {otro ? (otro.usuarioNombre?.charAt(0) || '') + (otro.usuarioApellido?.charAt(0) || '') : '?'}
+                      {otro ? (otro.userFirstName?.charAt(0) || '') + (otro.userLastName?.charAt(0) || '') : '?'}
                     </div>
                     <div>
                       <p className="font-semibold text-sm text-slate-800">
-                        {otro ? `${otro.usuarioNombre} ${otro.usuarioApellido}` : 'Usuario'}
+                        {otro ? `${otro.userFirstName} ${otro.userLastName}` : 'Usuario'}
                       </p>
                       <span className={`text-xs ${
-                        otro?.usuarioRol === 'profesor' ? 'text-purple-500' : 'text-blue-500'
+                        otro?.userRole === 'professor' ? 'text-purple-500' : 'text-blue-500'
                       }`}>
-                        {otro?.usuarioRol === 'profesor' ? 'Profesor' : 'Estudiante'}
+                        {otro?.userRole === 'professor' ? 'Profesor' : 'Estudiante'}
                       </span>
                     </div>
                   </div>
@@ -182,27 +182,27 @@ const MessagingPage: FC = (): ReactElement => {
                 <div className="flex justify-center py-10">
                   <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
                 </div>
-              ) : mensajes.length === 0 ? (
+              ) : messages.length === 0 ? (
                 <p className="text-center text-slate-400 text-sm py-10">
                   No hay mensajes. Escribe algo para iniciar la conversación.
                 </p>
               ) : (
-                mensajes.map((msg) => {
-                  const esMio = msg.remitenteId === usuarioId;
+                messages.map((msg) => {
+                  const isMine = msg.senderId === userId;
                   return (
-                    <div key={msg.id} className={`flex ${esMio ? 'justify-end' : 'justify-start'}`}>
+                    <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl ${
-                        esMio
+                        isMine
                           ? 'bg-emerald-500 text-white rounded-br-md'
                           : 'bg-slate-100 text-slate-800 rounded-bl-md'
                       }`}>
-                        {!esMio && (
+                        {!isMine && (
                           <p className="text-xs font-medium text-slate-500 mb-0.5">
-                            {msg.remitenteNombre} {msg.remitenteApellido}
+                            {msg.senderFirstName} {msg.senderLastName}
                           </p>
                         )}
-                        <p className="text-sm">{msg.contenido}</p>
-                        <p className={`text-xs mt-1 ${esMio ? 'text-emerald-100' : 'text-slate-400'}`}>
+                        <p className="text-sm">{msg.content}</p>
+                        <p className={`text-xs mt-1 ${isMine ? 'text-emerald-100' : 'text-slate-400'}`}>
                           {formatTime(msg.createdAt)}
                         </p>
                       </div>
@@ -215,18 +215,18 @@ const MessagingPage: FC = (): ReactElement => {
             <form onSubmit={handleSubmit} className="border-t border-slate-200 p-4 flex gap-3">
               <input
                 type="text"
-                value={nuevoMensaje}
-                onChange={(e) => setNuevoMensaje(e.target.value)}
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Escribe un mensaje..."
                 className="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all text-sm"
-                disabled={enviando}
+                disabled={sending}
               />
               <button
                 type="submit"
-                disabled={enviando || !nuevoMensaje.trim()}
+                disabled={sending || !newMessage.trim()}
                 className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
               >
-                {enviando ? 'Enviando...' : 'Enviar'}
+                {sending ? 'Enviando...' : 'Enviar'}
               </button>
             </form>
           </>

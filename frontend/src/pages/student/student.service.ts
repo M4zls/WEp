@@ -2,14 +2,14 @@ import type { UserData } from './student.types';
 
 export interface StudentLoginResponse {
   rut: string;
-  nombre?: string;
-  apellido?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
-  cursos?: string;
+  courses?: string;
   token?: string;
 }
 
-const API_URL: string = 'http://localhost:3000/api';
+const API_URL: string = 'http://localhost:3100/api';
 
 class StudentService {
   async login(email: string, password: string): Promise<StudentLoginResponse> {
@@ -24,14 +24,14 @@ class StudentService {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Error al iniciar sesión');
+        throw new Error(error.error || 'Error durante el inicio de sesión');
       }
 
       const data = await response.json();
       sessionStorage.setItem('studentToken', JSON.stringify(data));
       return data;
     } catch (error) {
-      console.error('Error en login de estudiante:', error);
+      console.error('Error in student login:', error);
       throw error;
     }
   }
@@ -51,7 +51,7 @@ class StudentService {
 
       return await response.json();
     } catch (error) {
-      console.error('Error al obtener estudiantes:', error);
+      console.error('Error fetching students:', error);
       throw error;
     }
   }
@@ -71,19 +71,19 @@ class StudentService {
 
       return await response.json();
     } catch (error) {
-      console.error('Error al obtener estudiante:', error);
+      console.error('Error fetching student:', error);
       throw error;
     }
   }
 
-  async createStudent(datos: UserData): Promise<UserData> {
+  async createStudent(data: UserData): Promise<UserData> {
     try {
       const response = await fetch(`${API_URL}/students/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(datos),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
@@ -93,19 +93,19 @@ class StudentService {
 
       return await response.json();
     } catch (error) {
-      console.error('Error al crear estudiante:', error);
+      console.error('Error creating student:', error);
       throw error;
     }
   }
 
-  async updateStudent(rut: string, datos: UserData): Promise<UserData> {
+  async updateStudent(rut: string, data: UserData): Promise<UserData> {
     try {
       const response = await fetch(`${API_URL}/students/${rut}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(datos),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
@@ -115,7 +115,7 @@ class StudentService {
 
       return await response.json();
     } catch (error) {
-      console.error('Error al actualizar estudiante:', error);
+      console.error('Error updating student:', error);
       throw error;
     }
   }
@@ -133,7 +133,7 @@ class StudentService {
         throw new Error('Error al eliminar estudiante');
       }
     } catch (error) {
-      console.error('Error al eliminar estudiante:', error);
+      console.error('Error deleting student:', error);
       throw error;
     }
   }

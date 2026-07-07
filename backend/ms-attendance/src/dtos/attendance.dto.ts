@@ -5,7 +5,7 @@ export const markAttendanceSchema = z.object({
   courseSubjectId: z.number({ error: 'El ID del curso-asignatura es obligatorio' }).int().positive(),
   records: z.array(z.object({
     studentRut: z.string({ error: 'El RUT del estudiante es obligatorio' }).min(1),
-    studentName: z.string({ error: 'El nombre del estudiante es obligatorio' }).min(1),
+    studentFirstName: z.string({ error: 'El nombre del estudiante es obligatorio' }).min(1),
     present: z.boolean({ error: 'El estado de asistencia es obligatorio' }),
     justification: z.string().optional(),
   })).min(1, 'Debe haber al menos un registro de asistencia'),

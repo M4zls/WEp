@@ -5,12 +5,12 @@ const gradesSchema = pgSchema('grades');
 
 export const grades = gradesSchema.table('grades', {
   id: serial('id').primaryKey(),
-  studentRut: text('estudiante_rut').notNull(),
-  subject: text('asignatura').notNull(),
-  curso: text('curso').notNull(),
-  grade: numeric('nota', { precision: 4, scale: 1 }).notNull(),
-  evaluationType: text('tipo_evaluacion').notNull(),
-  date: text('fecha').notNull(),
-  professorRut: text('profesor_rut').notNull(),
-  coefficient: integer('coeficiente').notNull().default(1),
+  studentRut: text('student_rut').notNull(),
+  subject: text('subject').notNull(),
+  course: text('course').notNull(),
+  grade: numeric('grade', { precision: 4, scale: 1 }).notNull(),
+  evaluationType: text('evaluation_type').notNull(),
+  date: text('date').notNull(),
+  professorRut: text('professor_rut').notNull(),
+  coefficient: integer('coefficient').notNull().default(1),
 });

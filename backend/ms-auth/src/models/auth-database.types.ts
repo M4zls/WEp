@@ -2,23 +2,23 @@ export type DBUser = {
   id: number;
   rut: string;
   dv: string;
-  name: string;
+  firstName: string;
   lastName: string;
   email: string;
   password: string;
-  rol: string;
-  activo: boolean | null;
+  role: string;
+  active: boolean | null;
   createdAt: string | null;
 };
 
 export type DBNewUser = {
   rut: string;
   dv: string;
-  name: string;
+  firstName: string;
   lastName: string;
   email: string;
   password: string;
-  rol?: string;
+  role?: string;
 };
 
 export type DBSession = {

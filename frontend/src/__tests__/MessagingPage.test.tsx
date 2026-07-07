@@ -12,23 +12,23 @@ function buildMockConversacion(overrides: Record<string, unknown> = {}) {
   return {
     id: 1,
     otherParticipant: {
-      usuarioId: '12.345.678-9',
-      usuarioNombre: 'Juan',
-      usuarioApellido: 'Pérez',
-      usuarioRol: 'estudiante',
+      userId: '12.345.678-9',
+      userFirstName: 'Juan',
+      userLastName: 'Pérez',
+      userRole: 'student',
     },
-    participantes: [],
-    ultimoMensaje: {
+    participants: [],
+    lastMessage: {
       id: 10,
-      conversacionId: 1,
-      remitenteId: '12.345.678-9',
-      remitenteNombre: 'Juan',
-      remitenteApellido: 'Pérez',
-      remitenteRol: 'estudiante',
-      contenido: 'Hola',
+      conversationId: 1,
+      senderId: '12.345.678-9',
+      senderFirstName: 'Juan',
+      senderLastName: 'Pérez',
+      senderRole: 'student',
+      content: 'Hola',
       createdAt: new Date().toISOString(),
     },
-    noLeidos: 0,
+    unreadCount: 0,
     createdAt: new Date().toISOString(),
     ...overrides,
   };
@@ -37,10 +37,10 @@ function buildMockConversacion(overrides: Record<string, unknown> = {}) {
 function buildMockContacto(overrides: Record<string, unknown> = {}) {
   return {
     id: '98.765.432-1',
-    nombre: 'María',
-    apellido: 'González',
-    rol: 'profesor',
-    contexto: 'Matemáticas - 3°A',
+    firstName: 'María',
+    lastName: 'González',
+    role: 'professor',
+    context: 'Matemáticas - 3°A',
     ...overrides,
   };
 }
@@ -48,12 +48,12 @@ function buildMockContacto(overrides: Record<string, unknown> = {}) {
 function buildMockMensaje(overrides: Record<string, unknown> = {}) {
   return {
     id: 1,
-    conversacionId: 1,
-    remitenteId: 'otro-id',
-    remitenteNombre: 'Juan',
-    remitenteApellido: 'Pérez',
-    remitenteRol: 'estudiante',
-    contenido: 'Mensaje de prueba',
+    conversationId: 1,
+    senderId: 'otro-id',
+    senderFirstName: 'Juan',
+    senderLastName: 'Pérez',
+    senderRole: 'student',
+    content: 'Mensaje de prueba',
     createdAt: new Date().toISOString(),
     ...overrides,
   };
@@ -61,24 +61,24 @@ function buildMockMensaje(overrides: Record<string, unknown> = {}) {
 
 function defaultMessagingState() {
   return {
-    conversaciones: [],
-    conversacionActiva: null,
-    mensajes: [],
+    conversations: [],
+    activeConversation: null,
+    messages: [],
     loadingConvs: false,
     loadingMsgs: false,
     error: null,
-    nuevoMensaje: '',
-    enviando: false,
-    vista: 'conversaciones' as const,
-    contactos: [],
-    loadingContactos: false,
-    usuarioId: '12.345.678-9',
-    setNuevoMensaje: vi.fn(),
-    seleccionarConversacion: vi.fn(),
-    handleEnviar: vi.fn(),
-    iniciarConversacion: vi.fn(),
-    abrirNuevo: vi.fn(),
-    setVista: vi.fn(),
+    newMessage: '',
+    sending: false,
+    view: 'conversations' as const,
+    contacts: [],
+    loadingContacts: false,
+    userId: '12.345.678-9',
+    setNewMessage: vi.fn(),
+    selectConversation: vi.fn(),
+    handleSend: vi.fn(),
+    startConversation: vi.fn(),
+    openNew: vi.fn(),
+    setView: vi.fn(),
     setError: vi.fn(),
   };
 }
@@ -88,7 +88,7 @@ describe('MessagingPage', () => {
     vi.clearAllMocks();
   });
 
-  it('should show loading spinner when conversaciones are loading', () => {
+  it('should show loading spinner when conversations are loading', () => {
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
       loadingConvs: true,
@@ -97,31 +97,31 @@ describe('MessagingPage', () => {
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
-  it('should show empty state when there are no conversaciones', () => {
+  it('should show empty state when there are no conversations', () => {
     mockUseMessaging.mockReturnValue(defaultMessagingState());
     render(<MessagingPage />);
-    expect(screen.getByText('Sin conversaciones')).toBeInTheDocument();
+    expect(screen.getByText('No conversations')).toBeInTheDocument();
   });
 
   it('should render conversation list', () => {
     const convs = [
-      buildMockConversacion({ id: 1, otherParticipant: { usuarioId: '1', usuarioNombre: 'Ana', usuarioApellido: 'López', usuarioRol: 'profesor' } }),
-      buildMockConversacion({ id: 2, otherParticipant: { usuarioId: '2', usuarioNombre: 'Luis', usuarioApellido: 'Mora', usuarioRol: 'estudiante' } }),
+      buildMockConversacion({ id: 1, otherParticipant: { userId: '1', userFirstName: 'Ana', userLastName: 'López', userRole: 'professor' } }),
+      buildMockConversacion({ id: 2, otherParticipant: { userId: '2', userFirstName: 'Luis', userLastName: 'Mora', userRole: 'student' } }),
     ];
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversaciones: convs,
+      conversations: convs,
     });
     render(<MessagingPage />);
     expect(screen.getByText('Ana López')).toBeInTheDocument();
     expect(screen.getByText('Luis Mora')).toBeInTheDocument();
   });
 
-  it('should show unread badge when conversation has noLeidos > 0', () => {
-    const conv = buildMockConversacion({ noLeidos: 3 });
+  it('should show unread badge when conversation has unreadCount > 0', () => {
+    const conv = buildMockConversacion({ unreadCount: 3 });
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversaciones: [conv],
+      conversations: [conv],
     });
     render(<MessagingPage />);
     expect(screen.getByText('3')).toBeInTheDocument();
@@ -131,8 +131,8 @@ describe('MessagingPage', () => {
     const conv = buildMockConversacion({ id: 1 });
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversaciones: [conv],
-      conversacionActiva: conv,
+      conversations: [conv],
+      activeConversation: conv,
     });
     render(<MessagingPage />);
     const buttons = screen.getAllByRole('button');
@@ -140,50 +140,50 @@ describe('MessagingPage', () => {
     expect(convButton).toBeTruthy();
   });
 
-  it('should call seleccionarConversacion when clicking a conversation', () => {
-    const seleccionarConversacion = vi.fn();
+  it('should call selectConversation when clicking a conversation', () => {
+    const selectConversation = vi.fn();
     const conv = buildMockConversacion({ id: 1 });
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversaciones: [conv],
-      seleccionarConversacion,
+      conversations: [conv],
+      selectConversation,
     });
     render(<MessagingPage />);
     fireEvent.click(screen.getByText('Juan Pérez'));
-    expect(seleccionarConversacion).toHaveBeenCalledWith(conv);
+    expect(selectConversation).toHaveBeenCalledWith(conv);
   });
 
   it('should show error state with retry button', () => {
     const setError = vi.fn();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      error: 'Error al cargar conversaciones',
+      error: 'Error loading conversations',
       setError,
     });
     render(<MessagingPage />);
-    expect(screen.getByText('Error al cargar conversaciones')).toBeInTheDocument();
-    const retryBtn = screen.getByText('Reintentar');
+    expect(screen.getByText('Error loading conversations')).toBeInTheDocument();
+    const retryBtn = screen.getByText('Retry');
     fireEvent.click(retryBtn);
     expect(setError).toHaveBeenCalledWith(null);
   });
 
-  it('should display chat panel when conversacionActiva is set', () => {
+  it('should display chat panel when activeConversation is set', () => {
     const conv = buildMockConversacion();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversacionActiva: conv,
+      activeConversation: conv,
     });
     render(<MessagingPage />);
     expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Escribe un mensaje...')).toBeInTheDocument();
-    expect(screen.getByText('Enviar')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Write a message...')).toBeInTheDocument();
+    expect(screen.getByText('Send')).toBeInTheDocument();
   });
 
-  it('should show loading spinner for       messages while fetching them', () => {
+  it('should show loading spinner for messages while fetching them', () => {
     const conv = buildMockConversacion();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversacionActiva: conv,
+      activeConversation: conv,
       loadingMsgs: true,
     });
     render(<MessagingPage />);
@@ -191,204 +191,204 @@ describe('MessagingPage', () => {
     expect(spinners.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('should show empty       messages state when no       messages', () => {
+  it('should show empty messages state when no messages', () => {
     const conv = buildMockConversacion();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversacionActiva: conv,
-            messages: [],
+      activeConversation: conv,
+      messages: [],
     });
     render(<MessagingPage />);
-    expect(screen.getByText('No hay mensajes. Escribe algo para iniciar la conversación.')).toBeInTheDocument();
+    expect(screen.getByText('No messages. Write something to start the conversation.')).toBeInTheDocument();
   });
 
-  it('should render       messages in chat panel', () => {
+  it('should render messages in chat panel', () => {
     const conv = buildMockConversacion();
-    const msg = buildMockMensaje({ id: 1, contenido: '¿Cómo estás?', remitenteId: 'otro-id' });
+    const msg = buildMockMensaje({ id: 1, content: '¿Cómo estás?', senderId: 'otro-id' });
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversacionActiva: conv,
-            messages: [msg],
+      activeConversation: conv,
+      messages: [msg],
     });
     render(<MessagingPage />);
     expect(screen.getByText('¿Cómo estás?')).toBeInTheDocument();
   });
 
-  it('should render own       messages right-aligned', () => {
+  it('should render own messages right-aligned', () => {
     const conv = buildMockConversacion();
-    const msg = buildMockMensaje({ id: 2, contenido: 'Mío', remitenteId: '12.345.678-9' });
+    const msg = buildMockMensaje({ id: 2, content: 'Mío', senderId: '12.345.678-9' });
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversacionActiva: conv,
-            messages: [msg],
+      activeConversation: conv,
+      messages: [msg],
     });
     render(<MessagingPage />);
     expect(screen.getByText('Mío')).toBeInTheDocument();
   });
 
-  it('should call handleEnviar on form submit', () => {
-    const handleEnviar = vi.fn();
+  it('should call handleSend on form submit', () => {
+    const handleSend = vi.fn();
     const conv = buildMockConversacion();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversacionActiva: conv,
-      nuevoMensaje: 'Hola',
-      handleEnviar,
+      activeConversation: conv,
+      newMessage: 'Hola',
+      handleSend,
     });
     render(<MessagingPage />);
-    fireEvent.click(screen.getByText('Enviar'));
-    expect(handleEnviar).toHaveBeenCalled();
+    fireEvent.click(screen.getByText('Send'));
+    expect(handleSend).toHaveBeenCalled();
   });
 
   it('should disable send button when input is empty', () => {
     const conv = buildMockConversacion();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversacionActiva: conv,
-      nuevoMensaje: '',
+      activeConversation: conv,
+      newMessage: '',
     });
     render(<MessagingPage />);
-    expect(screen.getByText('Enviar')).toBeDisabled();
+    expect(screen.getByText('Send')).toBeDisabled();
   });
 
-  it('should show "Enviando..." when enviando', () => {
+  it('should show "Sending..." when sending', () => {
     const conv = buildMockConversacion();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversacionActiva: conv,
-      nuevoMensaje: 'Hola',
-      enviando: true,
+      activeConversation: conv,
+      newMessage: 'Hola',
+      sending: true,
     });
     render(<MessagingPage />);
-    expect(screen.getByText('Enviando...')).toBeInTheDocument();
+    expect(screen.getByText('Sending...')).toBeInTheDocument();
   });
 
-  it('should call setNuevoMensaje when typing in input', () => {
-    const setNuevoMensaje = vi.fn();
+  it('should call setNewMessage when typing in input', () => {
+    const setNewMessage = vi.fn();
     const conv = buildMockConversacion();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversacionActiva: conv,
-      nuevoMensaje: '',
-      setNuevoMensaje,
+      activeConversation: conv,
+      newMessage: '',
+      setNewMessage,
     });
     render(<MessagingPage />);
-    const input = screen.getByPlaceholderText('Escribe un mensaje...');
+    const input = screen.getByPlaceholderText('Write a message...');
     fireEvent.change(input, { target: { value: 'Nuevo texto' } });
-    expect(setNuevoMensaje).toHaveBeenCalledWith('Nuevo texto');
+    expect(setNewMessage).toHaveBeenCalledWith('Nuevo texto');
   });
 
-  it('should call abrirNuevo when clicking "+ Nuevo" button', () => {
-    const abrirNuevo = vi.fn();
+  it('should call openNew when clicking "+ New" button', () => {
+    const openNew = vi.fn();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      abrirNuevo,
+      openNew,
     });
     render(<MessagingPage />);
-    fireEvent.click(screen.getByText('+ Nuevo'));
-    expect(abrirNuevo).toHaveBeenCalled();
+    fireEvent.click(screen.getByText('+ New'));
+    expect(openNew).toHaveBeenCalled();
   });
 
-  it('should show contact list in "nuevo" view', () => {
-    const contactos = [
-      buildMockContacto({ id: '1', nombre: 'Carlos', apellido: 'Díaz', rol: 'profesor' }),
-      buildMockContacto({ id: '2', nombre: 'Sofía', apellido: 'Rivas', rol: 'estudiante' }),
+  it('should show contact list in "new" view', () => {
+    const contacts = [
+      buildMockContacto({ id: '1', firstName: 'Carlos', lastName: 'Díaz', role: 'professor' }),
+      buildMockContacto({ id: '2', firstName: 'Sofía', lastName: 'Rivas', role: 'student' }),
     ];
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      vista: 'nuevo',
-      contactos,
+      view: 'new',
+      contacts,
     });
     render(<MessagingPage />);
-    expect(screen.getByText('Nueva Conversación')).toBeInTheDocument();
+    expect(screen.getByText('New Conversation')).toBeInTheDocument();
     expect(screen.getByText('Carlos Díaz')).toBeInTheDocument();
     expect(screen.getByText('Sofía Rivas')).toBeInTheDocument();
   });
 
   it('should show role badges in contact list', () => {
-    const contactos = [
-      buildMockContacto({ id: '1', nombre: 'Prof', apellido: 'Uno', rol: 'profesor' }),
-      buildMockContacto({ id: '2', nombre: 'Est', apellido: 'Dos', rol: 'estudiante' }),
+    const contacts = [
+      buildMockContacto({ id: '1', firstName: 'Prof', lastName: 'Uno', role: 'professor' }),
+      buildMockContacto({ id: '2', firstName: 'Est', lastName: 'Dos', role: 'student' }),
     ];
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      vista: 'nuevo',
-      contactos,
+      view: 'new',
+      contacts,
     });
     render(<MessagingPage />);
     expect(screen.getByText('Prof')).toBeInTheDocument();
-    expect(screen.getByText('Est')).toBeInTheDocument();
+    expect(screen.getByText('Std')).toBeInTheDocument();
   });
 
-  it('should call iniciarConversacion when clicking a contact', () => {
-    const iniciarConversacion = vi.fn();
+  it('should call startConversation when clicking a contact', () => {
+    const startConversation = vi.fn();
     const contacto = buildMockContacto();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      vista: 'nuevo',
-      contactos: [contacto],
-      iniciarConversacion,
+      view: 'new',
+      contacts: [contacto],
+      startConversation,
     });
     render(<MessagingPage />);
     fireEvent.click(screen.getByText('María González'));
-    expect(iniciarConversacion).toHaveBeenCalledWith(contacto);
+    expect(startConversation).toHaveBeenCalledWith(contacto);
   });
 
-  it('should show loading spinner when contactos are loading', () => {
+  it('should show loading spinner when contacts are loading', () => {
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      vista: 'nuevo',
-      loadingContactos: true,
+      view: 'new',
+      loadingContacts: true,
     });
     render(<MessagingPage />);
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
-  it('should show empty contactos message', () => {
+  it('should show empty contacts message', () => {
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      vista: 'nuevo',
-      contactos: [],
+      view: 'new',
+      contacts: [],
     });
     render(<MessagingPage />);
-    expect(screen.getByText('No hay contactos disponibles')).toBeInTheDocument();
+    expect(screen.getByText('No contacts available')).toBeInTheDocument();
   });
 
-  it('should show "Volver" button in nuevo view', () => {
-    const setVista = vi.fn();
+  it('should show "Back" button in new view', () => {
+    const setView = vi.fn();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      vista: 'nuevo',
-      setVista,
+      view: 'new',
+      setView,
     });
     render(<MessagingPage />);
-    const volver = screen.getByText('Volver');
-    fireEvent.click(volver);
-    expect(setVista).toHaveBeenCalledWith('conversaciones');
+    const back = screen.getByText('Back');
+    fireEvent.click(back);
+    expect(setView).toHaveBeenCalledWith('conversations');
   });
 
   it('should show selection hint when no active conversation', () => {
     mockUseMessaging.mockReturnValue(defaultMessagingState());
     render(<MessagingPage />);
-    expect(screen.getByText('Selecciona una conversación')).toBeInTheDocument();
+    expect(screen.getByText('Select a conversation')).toBeInTheDocument();
   });
 
-  it('should show selection hint in nuevo view', () => {
+  it('should show selection hint in new view', () => {
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      vista: 'nuevo',
+      view: 'new',
     });
     render(<MessagingPage />);
-    expect(screen.getByText('Selecciona un contacto')).toBeInTheDocument();
+    expect(screen.getByText('Select a contact')).toBeInTheDocument();
   });
 
   it('should render last message preview text', () => {
     const conv = buildMockConversacion({
-      ultimoMensaje: { id: 10, conversacionId: 1, remitenteId: '1', remitenteNombre: 'A', remitenteApellido: 'B', remitenteRol: 'estudiante', contenido: 'Último mensaje', createdAt: new Date().toISOString() },
+      lastMessage: { id: 10, conversationId: 1, senderId: '1', senderFirstName: 'A', senderLastName: 'B', senderRole: 'student', content: 'Último mensaje', createdAt: new Date().toISOString() },
     });
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      conversaciones: [conv],
+      conversations: [conv],
     });
     render(<MessagingPage />);
     expect(screen.getByText('Último mensaje')).toBeInTheDocument();

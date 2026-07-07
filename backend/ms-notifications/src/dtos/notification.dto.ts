@@ -32,8 +32,8 @@ export type GradeAlertDto = z.infer<typeof gradeAlertSchema>;
 
 export const messageAlertSchema = z.object({
   recipientRut: z.string().min(1),
-  recipientRole: z.enum(['estudiante', 'profesor']),
-  senderName: z.string().min(1),
+  recipientRole: z.enum(['student', 'professor']),
+  senderFirstName: z.string().min(1),
   senderLastName: z.string().min(1),
   contentPreview: z.string().min(1),
   conversationId: z.number(),

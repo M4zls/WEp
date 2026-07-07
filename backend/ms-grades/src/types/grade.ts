@@ -11,7 +11,7 @@ export interface IGrade {
   /** Nombre de la asignatura */
   subject: string;
   /** Curso al que pertenece (ej: 3°A) */
-  curso: string;
+  course: string;
   /** Valor de la nota (escala 1.0 - 7.0) */
   grade: string;
   /** Tipo de evaluación (prueba, tarea, trabajo, etc.) */
@@ -29,11 +29,11 @@ export interface IStudentGrades {
   /** RUT del alumno */
   rut: string;
   /** Nombre del alumno */
-  nombre: string;
+  firstName: string;
   /** Apellido del alumno */
-  apellido: string;
+  lastName: string;
   /** Curso del alumno */
-  curso: string;
+  course: string;
   /** Lista de calificaciones agrupadas por asignatura */
   subjects: ISubjectGrades[];
 }
@@ -45,5 +45,5 @@ export interface ISubjectGrades {
   /** Lista de notas de esa asignatura */
   grades: IGrade[];
   /** Promedio de la asignatura */
-  promedio: string;
+  average: string;
 }

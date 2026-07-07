@@ -4,11 +4,11 @@ import { z } from 'zod';
 export const createConversationSchema = z.object({
   participantIds: z.array(z.string({ error: 'ID de participante inválido' }))
     .min(2, 'Se requieren al menos 2 participantes'),
-  participantNames: z.array(z.string())
+  participantFirstNames: z.array(z.string())
     .min(2, 'Se requieren nombres para los participantes'),
   participantLastNames: z.array(z.string())
     .min(2, 'Se requieren apellidos para los participantes'),
-  participantRoles: z.array(z.enum(['estudiante', 'profesor']))
+  participantRoles: z.array(z.enum(['student', 'professor']))
     .min(2, 'Se requieren roles para los participantes'),
 });
 
@@ -16,9 +16,9 @@ export const createConversationSchema = z.object({
 export const sendMessageSchema = z.object({
   conversationId: z.number({ error: 'ID de conversación requerido' }).int().positive(),
   senderId: z.string({ error: 'ID del remitente requerido' }),
-  senderName: z.string({ error: 'Nombre del remitente requerido' }),
+  senderFirstName: z.string({ error: 'Nombre del remitente requerido' }),
   senderLastName: z.string({ error: 'Apellido del remitente requerido' }),
-  senderRole: z.enum(['estudiante', 'profesor']),
+  senderRole: z.enum(['student', 'professor']),
   content: z.string({ error: 'El mensaje no puede estar vacío' }).min(1, 'El mensaje no puede estar vacío'),
 });
 

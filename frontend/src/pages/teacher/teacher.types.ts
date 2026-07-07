@@ -1,16 +1,16 @@
 export interface UserData {
   id?: number;
   rut?: string;
-  nombre?: string;
-  apellido?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
-  rol?: string;
+  role?: string;
 }
 
-export interface CursoInfo {
+export interface CourseInfo {
   id: number;
-  nombre: string;
-  nivel: string;
-  letra: string;
-  materias: { id: number; asignatura_nombre: string; asignatura_codigo?: string; estudiantes: number }[];
+  name: string;
+  level: string;
+  letter: string;
+  subjects: { id: number; subjectName: string; subjectCode?: string; students: number }[];
 }

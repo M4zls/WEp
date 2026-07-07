@@ -3,6 +3,7 @@ import { MessagingService } from '../services/messaging.service.js';
 import { createConversationSchema, sendMessageSchema } from '../dtos/messaging.dto.js';
 
 const service = new MessagingService();
+const MS_NOTIFICATIONS = process.env.MS_NOTIFICATIONS_SERVICE || 'http://ms-notifications:3003';
 
 /** Controlador REST del microservicio de mensajería. Montado en /messaging. */
 export const messagingController = new Hono();
@@ -55,6 +56,24 @@ messagingController.post('/messages', async (c) => {
       return c.json({ error: msgs }, 400);
     }
     const message = await service.sendMessage(parsed.data);
+    service.listConversations(data.senderId).then(conversaciones => {
+      const conv = conversaciones.find((c: any) => c.id === data.conversationId);
+      if (conv && conv.otherParticipant) {
+        const dest = conv.otherParticipant;
+        fetch(`${MS_NOTIFICATIONS}/notifications/message-notice`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipientRut: dest.userId,
+            recipientRole: dest.userRole,
+            senderFirstName: data.senderFirstName,
+            senderLastName: data.senderLastName,
+            contentPreview: data.content,
+            conversationId: data.conversationId,
+          }),
+        }).catch((err: any) => console.error('[messages] notification failed:', err.message));
+      }
+    }).catch((err: any) => console.error('[messages] participant fetch failed:', err.message));
     return c.json(message, 201);
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
@@ -84,7 +103,7 @@ messagingController.put('/messages/read/:conversationId/:userId', async (c) => {
     const conversationId = parseInt(c.req.param('conversationId'));
     const userId = c.req.param('userId');
     await service.markAsRead(conversationId, userId);
-    return c.json({ message: 'Mensajes marcados como leídos' });
+    return c.json({ message: 'Messages marked as read' });
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }

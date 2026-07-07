@@ -8,12 +8,12 @@ export const users = authSchema.table('users', {
   id: serial('id').primaryKey(),
   rut: text('rut').notNull().unique(),
   dv: text('dv').notNull(),
-  name: text('nombre').notNull(),
-  lastName: text('apellido').notNull(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
-  rol: text('rol').notNull().default('estudiante'),
-  activo: boolean('activo').default(true),
+  role: text('role').notNull().default('student'),
+  active: boolean('active').default(true),
   createdAt: text('created_at').default(sql`now()::text`),
 });
 
@@ -34,7 +34,7 @@ export const recoveryTokens = authSchema.table('recovery_tokens', {
     .references(() => users.id, { onDelete: 'cascade' }),
   token: text('token').notNull().unique(),
   expiresAt: text('expires_at').notNull(),
-  usado: boolean('usado').default(false),
+  used: boolean('used').default(false),
   createdAt: text('created_at').default(sql`now()::text`),
 });
 
@@ -43,7 +43,7 @@ export const permissions = authSchema.table('permissions', {
   userId: integer('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  modulo: text('modulo').notNull(),
+  module: text('module').notNull(),
   read: boolean('read').default(false),
   write: boolean('write').default(false),
   delete: boolean('delete').default(false),

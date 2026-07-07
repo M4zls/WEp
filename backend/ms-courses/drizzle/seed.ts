@@ -60,17 +60,15 @@ async function seed() {
       console.log('Ya hay cursos cargados, saltando inserción.');
     }
 
-    const csRows = await sql`SELECT cs.id, s.name as subject_name FROM "courses"."course_subject" cs JOIN "courses"."subjects" s ON s.id = cs.subject_id WHERE cs.professor_id IS NULL`;
+    const csRows = await sql`SELECT cs.id, s.code as subject_code FROM "courses"."course_subject" cs JOIN "courses"."subjects" s ON s.id = cs.subject_id WHERE cs.professor_id IS NULL`;
     if (csRows.length > 0) {
-      const teacherRows = await sql`SELECT id, materia FROM "teachers"."teachers" ORDER BY id`;
+      const MAT_PROF = 1, LEN_PROF = 2, ING_PROF = 3, HIS_PROF = 4, CIE_PROF = 5;
+      const profMap: Record<string, number> = { MAT: MAT_PROF, LEN: LEN_PROF, ING: ING_PROF, HIS: HIS_PROF, CIE: CIE_PROF };
       let assigned = 0;
       for (const cs of csRows) {
-        const prof = teacherRows.find((t: any) => t.materia.toLowerCase() === cs.subject_name.toLowerCase());
-        if (prof) {
-          await sql`
-            UPDATE "courses"."course_subject" SET professor_id = ${prof.id}
-            WHERE id = ${cs.id}
-          `;
+        const pid = profMap[cs.subject_code.toUpperCase()];
+        if (pid) {
+          await sql`UPDATE "courses"."course_subject" SET professor_id = ${pid} WHERE id = ${cs.id}`;
           assigned++;
         }
       }

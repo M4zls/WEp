@@ -42,11 +42,11 @@ export class AuthRepository implements IAuthRepository {
       .values({
         rut: data.rut,
         dv: data.dv,
-        name: data.name,
+        firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         password: data.password,
-        rol: data.rol ?? 'estudiante',
+        role: data.role ?? 'student',
       })
       .returning();
     return result[0];

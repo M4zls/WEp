@@ -1,6 +1,6 @@
 import authService from '../pages/auth/service';
 
-const API_BASE_URL: string = 'http://localhost:3000/api';
+const API_BASE_URL: string = 'http://localhost:3100/api';
 
 interface RequestOptions extends RequestInit {
   headers?: Record<string, string>;

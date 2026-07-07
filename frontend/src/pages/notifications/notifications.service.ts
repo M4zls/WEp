@@ -1,8 +1,8 @@
 import apiClient from '../../api/apiClient';
 
-export interface InAppNotificacion {
+export interface InAppNotification {
   id: number;
-  usuarioId: number;
+  userId: number;
   title: string;
   message: string;
   type: string;
@@ -13,16 +13,16 @@ export interface InAppNotificacion {
 }
 
 class NotificationsService {
-  async getByUsuario(usuarioId: number): Promise<InAppNotificacion[]> {
-    return apiClient.get(`/notifications/usuario/${usuarioId}`);
+  async getByUser(userId: number): Promise<InAppNotification[]> {
+    return apiClient.get(`/notifications/user/${userId}`);
   }
 
-  async getUnreadCount(usuarioId: number): Promise<{ count: number }> {
-    return apiClient.get(`/notifications/usuario/${usuarioId}/no-leidas`);
+  async getUnreadCount(userId: number): Promise<{ count: number }> {
+    return apiClient.get(`/notifications/user/${userId}/unread`);
   }
 
   async markAsRead(id: number): Promise<void> {
-    return apiClient.put(`/notifications/${id}/leer`, {});
+    return apiClient.put(`/notifications/${id}/read`, {});
   }
 }
 

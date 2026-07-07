@@ -7,42 +7,42 @@ export const teachers = profesoresSchema.table('teachers', {
   id: serial('id').primaryKey(),
   rut: text('rut').notNull().unique(),
   dv: text('dv').notNull(),
-  name: text('nombre').notNull(),
-  lastName: text('apellido').notNull(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
-  phone: text('telefono'),
-  subject: text('materia').notNull(),
-  createdAt: text('fecha_ingreso').default(sql`now()::text`),
+  phone: text('phone'),
+  subject: text('subject').notNull(),
+  createdAt: text('hire_date').default(sql`now()::text`),
 });
 
-export const clases = profesoresSchema.table('clases', {
+export const lessons = profesoresSchema.table('lessons', {
   id: serial('id').primaryKey(),
-  profesorId: integer('profesor_id').notNull().references(() => teachers.id, { onDelete: 'cascade' }),
-  cursoId: text('curso_id').notNull(),
-  materia: text('materia').notNull(),
-  fecha: text('fecha').notNull(),
-  tema: text('tema'),
-  descripcion: text('descripcion'),
-  sala: text('sala'),
+  professorId: integer('professor_id').notNull().references(() => teachers.id, { onDelete: 'cascade' }),
+  courseId: text('course_id').notNull(),
+  subject: text('subject').notNull(),
+  date: text('date').notNull(),
+  topic: text('topic'),
+  description: text('description'),
+  room: text('room'),
 });
 
-export const horarios = profesoresSchema.table('horarios', {
+export const schedules = profesoresSchema.table('schedules', {
   id: serial('id').primaryKey(),
-  profesorId: integer('profesor_id').notNull().references(() => teachers.id, { onDelete: 'cascade' }),
-  dia: text('dia').notNull(),
-  horaInicio: text('hora_inicio').notNull(),
-  horaFin: text('hora_fin').notNull(),
-  sala: text('sala'),
-  cursoId: text('curso_id').notNull(),
+  professorId: integer('professor_id').notNull().references(() => teachers.id, { onDelete: 'cascade' }),
+  day: text('day').notNull(),
+  startTime: text('start_time').notNull(),
+  endTime: text('end_time').notNull(),
+  room: text('room'),
+  courseId: text('course_id').notNull(),
 });
 
-export const disponibilidad = profesoresSchema.table('disponibilidad', {
+export const availability = profesoresSchema.table('availability', {
   id: serial('id').primaryKey(),
-  profesorId: integer('profesor_id').notNull().references(() => teachers.id, { onDelete: 'cascade' }),
-  dia: text('dia').notNull(),
-  horaInicio: text('hora_inicio').notNull(),
-  horaFin: text('hora_fin').notNull(),
-  tipo: text('tipo').notNull(),
-  ubicacion: text('ubicacion'),
+  professorId: integer('professor_id').notNull().references(() => teachers.id, { onDelete: 'cascade' }),
+  day: text('day').notNull(),
+  startTime: text('start_time').notNull(),
+  endTime: text('end_time').notNull(),
+  type: text('type').notNull(),
+  location: text('location'),
 });

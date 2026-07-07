@@ -61,7 +61,7 @@ async function seed() {
     }
     for (const n of NOTAS_SEED) {
       await sql`
-        INSERT INTO "grades"."grades" (estudiante_rut, asignatura, curso, nota, tipo_evaluacion, fecha, profesor_rut, coeficiente)
+        INSERT INTO "grades"."grades" (student_rut, subject, course, grade, evaluation_type, date, professor_rut, coefficient)
         VALUES (${n.studentRut}, ${n.subject}, ${n.curso}, ${n.grade}, ${n.evaluationType}, ${n.date}, ${n.professorRut}, ${n.coefficient})
       `;
     }

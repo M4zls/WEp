@@ -26,7 +26,7 @@ describe('ProtectedRoute', () => {
   });
 
   it('should render children when authenticated', () => {
-    useAuthStore.setState({ isAuthenticated: true, user: { email: 'test@test.com', role: 'profesor' }, role: 'profesor' });
+    useAuthStore.setState({ isAuthenticated: true, user: { email: 'test@test.com', role: 'professor' }, role: 'professor' });
 
     renderProtectedRoute();
 

@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { getDatabaseInstance } from '../models/data.js';
-import { courseSubject, subjects, professors } from '../models/schema.js';
+import { courseSubject, subjects } from '../models/schema.js';
 import type { CourseSubject } from '../types/course.types.js';
 import type { ICourseSubjectsRepository } from './course-subjects.repository.interface.js';
 
@@ -13,18 +13,14 @@ export class CourseSubjectsRepository implements ICourseSubjectsRepository {
     return this.db
       .select({
         id: courseSubject.id,
-        cursoId: courseSubject.courseId,
-        asignaturaId: courseSubject.subjectId,
-        profesorId: courseSubject.professorId,
-        asignaturaNombre: subjects.name,
-        asignaturaCodigo: subjects.code,
-        profesorRut: professors.rut,
-        profesorNombre: professors.name,
-        profesorApellido: professors.lastName,
+        courseId: courseSubject.courseId,
+        subjectId: courseSubject.subjectId,
+        professorId: courseSubject.professorId,
+        subjectName: subjects.name,
+        subjectCode: subjects.code,
       })
       .from(courseSubject)
       .leftJoin(subjects, eq(courseSubject.subjectId, subjects.id))
-      .leftJoin(professors, eq(courseSubject.professorId, professors.id))
       .where(eq(courseSubject.courseId, courseId));
   }
 
