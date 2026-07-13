@@ -29,6 +29,9 @@ services:
       - NODE_ENV=production
       - PORT=3002
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_auth
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -46,6 +49,9 @@ services:
       - NODE_ENV=production
       - PORT=3001
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_students
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -63,6 +69,9 @@ services:
       - NODE_ENV=production
       - PORT=3004
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_teachers
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -83,6 +92,9 @@ services:
       - MS_STUDENTS_SERVICE=http://ms-students:3001
       - MS_AUTH_SERVICE=http://ms-auth:3002
       - NOVU_SECRET_KEY=${NOVU_SECRET_KEY}
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -101,6 +113,9 @@ services:
       - PORT=3005
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_courses
       - MS_TEACHERS_SERVICE=http://ms-teachers:3004
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -118,6 +133,9 @@ services:
       - NODE_ENV=production
       - PORT=3006
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_classes
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -135,6 +153,9 @@ services:
       - NODE_ENV=production
       - PORT=3007
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_schedule
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -153,6 +174,9 @@ services:
       - PORT=3008
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_attendance
       - MS_NOTIFICATIONS_SERVICE=http://ms-notifications:3003
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -171,6 +195,9 @@ services:
       - PORT=3009
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_messaging
       - MS_NOTIFICATIONS_SERVICE=http://ms-notifications:3003
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -191,6 +218,9 @@ services:
       - MS_STUDENTS_SERVICE=http://ms-students:3001
       - MS_TEACHERS_SERVICE=http://ms-teachers:3004
       - MS_NOTIFICATIONS_SERVICE=http://ms-notifications:3003
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
@@ -198,12 +228,12 @@ services:
       - wep-network
 
   krakend:
-    image: krakend:2.13
+    build:
+      context: ./backend/krakend
+      dockerfile: Dockerfile
     container_name: krakend-service
     ports:
       - "3100:8080"
-    volumes:
-      - ./backend/krakend:/etc/krakend
     depends_on:
       - ms-auth
       - ms-students
@@ -230,8 +260,58 @@ services:
     networks:
       - wep-network
 
+  glitchtip-db:
+    image: postgres:16-alpine
+    container_name: glitchtip-db
+    environment:
+      POSTGRES_USER: glitchtip
+      POSTGRES_PASSWORD: glitchtip
+      POSTGRES_DB: glitchtip
+    volumes:
+      - glitchtip-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U glitchtip"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - wep-network
+
+  glitchtip-redis:
+    image: redis:7-alpine
+    container_name: glitchtip-redis
+    networks:
+      - wep-network
+
+  glitchtip:
+    image: glitchtip/glitchtip
+    container_name: glitchtip
+    ports:
+      - "8000:8000"
+    depends_on:
+      glitchtip-db:
+        condition: service_healthy
+      glitchtip-redis:
+        condition: service_started
+    environment:
+      - DATABASE_URL=postgres://glitchtip:glitchtip@glitchtip-db:5432/glitchtip
+      - REDIS_URL=redis://glitchtip-redis:6379/0
+      - VALKEY_URL=redis://glitchtip-redis:6379/0
+      - GLITCHTIP_DOMAIN=http://localhost:8000
+      - GLITCHTIP_EMBED_WORKER=true
+      - SECRET_KEY=changeme-super-secret-key-glitchtip-2026
+      - DEFAULT_FROM_EMAIL=admin@localhost
+      - DISABLE_USER_REGISTRATION=false
+      - ENABLE_LOGS=true
+      - CSP_STYLE_SRC='self' 'unsafe-inline'
+      - CSP_SCRIPT_SRC='self' 'unsafe-eval' https://*.glitchtip.com
+      - CSP_STYLE_SRC_ELEM='self' 'unsafe-inline'
+    networks:
+      - wep-network
+
 volumes:
   pgdata:
+  glitchtip-pgdata:
 
 networks:
   wep-network:
