@@ -9,7 +9,7 @@ export const createTeacherSchema = z.object({
     .string()
     .min(1, 'El dígito verificador es obligatorio')
     .length(1, 'El dígito verificador debe ser un solo carácter'),
-  name: z
+  firstName: z
     .string()
     .min(1, 'El nombre es obligatorio'),
   lastName: z

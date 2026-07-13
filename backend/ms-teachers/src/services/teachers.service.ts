@@ -16,6 +16,12 @@ export class TeachersService implements ITeachersService {
         return this.repo.getAllTeachers();
     }
 
+    async getTeacherById(id: number): Promise<ITeacher> {
+        const profesor = await this.repo.findTeacherById(id);
+        if (!profesor) throw new Error(PROFESSOR_ERRORS.NOT_FOUND);
+        return profesor;
+    }
+
     async getTeacherByRut(rut: string): Promise<ITeacher | null> {
         const profesor = await this.repo.findTeacherByRut(rut);
         if (!profesor) {
@@ -32,7 +38,7 @@ export class TeachersService implements ITeachersService {
 
         const match = await comparePassword(password, profesor.password);
         if (!match) {
-            throw new Error('Contraseña incorrecta');
+            throw new Error('Invalid password');
         }
 
         const { password: _, ...profesorSeguro } = profesor;

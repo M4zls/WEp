@@ -17,7 +17,7 @@ import classesService from '../pages/classes/classes.service';
 import courseService from '../pages/courses/courses.service';
 
 describe('HomeView', () => {
-  const mockUser = { nombre: 'Juan', apellido: 'Perez', rut: '123-4', cursos: '3A' };
+  const mockUser = { firstName: 'Juan', lastName: 'Perez', rut: '123-4', courses: '3A' };
   const mockOnGoToSubjects = vi.fn();
 
   beforeEach(() => {
@@ -28,12 +28,12 @@ describe('HomeView', () => {
   /**
    * Verifies the greeting includes the user's full name and role badge
    */
-  it('should render greeting for estudiante', async () => {
-    render(<HomeView userData={mockUser} role="estudiante" onGoToSubjects={mockOnGoToSubjects} />);
+  it('should render greeting for student', async () => {
+    render(<HomeView userData={mockUser} role="student" onGoToSubjects={mockOnGoToSubjects} />);
     await waitFor(() => {
       expect(screen.getByText(/Juan Perez/)).toBeInTheDocument();
     });
-    expect(screen.getByText('Estudiante')).toBeInTheDocument();
+    expect(screen.getByText('Student')).toBeInTheDocument();
   });
 
   /**
@@ -42,7 +42,7 @@ describe('HomeView', () => {
   it('should show loading state', () => {
     sessionStorage.setItem('user', JSON.stringify(mockUser));
     vi.mocked(courseService.getCourses).mockReturnValue(new Promise(() => {}));
-    render(<HomeView userData={mockUser} role="estudiante" onGoToSubjects={mockOnGoToSubjects} />);
+    render(<HomeView userData={mockUser} role="student" onGoToSubjects={mockOnGoToSubjects} />);
     const statValues = screen.getAllByText('—');
     expect(statValues.length).toBeGreaterThanOrEqual(2);
   });
@@ -50,13 +50,13 @@ describe('HomeView', () => {
   /**
    * Verifies stats render numeric values after services resolve
    */
-  it('should render stats for estudiante', async () => {
+  it('should render stats for student', async () => {
     sessionStorage.setItem('user', JSON.stringify(mockUser));
-    vi.mocked(courseService.getCourses).mockResolvedValue([{ id: 1, nombre: '3A', nivel: 'Tercero', letra: 'A' }]);
-    vi.mocked(courseService.getSubjects).mockResolvedValue([{ id: 10, asignaturaNombre: 'Matemáticas', asignaturaCodigo: 'MAT', profesorId: 1 }]);
+    vi.mocked(courseService.getCourses).mockResolvedValue([{ id: 1, name: '3A', level: 'Tercero', letter: 'A' }]);
+    vi.mocked(courseService.getSubjects).mockResolvedValue([{ id: 10, subjectName: 'Matemáticas', subjectCode: 'MAT', professorId: 1 }]);
     vi.mocked(classesService.list).mockResolvedValue([]);
 
-    render(<HomeView userData={mockUser} role="estudiante" onGoToSubjects={mockOnGoToSubjects} />);
+    render(<HomeView userData={mockUser} role="student" onGoToSubjects={mockOnGoToSubjects} />);
     await waitFor(() => {
       expect(screen.getByText('1')).toBeInTheDocument();
     });
@@ -67,13 +67,13 @@ describe('HomeView', () => {
    */
   it('should show no upcoming classes', async () => {
     sessionStorage.setItem('user', JSON.stringify(mockUser));
-    vi.mocked(courseService.getCourses).mockResolvedValue([{ id: 1, nombre: '3A', nivel: 'Tercero', letra: 'A' }]);
+    vi.mocked(courseService.getCourses).mockResolvedValue([{ id: 1, name: '3A', level: 'Tercero', letter: 'A' }]);
     vi.mocked(courseService.getSubjects).mockResolvedValue([]);
     vi.mocked(classesService.list).mockResolvedValue([]);
 
-    render(<HomeView userData={mockUser} role="estudiante" onGoToSubjects={mockOnGoToSubjects} />);
+    render(<HomeView userData={mockUser} role="student" onGoToSubjects={mockOnGoToSubjects} />);
     await waitFor(() => {
-      expect(screen.getByText('No hay clases programadas para los próximos días')).toBeInTheDocument();
+      expect(screen.getByText('No classes scheduled for the next days')).toBeInTheDocument();
     });
   });
 
@@ -81,8 +81,8 @@ describe('HomeView', () => {
    * Verifies clicking the subjects button triggers the onGoToSubjects callback
    */
   it('should call onGoToSubjects when button clicked', async () => {
-    render(<HomeView userData={mockUser} role="estudiante" onGoToSubjects={mockOnGoToSubjects} />);
-    const buttons = screen.getAllByText(/Ir a Mis Asignaturas/);
+    render(<HomeView userData={mockUser} role="student" onGoToSubjects={mockOnGoToSubjects} />);
+    const buttons = screen.getAllByText(/Go to My Subjects/);
     fireEvent.click(buttons[0]);
     expect(mockOnGoToSubjects).toHaveBeenCalled();
   });

@@ -9,39 +9,39 @@ const sql = postgres(connectionString, { max: 1 });
 
 try {
   await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "notifications";');
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notifications"."eventos" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notifications"."events" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"titulo" text NOT NULL,
-	"descripcion" text,
-	"tipo" text NOT NULL,
-	"datos" text,
-	"activo" boolean DEFAULT true,
-	"fecha_creacion" text DEFAULT (now()::text),
-	"fecha_programada" text
+	"title" text NOT NULL,
+	"description" text,
+	"type" text NOT NULL,
+	"data" text,
+	"active" boolean DEFAULT true,
+	"created_at" text DEFAULT (now()::text),
+	"scheduled_at" text
   );`);
   await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notifications"."logs" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"usuario_id" integer,
-	"accion" text NOT NULL,
-	"modulo" text NOT NULL,
-	"detalles" text,
+	"user_id" integer,
+	"action" text NOT NULL,
+	"module" text NOT NULL,
+	"details" text,
 	"ip" text,
-	"estado" text NOT NULL,
-	"fecha_creacion" text DEFAULT (now()::text)
+	"status" text NOT NULL,
+	"created_at" text DEFAULT (now()::text)
   );`);
-  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notifications"."notificaciones" (
+  await sql.unsafe(`CREATE TABLE IF NOT EXISTS "notifications"."notifications" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"usuario_id" integer NOT NULL,
-	"titulo" text NOT NULL,
-	"mensaje" text NOT NULL,
-	"tipo" text NOT NULL,
-	"leida" boolean DEFAULT false,
+	"user_id" integer NOT NULL,
+	"title" text NOT NULL,
+	"message" text NOT NULL,
+	"type" text NOT NULL,
+	"read" boolean DEFAULT false,
 	"url" text,
-	"fecha_creacion" text DEFAULT (now()::text),
-  "fecha_lectura" text
+	"created_at" text DEFAULT (now()::text),
+  "read_at" text
   );`);
 
-  await sql.unsafe(`DROP TABLE IF EXISTS "notifications"."notifications" CASCADE;`);
+  await sql.unsafe(`DROP TABLE IF EXISTS "notifications"."notificaciones" CASCADE;`);
 
   console.log('Migraciones de notificaciones ejecutadas correctamente');
 } finally {

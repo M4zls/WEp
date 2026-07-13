@@ -37,6 +37,14 @@ export class TeachersRepository implements ITeachersRepository {
      * @param {string} email - Email del profesor a buscar.
      * @returns {Promise<ITeacher | null>} Profesor encontrado o null.
      */
+    async findTeacherById(id: number): Promise<ITeacher | null> {
+        const resultado = await this.db
+            .select()
+            .from(teachers)
+            .where(eq(teachers.id, id));
+        return resultado.length > 0 ? resultado[0] : null;
+    }
+
     async findTeacherByEmail(email: string): Promise<ITeacher | null> {
         const resultado = await this.db
             .select()
@@ -54,7 +62,7 @@ export class TeachersRepository implements ITeachersRepository {
         await this.db.insert(teachers).values({
             rut: datos.rut,
             dv: datos.dv,
-            name: datos.name,
+            firstName: datos.firstName,
             lastName: datos.lastName,
             email: datos.email,
             password: datos.password,
@@ -94,11 +102,11 @@ export class TeachersRepository implements ITeachersRepository {
      * @param {string} materia - Materia a consultar.
      * @returns {Promise<string | null>} Nombre de la materia o null.
      */
-    async findTeacherSubject(materia: string): Promise<string | null> {
+    async findTeacherSubject(subject: string): Promise<string | null> {
         const resultado = await this.db
             .select()
             .from(teachers)
-            .where(eq(teachers.subject, materia));
+            .where(eq(teachers.subject, subject));
         return resultado.length > 0 ? resultado[0].subject : null;
     }
 }

@@ -14,7 +14,7 @@ describe('ROUTES', () => {
   });
 
   it('should have SUBJECT_DETAIL with param', () => {
-    expect(ROUTES.SUBJECT_DETAIL).toBe('/dashboard/materia/:cursoAsignaturaId');
+    expect(ROUTES.SUBJECT_DETAIL).toBe('/dashboard/subject/:courseSubjectId');
   });
 
   it('should have readonly properties via as const', () => {

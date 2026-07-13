@@ -31,7 +31,7 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: wep-config
-              key: DATABASE_URL
+              key: DB_COURSES_URL
         livenessProbe:
           httpGet:
             path: /health

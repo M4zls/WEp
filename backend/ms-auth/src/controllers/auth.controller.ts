@@ -42,6 +42,16 @@ auth.post('/logout', async (c) => {
   }
 });
 
+auth.get('/users/:rut', async (c) => {
+  try {
+    const rut = c.req.param('rut');
+    const user = await service.getUserByRut(rut);
+    return c.json({ id: user.id, rut: user.rut, firstName: user.firstName, lastName: user.lastName, role: user.role });
+  } catch (err: any) {
+    return c.json({ error: err.message }, 404);
+  }
+});
+
 auth.get('/verify', async (c) => {
   try {
     const authHeader = c.req.header('Authorization');

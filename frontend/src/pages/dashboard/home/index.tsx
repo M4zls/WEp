@@ -1,29 +1,29 @@
 import React, { FC, ReactElement, useEffect, useState, useCallback } from 'react';
 import classesService from '../../classes/classes.service';
-import type { Class as SchoolClass } from '../../classes/class.types';
+import type { SchoolClass } from '../../classes/class.types';
 import courseService from '../../courses/courses.service';
 
 interface HomeViewProps {
-  userData: { nombre?: string; apellido?: string; email?: string; rut?: string; cursos?: string } | null;
-  role: 'estudiante' | 'profesor';
+  userData: { firstName?: string; lastName?: string; email?: string; rut?: string; courses?: string } | null;
+  role: 'student' | 'professor';
   onGoToSubjects: () => void;
 }
 
-const estadoBadge: Record<string, string> = {
+const statusBadge: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
   completed: 'bg-emerald-100 text-emerald-700',
   cancelled: 'bg-red-100 text-red-700',
 };
 
-const estadoLabel: Record<string, string> = {
+const statusLabel: Record<string, string> = {
   pending: 'Pendiente',
-  completed: 'Realizada',
+  completed: 'Completada',
   cancelled: 'Cancelada',
 };
 
 const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactElement => {
   const [greeting, setGreeting] = useState('');
-  const [proximasClases, setProximasClases] = useState<SchoolClass[]>([]);
+  const [upcomingClasses, setUpcomingClasses] = useState<SchoolClass[]>([]);
   const [stats, setStats] = useState({ subjects: 0, courses: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -34,16 +34,16 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
       if (!stored) return;
       const user = JSON.parse(stored);
 
-      if (role === 'estudiante') {
-        const cursoNombre = user.cursos;
-        if (cursoNombre) {
+      if (role === 'student') {
+        const courseName = user.courses;
+        if (courseName) {
           const lista = await courseService.getCourses();
-          const miCurso: any = lista.find((c: any) => c.nombre === cursoNombre);
-          if (miCurso) {
-            const materias = await courseService.getSubjectsByCourse(miCurso.id);
-            setStats({ subjects: materias.length, courses: 1 });
+          const myCourse: any = lista.find((c: any) => c.name === courseName);
+          if (myCourse) {
+            const subjects = await courseService.getSubjectsByCourse(myCourse.id);
+            setStats({ subjects: subjects.length, courses: 1 });
 
-            const ids = materias.map((m: any) => m.id);
+            const ids = subjects.map((m: any) => m.id);
             if (ids.length > 0) {
               const todas: SchoolClass[] = [];
               for (const id of ids) {
@@ -56,25 +56,25 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
               const dentroDe7 = new Date();
               dentroDe7.setDate(hoy.getDate() + 7);
               const proximas = todas
-            .filter(c => c.estado === 'pending' && c.fecha >= hoy.toISOString().slice(0, 10))
-                  .filter(c => c.fecha <= dentroDe7.toISOString().slice(0, 10))
-                  .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.horaInicio.localeCompare(b.horaInicio))
+                .filter(c => c.status === 'pending' && c.date >= hoy.toISOString().slice(0, 10))
+                .filter(c => c.date <= dentroDe7.toISOString().slice(0, 10))
+                .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
                 .slice(0, 5);
-              setProximasClases(proximas);
+              setUpcomingClasses(proximas);
             }
           }
         }
       } else {
-        const profesorId = user.id;
+        const professorId = user.id;
         const lista = await courseService.getCourses();
         let totalSubjects = 0;
         const ids: number[] = [];
         for (const c of lista) {
           try {
-            const materias = await courseService.getSubjectsByCourse(c.id);
-            const filtradas = materias.filter((m: any) => m.profesorId === profesorId);
-            totalSubjects += filtradas.length;
-            ids.push(...filtradas.map((m: any) => m.id));
+            const subjects = await courseService.getSubjectsByCourse(c.id);
+            const filtered = subjects.filter((m: any) => m.professorId === professorId);
+            totalSubjects += filtered.length;
+            ids.push(...filtered.map((m: any) => m.id));
           } catch { /* skip */ }
         }
         setStats({ subjects: totalSubjects, courses: lista.length });
@@ -91,11 +91,11 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
           const dentroDe7 = new Date();
           dentroDe7.setDate(hoy.getDate() + 7);
           const proximas = todas
-            .filter(c => c.estado === 'pending' && c.fecha >= hoy.toISOString().slice(0, 10))
-            .filter(c => c.fecha <= dentroDe7.toISOString().slice(0, 10))
-            .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.startTime.localeCompare(b.startTime))
+            .filter(c => c.status === 'pending' && c.date >= hoy.toISOString().slice(0, 10))
+            .filter(c => c.date <= dentroDe7.toISOString().slice(0, 10))
+            .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
             .slice(0, 5);
-          setProximasClases(proximas);
+          setUpcomingClasses(proximas);
         }
       }
     } catch {
@@ -125,22 +125,22 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-              {userData.nombre?.charAt(0) || '?'}{userData.apellido?.charAt(0) || ''}
+              {userData.firstName?.charAt(0) || '?'}{userData.lastName?.charAt(0) || ''}
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-slate-800">
-                {greeting}, {userData.nombre} {userData.apellido}
+                {greeting}, {userData.firstName} {userData.lastName}
               </h2>
               <div className="flex flex-wrap gap-3 mt-2">
                 <span className="inline-flex items-center gap-1 text-sm bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full font-medium">
-                  {role === 'estudiante' ? 'Estudiante' : 'Profesor'}
+                  {role === 'student' ? 'Estudiante' : 'Profesor'}
                 </span>
                 <span className="inline-flex items-center gap-1 text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium">
                   {userData.rut}
                 </span>
-                {role === 'estudiante' && userData.cursos && (
+                {role === 'student' && userData.courses && (
                   <span className="inline-flex items-center gap-1 text-sm bg-purple-50 text-purple-600 px-3 py-1 rounded-full font-medium">
-                    {userData.cursos}
+                    {userData.courses}
                   </span>
                 )}
               </div>
@@ -153,9 +153,7 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-500 font-medium">
-                {role === 'estudiante' ? 'Asignaturas' : 'Asignaturas'}
-              </p>
+              <p className="text-sm text-slate-500 font-medium">Asignaturas</p>
               <p className="text-3xl font-bold text-slate-800 mt-1">
                 {loading ? '—' : stats.subjects}
               </p>
@@ -167,7 +165,7 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
             </div>
           </div>
         </div>
-        {role === 'profesor' && (
+        {role === 'professor' && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -189,7 +187,7 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
             <div>
               <p className="text-sm text-slate-500 font-medium">Próximas Clases</p>
               <p className="text-3xl font-bold text-slate-800 mt-1">
-                {loading ? '—' : proximasClases.length}
+                {loading ? '—' : upcomingClasses.length}
               </p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
@@ -208,7 +206,7 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
             onClick={onGoToSubjects}
             className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition"
           >
-            Ver todas →
+            Ver todo →
           </button>
         </div>
 
@@ -218,19 +216,19 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
               <div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse" />
             ))}
           </div>
-        ) : proximasClases.length > 0 ? (
+        ) : upcomingClasses.length > 0 ? (
           <div className="space-y-2">
-            {proximasClases.map(clase => (
+            {upcomingClasses.map(clase => (
               <div key={clase.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition">
                 <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-sm font-bold flex-shrink-0">
-                  {new Date(clase.fecha + 'T12:00:00').getDate()}
+                  {new Date(clase.date + 'T12:00:00').getDate()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-700 truncate">{clase.titulo}</p>
-                  <p className="text-xs text-slate-400 capitalize">{formatDate(clase.fecha)} · {clase.horaInicio} - {clase.horaTermino}</p>
+                  <p className="text-sm font-medium text-slate-700 truncate">{clase.title}</p>
+                  <p className="text-xs text-slate-400 capitalize">{formatDate(clase.date)} · {clase.startTime} - {clase.endTime}</p>
                 </div>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full flex-shrink-0 ${estadoBadge[clase.estado] || 'bg-slate-100 text-slate-600'}`}>
-                  {estadoLabel[clase.estado] || clase.estado}
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full flex-shrink-0 ${statusBadge[clase.status] || 'bg-slate-100 text-slate-600'}`}>
+                  {statusLabel[clase.status] || clase.status}
                 </span>
               </div>
             ))}
@@ -248,7 +246,7 @@ const HomeView: FC<HomeViewProps> = ({ userData, role, onGoToSubjects }): ReactE
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          Ir a Mis {role === 'estudiante' ? 'Asignaturas' : 'Asignaturas'}
+          Ir a Mis Asignaturas
         </button>
       </div>
     </>

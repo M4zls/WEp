@@ -37,7 +37,7 @@ export class StudentsService implements IStudentsService {
         }
 
         const token = await sign(
-            { sub: estudiante.rut, email: estudiante.email, rut: estudiante.rut, rol: 'estudiante', exp: Math.floor(Date.now() / 1000) + JWT_EXPIRES_IN },
+            { sub: estudiante.rut, email: estudiante.email, rut: estudiante.rut, role: 'student', exp: Math.floor(Date.now() / 1000) + JWT_EXPIRES_IN },
             JWT_SECRET,
         );
 

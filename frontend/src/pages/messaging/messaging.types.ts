@@ -1,44 +1,44 @@
 export interface OtherParticipant {
-  usuarioId: string;
-  usuarioNombre: string;
-  usuarioApellido: string;
-  usuarioRol: string;
+  userId: string;
+  userFirstName: string;
+  userLastName: string;
+  userRole: string;
 }
 
 export interface Conversation {
   id: number;
   otherParticipant: OtherParticipant | null;
-  participantes: ConversationParticipant[];
-  ultimoMensaje: Message | null;
-  noLeidos: number;
+  participants: ConversationParticipant[];
+  lastMessage: Message | null;
+  unreadCount: number;
   createdAt?: string | null;
 }
 
 export interface ConversationParticipant {
   id?: number;
-  conversacionId: number;
-  usuarioId: string;
-  usuarioNombre: string;
-  usuarioApellido: string;
-  usuarioRol: string;
+  conversationId: number;
+  userId: string;
+  userFirstName: string;
+  userLastName: string;
+  userRole: string;
 }
 
 export interface Message {
   id?: number;
-  conversacionId: number;
-  remitenteId: string;
-  remitenteNombre: string;
-  remitenteApellido: string;
-  remitenteRol: string;
-  contenido: string;
-  leido?: boolean | null;
+  conversationId: number;
+  senderId: string;
+  senderFirstName: string;
+  senderLastName: string;
+  senderRole: string;
+  content: string;
+  read?: boolean | null;
   createdAt?: string | null;
 }
 
 export interface Contact {
   id: string;
-  nombre: string;
-  apellido: string;
-  rol: 'estudiante' | 'profesor';
-  contexto: string;
+  firstName: string;
+  lastName: string;
+  role: 'student' | 'professor';
+  context: string;
 }

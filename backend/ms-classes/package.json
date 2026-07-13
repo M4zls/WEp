@@ -13,7 +13,8 @@
     "drizzle-orm": "^0.45.2",
     "hono": "^4.12.16",
     "postgres": "^3.4.9",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "@sentry/bun": "^8.0.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

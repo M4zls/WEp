@@ -6,13 +6,13 @@ import classesService from '../../classes/classes.service';
 import scheduleService from '../../schedule/schedule.service';
 import attendanceService from '../../attendance/attendance.service';
 import coursesService from '../courses.service';
-import type { Clase } from '../../classes/class.types';
-import type { Horario } from '../../schedule/schedule.types';
-import type { Asistencia } from '../../attendance/attendance.types';
+import type { SchoolClass } from '../../classes/class.types';
+import type { Schedule } from '../../schedule/schedule.types';
+import type { Attendance } from '../../attendance/attendance.types';
 import { CLASS_STATUSES } from '../../classes/class.types';
 import { WEEK_DAYS } from '../../schedule/schedule.types';
-import ClaseFormModal from './class-form.modal';
-import HorarioFormModal from './schedule-form.modal';
+import ClassFormModal from './class-form.modal';
+import ScheduleFormModal from './schedule-form.modal';
 
 interface LocationState {
   subjectName?: string;
@@ -21,7 +21,7 @@ interface LocationState {
   colorIdx?: number;
 }
 
-type Tab = 'horario' | 'clases' | 'asistencia';
+type Tab = 'schedule' | 'classes' | 'attendance';
 
 const cardColors = [
   { bar: 'bg-emerald-500', light: 'bg-emerald-50', text: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-700' },
@@ -32,15 +32,15 @@ const cardColors = [
   { bar: 'bg-cyan-500', light: 'bg-cyan-50', text: 'text-cyan-700', badge: 'bg-cyan-100 text-cyan-700' },
 ];
 
-const estadoBadge: Record<string, string> = {
+const statusBadge: Record<string, string> = {
   [CLASS_STATUSES.PENDING]: 'bg-amber-100 text-amber-700',
   [CLASS_STATUSES.COMPLETED]: 'bg-emerald-100 text-emerald-700',
   [CLASS_STATUSES.CANCELLED]: 'bg-red-100 text-red-700',
 };
 
-const estadoLabel: Record<string, string> = {
+const statusLabel: Record<string, string> = {
   [CLASS_STATUSES.PENDING]: 'Pendiente',
-  [CLASS_STATUSES.COMPLETED]: 'Realizada',
+  [CLASS_STATUSES.COMPLETED]: 'Completada',
   [CLASS_STATUSES.CANCELLED]: 'Cancelada',
 };
 
@@ -55,7 +55,7 @@ const formatDate = (dateStr: string): string => {
 };
 
 const SubjectDetail: FC = (): ReactElement | null => {
-  const { cursoAsignaturaId } = useParams<{ cursoAsignaturaId: string }>();
+  const { courseSubjectId } = useParams<{ courseSubjectId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as LocationState | null;
@@ -63,78 +63,78 @@ const SubjectDetail: FC = (): ReactElement | null => {
   const authRole = useAuthStore((s) => s.role);
 
   const [userData, setUserData] = useState<any>(null);
-  const [role, setRole] = useState<'estudiante' | 'profesor'>(authRole || 'estudiante');
-  const [tab, setTab] = useState<Tab>('horario');
+  const [role, setRole] = useState<'student' | 'professor'>(authRole || 'student');
+  const [tab, setTab] = useState<Tab>('schedule');
 
-  const [clases, setClases] = useState<Clase[]>([]);
-  const [clasesLoading, setClasesLoading] = useState(true);
-  const [showClaseModal, setShowClaseModal] = useState(false);
-  const [editingClase, setEditingClase] = useState<Clase | null>(null);
+  const [classes, setClasses] = useState<SchoolClass[]>([]);
+  const [classesLoading, setClassesLoading] = useState(true);
+  const [showClassModal, setShowClassModal] = useState(false);
+  const [editingClass, setEditingClass] = useState<SchoolClass | null>(null);
 
-  const [horarios, setHorarios] = useState<Horario[]>([]);
-  const [horariosLoading, setHorariosLoading] = useState(true);
-  const [showHorarioModal, setShowHorarioModal] = useState(false);
-  const [editingHorario, setEditingHorario] = useState<Horario | null>(null);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [schedulesLoading, setSchedulesLoading] = useState(true);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
 
-  const [asistenciaClaseId, setAsistenciaClaseId] = useState<number | null>(null);
-  const [asistencias, setAsistencias] = useState<Asistencia[]>([]);
-  const [asistenciaLoading, setAsistenciaLoading] = useState(false);
-  const [estudiantesCurso, setEstudiantesCurso] = useState<any[]>([]);
-  const [asistenciaGuardando, setAsistenciaGuardando] = useState(false);
+  const [attendanceClassId, setAttendanceClassId] = useState<number | null>(null);
+  const [attendances, setAttendances] = useState<Attendance[]>([]);
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
+  const [courseStudents, setCourseStudents] = useState<any[]>([]);
+  const [attendanceSaving, setAttendanceSaving] = useState(false);
 
-  const isProfessor = role === 'profesor';
-  const id = Number(cursoAsignaturaId);
+  const isProfessor = role === 'professor';
+  const id = Number(courseSubjectId);
 
-  const loadClases = useCallback(async () => {
+  const loadClasses = useCallback(async () => {
     if (!id) return;
-    setClasesLoading(true);
+    setClassesLoading(true);
     try {
       const data = await classesService.list(id);
-      setClases(data);
+      setClasses(data);
     } catch {
-      setClases([]);
+      setClasses([]);
     } finally {
-      setClasesLoading(false);
+      setClassesLoading(false);
     }
   }, [id]);
 
-  const loadHorarios = useCallback(async () => {
+  const loadSchedules = useCallback(async () => {
     if (!id) return;
-    setHorariosLoading(true);
+    setSchedulesLoading(true);
     try {
       const data = await scheduleService.list(id);
-      setHorarios(data);
+      setSchedules(data);
     } catch {
-      setHorarios([]);
+      setSchedules([]);
     } finally {
-      setHorariosLoading(false);
+      setSchedulesLoading(false);
     }
   }, [id]);
 
   useEffect(() => {
     const stored = sessionStorage.getItem('user');
     const user = stored ? JSON.parse(stored) : authUser;
-    const effectiveRole = (stored ? sessionStorage.getItem('role') : authRole) || 'estudiante';
+    const effectiveRole = (stored ? sessionStorage.getItem('role') : authRole) || 'student';
     setUserData(user);
-    setRole(effectiveRole as 'estudiante' | 'profesor');
+    setRole(effectiveRole as 'student' | 'professor');
 
-    loadClases();
-    loadHorarios();
+    loadClasses();
+    loadSchedules();
 
-    if (effectiveRole === 'profesor' && state?.courseName) {
+    if (effectiveRole === 'professor' && state?.courseName) {
       coursesService.getStudentsByCourse(state.courseName)
-        .then(data => setEstudiantesCurso(Array.isArray(data) ? data : []))
-        .catch(() => setEstudiantesCurso([]));
+        .then(data => setCourseStudents(Array.isArray(data) ? data : []))
+        .catch(() => setCourseStudents([]));
     }
-  }, [loadClases, loadHorarios, navigate, state?.courseName, authUser, authRole]);
+  }, [loadClasses, loadSchedules, navigate, state?.courseName, authUser, authRole]);
 
   const handleLogout = () => {
     sessionStorage.clear();
     navigate('/');
   };
 
-  const grouped = clases.reduce<Record<string, Clase[]>>((acc, c) => {
-    const key = c.fecha;
+  const grouped = classes.reduce<Record<string, SchoolClass[]>>((acc, c) => {
+    const key = c.date;
     if (!acc[key]) acc[key] = [];
     acc[key].push(c);
     return acc;
@@ -144,29 +144,29 @@ const SubjectDetail: FC = (): ReactElement | null => {
   const colorIdx = state?.colorIdx ?? 0;
   const color = cardColors[colorIdx % cardColors.length];
 
-  const handleDeleteClase = async (id: number) => {
+  const handleDeleteClass = async (id: number) => {
     if (!window.confirm('¿Eliminar esta clase?')) return;
     await classesService.remove(id);
-    await loadClases();
+    await loadClasses();
   };
 
-  const horariosByDay = ([] as number[]).concat(1, 2, 3, 4, 5).map(dia => ({
-    dia,
-    label: WEEK_DAYS[dia],
-    bloques: horarios.filter(h => h.diaSemana === dia).sort((a, b) => a.horaInicio.localeCompare(b.horaInicio)),
+  const schedulesByDay = ([] as number[]).concat(1, 2, 3, 4, 5).map(day => ({
+    day,
+    label: WEEK_DAYS[day],
+    blocks: schedules.filter(h => h.weekDay === day).sort((a, b) => a.startTime.localeCompare(b.startTime)),
   }));
 
   return (
-    <DashboardLayout userData={userData} role={role} onLogout={handleLogout} defaultSection={role === 'profesor' ? 'courses' : 'classes'}>
+    <DashboardLayout userData={userData} role={role} onLogout={handleLogout} defaultSection={role === 'professor' ? 'courses' : 'classes'}>
       <div className="mb-6">
         <button
-          onClick={() => navigate('/dashboard', { state: { section: role === 'profesor' ? 'courses' : 'classes' } })}
+          onClick={() => navigate('/dashboard', { state: { section: role === 'professor' ? 'courses' : 'classes' } })}
           className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition mb-4"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Volver al panel
+          Volver al inicio
         </button>
 
         <div className="flex items-center gap-4">
@@ -195,9 +195,9 @@ const SubjectDetail: FC = (): ReactElement | null => {
 
       <div className="flex gap-1 mb-6 border-b border-slate-200">
         <button
-          onClick={() => setTab('horario')}
+          onClick={() => setTab('schedule')}
           className={`px-5 py-3 text-sm font-medium rounded-t-xl transition ${
-            tab === 'horario'
+            tab === 'schedule'
               ? 'bg-white text-emerald-600 border border-b-0 border-slate-200 -mb-px shadow-sm'
               : 'text-slate-500 hover:text-slate-700'
           }`}
@@ -205,9 +205,9 @@ const SubjectDetail: FC = (): ReactElement | null => {
           Horario
         </button>
         <button
-          onClick={() => setTab('clases')}
+          onClick={() => setTab('classes')}
           className={`px-5 py-3 text-sm font-medium rounded-t-xl transition ${
-            tab === 'clases'
+            tab === 'classes'
               ? 'bg-white text-emerald-600 border border-b-0 border-slate-200 -mb-px shadow-sm'
               : 'text-slate-500 hover:text-slate-700'
           }`}
@@ -216,9 +216,9 @@ const SubjectDetail: FC = (): ReactElement | null => {
         </button>
         {isProfessor && (
           <button
-            onClick={() => setTab('asistencia')}
+            onClick={() => setTab('attendance')}
             className={`px-5 py-3 text-sm font-medium rounded-t-xl transition ${
-              tab === 'asistencia'
+              tab === 'attendance'
                 ? 'bg-white text-emerald-600 border border-b-0 border-slate-200 -mb-px shadow-sm'
                 : 'text-slate-500 hover:text-slate-700'
             }`}
@@ -228,13 +228,13 @@ const SubjectDetail: FC = (): ReactElement | null => {
         )}
       </div>
 
-      {tab === 'horario' && (
+      {tab === 'schedule' && (
         <>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-slate-800">Horario Semanal</h3>
             {isProfessor && (
               <button
-                onClick={() => { setEditingHorario(null); setShowHorarioModal(true); }}
+                onClick={() => { setEditingSchedule(null); setShowScheduleModal(true); }}
                 className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 transition shadow-sm"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -245,7 +245,7 @@ const SubjectDetail: FC = (): ReactElement | null => {
             )}
           </div>
 
-          {horariosLoading ? (
+          {schedulesLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
                 <div key={i} className="bg-white rounded-2xl p-5 border border-slate-200 animate-pulse">
@@ -254,36 +254,36 @@ const SubjectDetail: FC = (): ReactElement | null => {
                 </div>
               ))}
             </div>
-          ) : horarios.length > 0 ? (
+          ) : schedules.length > 0 ? (
             <div className="space-y-6">
-              {horariosByDay.map(({ dia, label, bloques }) => (
-                <div key={dia}>
+              {schedulesByDay.map(({ day, label, blocks }) => (
+                <div key={day}>
                   <div className="flex items-center gap-3 mb-3">
                     <div className={`w-2.5 h-2.5 rounded-full ${color.bar}`} />
                     <h4 className="text-base font-semibold text-slate-700">{label}</h4>
-                    {bloques.length === 0 && <span className="text-xs text-slate-400">Sin bloques</span>}
+                    {blocks.length === 0 && <span className="text-xs text-slate-400">Sin bloques</span>}
                   </div>
-                  {bloques.length > 0 && (
+                  {blocks.length > 0 && (
                     <div className="space-y-2">
-                      {bloques.map(h => (
+                      {blocks.map(h => (
                         <div key={h.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-sm transition-shadow flex">
                           <div className={`w-1.5 flex-shrink-0 ${color.bar}`} />
                           <div className="flex-1 px-5 py-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-sm font-bold flex-shrink-0">
-                                {h.horaInicio.slice(0, 2)}
+                                {h.startTime.slice(0, 2)}
                               </div>
                               <div>
                                 <p className="text-sm font-medium text-slate-700">
-                                  {h.horaInicio} - {h.horaTermino}
+                                  {h.startTime} - {h.endTime}
                                 </p>
-                                <p className="text-xs text-slate-400">{label} · {h.horaInicio} a {h.horaTermino}</p>
+                                <p className="text-xs text-slate-400">{label} · {h.startTime} - {h.endTime}</p>
                               </div>
                             </div>
                             {isProfessor && (
                               <div className="flex gap-1.5 flex-shrink-0">
                                 <button
-                                  onClick={() => { setEditingHorario(h); setShowHorarioModal(true); }}
+                                  onClick={() => { setEditingSchedule(h); setShowScheduleModal(true); }}
                                   className="p-2 rounded-xl text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition"
                                   title="Editar"
                                 >
@@ -295,7 +295,7 @@ const SubjectDetail: FC = (): ReactElement | null => {
                                   onClick={async () => {
                                     if (!window.confirm('¿Eliminar este bloque horario?')) return;
                                     await scheduleService.remove(h.id);
-                                    await loadHorarios();
+                                    await loadSchedules();
                                   }}
                                   className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
                                   title="Eliminar"
@@ -321,22 +321,22 @@ const SubjectDetail: FC = (): ReactElement | null => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
-              <p className="text-slate-500 font-medium">Sin horario definido</p>
+              <p className="text-slate-500 font-medium">Horario no definido</p>
               <p className="text-slate-400 text-sm mt-1">
-                {isProfessor ? 'Agrega bloques horarios usando el botón "Agregar Bloque"' : 'El profesor aún no ha definido el horario'}
+                {isProfessor ? 'Agrega bloques usando el botón "Agregar Bloque"' : 'El profesor aún no ha definido el horario'}
               </p>
             </div>
           )}
         </>
       )}
 
-      {tab === 'clases' && (
+      {tab === 'classes' && (
         <>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-slate-800">Clases</h3>
             {isProfessor && (
               <button
-                onClick={() => { setEditingClase(null); setShowClaseModal(true); }}
+                onClick={() => { setEditingClass(null); setShowClassModal(true); }}
                 className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 transition shadow-sm"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -347,7 +347,7 @@ const SubjectDetail: FC = (): ReactElement | null => {
             )}
           </div>
 
-          {clasesLoading ? (
+          {classesLoading ? (
             <div className="space-y-6">
               {[1, 2].map((g) => (
                 <div key={g}>
@@ -363,20 +363,20 @@ const SubjectDetail: FC = (): ReactElement | null => {
                 </div>
               ))}
             </div>
-          ) : clases.length > 0 ? (
+          ) : classes.length > 0 ? (
             <div className="space-y-8">
-              {sortedDates.map((fecha) => (
-                <div key={fecha}>
+              {sortedDates.map((date) => (
+                <div key={date}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className={`w-2.5 h-2.5 rounded-full ${color.bar}`} />
                     <h4 className="text-base font-semibold text-slate-700 capitalize">
-                      {formatDate(fecha)}
+                      {formatDate(date)}
                     </h4>
-                    <span className="text-xs text-slate-400 font-mono">{fecha}</span>
+                    <span className="text-xs text-slate-400 font-mono">{date}</span>
                   </div>
 
                   <div className="space-y-3">
-                    {grouped[fecha].map((clase) => (
+                    {grouped[date].map((clase) => (
                       <div
                         key={clase.id}
                         className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-sm transition-shadow flex"
@@ -386,25 +386,25 @@ const SubjectDetail: FC = (): ReactElement | null => {
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-3 flex-wrap">
-                                <h5 className="text-base font-semibold text-slate-800">{clase.titulo}</h5>
-                                <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${estadoBadge[clase.estado] || estadoBadge['pendiente']}`}>
-                                  {estadoLabel[clase.estado] || clase.estado}
+                                <h5 className="text-base font-semibold text-slate-800">{clase.title}</h5>
+                                <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${statusBadge[clase.status] || statusBadge['pending']}`}>
+                                  {statusLabel[clase.status] || clase.status}
                                 </span>
                               </div>
-                              {clase.descripcion && (
-                                <p className="text-sm text-slate-500 mt-1.5">{clase.descripcion}</p>
+                              {clase.description && (
+                                <p className="text-sm text-slate-500 mt-1.5">{clase.description}</p>
                               )}
                               <div className="flex items-center gap-2 mt-2.5 text-sm text-slate-400">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <span>{clase.horaInicio} - {clase.horaTermino}</span>
+                                <span>{clase.startTime} - {clase.endTime}</span>
                               </div>
                             </div>
                             {isProfessor && (
                               <div className="flex gap-1.5 flex-shrink-0">
                                 <button
-                                  onClick={() => { setEditingClase(clase); setShowClaseModal(true); }}
+                                  onClick={() => { setEditingClass(clase); setShowClassModal(true); }}
                                   className="p-2 rounded-xl text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition"
                                   title="Editar"
                                 >
@@ -413,7 +413,7 @@ const SubjectDetail: FC = (): ReactElement | null => {
                                   </svg>
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteClase(clase.id)}
+                                  onClick={() => handleDeleteClass(clase.id)}
                                   className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
                                   title="Eliminar"
                                 >
@@ -440,20 +440,20 @@ const SubjectDetail: FC = (): ReactElement | null => {
               </div>
               <p className="text-slate-500 font-medium">No hay clases registradas</p>
               <p className="text-slate-400 text-sm mt-1">
-                {isProfessor ? 'Crea la primera clase usando el botón "Nueva Clase"' : 'El profesor aún no ha registrado clases'}
+                {isProfessor ? 'Crea la primera clase con el botón "Nueva Clase"' : 'El profesor aún no ha registrado clases'}
               </p>
             </div>
           )}
         </>
       )}
 
-      {tab === 'asistencia' && (
+      {tab === 'attendance' && (
         <>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-slate-800">Asistencia</h3>
           </div>
 
-          {clases.length === 0 ? (
+          {classes.length === 0 ? (
             <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
               <p className="text-slate-500 font-medium">No hay clases registradas</p>
               <p className="text-slate-400 text-sm mt-1">Crea una clase primero para registrar asistencia</p>
@@ -461,42 +461,42 @@ const SubjectDetail: FC = (): ReactElement | null => {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1">
-                <label className="block text-sm font-medium text-slate-700 mb-2">Selecciona una clase</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Seleccionar una clase</label>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {clases.sort((a, b) => b.fecha.localeCompare(a.fecha)).map(cl => (
+                  {classes.sort((a, b) => b.date.localeCompare(a.date)).map(cl => (
                     <button
                       key={cl.id}
                       onClick={async () => {
-                        setAsistenciaClaseId(cl.id);
-                        setAsistenciaLoading(true);
+                        setAttendanceClassId(cl.id);
+                        setAttendanceLoading(true);
                         try {
                           const data = await attendanceService.listByClass(cl.id);
-                          setAsistencias(data);
+                          setAttendances(data);
                         } catch {
-                          setAsistencias([]);
+                          setAttendances([]);
                         } finally {
-                          setAsistenciaLoading(false);
+                          setAttendanceLoading(false);
                         }
                       }}
                       className={`w-full text-left p-3 rounded-xl border transition ${
-                        asistenciaClaseId === cl.id
+                        attendanceClassId === cl.id
                           ? 'border-emerald-500 bg-emerald-50'
                           : 'border-slate-200 hover:border-slate-300'
                       }`}
                     >
-                      <p className="text-sm font-medium text-slate-700">{cl.titulo}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">{cl.fecha} · {cl.horaInicio} - {cl.horaTermino}</p>
+                      <p className="text-sm font-medium text-slate-700">{cl.title}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{cl.date} · {cl.startTime} - {cl.endTime}</p>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div className="lg:col-span-2">
-                {!asistenciaClaseId ? (
+                {!attendanceClassId ? (
                   <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-                    <p className="text-slate-500">Selecciona una clase para gestionar la asistencia</p>
+                    <p className="text-slate-500">Selecciona una clase para gestionar asistencia</p>
                   </div>
-                ) : asistenciaLoading ? (
+                ) : attendanceLoading ? (
                   <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center animate-pulse">
                     <p className="text-slate-400">Cargando asistencia...</p>
                   </div>
@@ -504,38 +504,38 @@ const SubjectDetail: FC = (): ReactElement | null => {
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="text-base font-semibold text-slate-700">
-                        {estudiantesCurso.length} estudiante(s) en el curso
+                        {courseStudents.length} estudiante(s) en el curso
                       </h4>
                       <button
                         onClick={async () => {
-                          if (!asistenciaClaseId) return;
-                          setAsistenciaGuardando(true);
+                          if (!attendanceClassId) return;
+                          setAttendanceSaving(true);
                           try {
-                            const registros = estudiantesCurso.map((est: any) => {
-                              const existente = asistencias.find(a => a.estudianteRut === est.rut);
+                            const records = courseStudents.map((est: any) => {
+                              const existing = attendances.find(a => a.studentRut === est.rut);
                               return {
-                                estudianteRut: est.rut,
-                                estudianteNombre: `${est.nombre} ${est.apellido || ''}`.trim(),
-                                presente: existente ? existente.presente : true,
+                                studentRut: est.rut,
+                                studentFirstName: `${est.firstName} ${est.lastName || ''}`.trim(),
+                                present: existing ? existing.present : true,
                               };
                             });
                             await attendanceService.mark({
-                              claseId: asistenciaClaseId,
-                              cursoAsignaturaId: id,
-                              registros,
+                              classId: attendanceClassId,
+                              courseSubjectId: id,
+                              records,
                             });
-                            const updated = await attendanceService.listByClass(asistenciaClaseId);
-                            setAsistencias(updated);
+                            const updated = await attendanceService.listByClass(attendanceClassId);
+                            setAttendances(updated);
                           } catch (err) {
-                            console.error('Error guardando asistencia:', err);
+                            console.error('Error saving attendance:', err);
                           } finally {
-                            setAsistenciaGuardando(false);
+                            setAttendanceSaving(false);
                           }
                         }}
-                        disabled={asistenciaGuardando}
+                        disabled={attendanceSaving}
                         className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 transition disabled:opacity-50"
                       >
-                        {asistenciaGuardando ? 'Guardando...' : 'Guardar Todo'}
+                        {attendanceSaving ? 'Guardando...' : 'Guardar Todo'}
                       </button>
                     </div>
 
@@ -550,33 +550,33 @@ const SubjectDetail: FC = (): ReactElement | null => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                          {estudiantesCurso.map((est: any) => {
-                            const asist = asistencias.find(a => a.estudianteRut === est.rut);
-                            const presente = asist ? asist.presente : true;
+                          {courseStudents.map((est: any) => {
+                            const asis = attendances.find(a => a.studentRut === est.rut);
+                            const present = asis ? asis.present : true;
                             return (
                               <tr key={est.rut} className="hover:bg-slate-50 transition">
                                 <td className="px-4 py-3 text-slate-500 font-mono text-xs">{est.rut}-{est.dv}</td>
-                                <td className="px-4 py-3 text-slate-700 font-medium">{est.nombre} {est.apellido}</td>
+                                <td className="px-4 py-3 text-slate-700 font-medium">{est.firstName} {est.lastName}</td>
                                 <td className="text-center px-4 py-3">
                                   <button
                                     onClick={async () => {
-                                      if (!asistenciaClaseId) return;
+                                      if (!attendanceClassId) return;
                                       try {
                                         await attendanceService.mark({
-                                          claseId: asistenciaClaseId,
-                                          cursoAsignaturaId: id,
-                                          registros: [{
-                                            estudianteRut: est.rut,
-                                            estudianteNombre: `${est.nombre} ${est.apellido || ''}`.trim(),
-                                            presente: true,
+                                          classId: attendanceClassId,
+                                          courseSubjectId: id,
+                                          records: [{
+                                            studentRut: est.rut,
+                                            studentFirstName: `${est.firstName} ${est.lastName || ''}`.trim(),
+                                            present: true,
                                           }],
                                         });
-                                        const updated = await attendanceService.listByClass(asistenciaClaseId);
-                                        setAsistencias(updated);
+                                        const updated = await attendanceService.listByClass(attendanceClassId);
+                                        setAttendances(updated);
                                       } catch (err) { console.error(err); }
                                     }}
                                     className={`w-8 h-8 rounded-full transition ${
-                                      presente
+                                      present
                                         ? 'bg-emerald-500 text-white shadow-sm'
                                         : 'bg-slate-100 text-slate-300 hover:bg-slate-200'
                                     }`}
@@ -587,23 +587,23 @@ const SubjectDetail: FC = (): ReactElement | null => {
                                 <td className="text-center px-4 py-3">
                                   <button
                                     onClick={async () => {
-                                      if (!asistenciaClaseId) return;
+                                      if (!attendanceClassId) return;
                                       try {
                                         await attendanceService.mark({
-                                          claseId: asistenciaClaseId,
-                                          cursoAsignaturaId: id,
-                                          registros: [{
-                                            estudianteRut: est.rut,
-                                            estudianteNombre: `${est.nombre} ${est.apellido || ''}`.trim(),
-                                            presente: false,
+                                          classId: attendanceClassId,
+                                          courseSubjectId: id,
+                                          records: [{
+                                            studentRut: est.rut,
+                                            studentFirstName: `${est.firstName} ${est.lastName || ''}`.trim(),
+                                            present: false,
                                           }],
                                         });
-                                        const updated = await attendanceService.listByClass(asistenciaClaseId);
-                                        setAsistencias(updated);
+                                        const updated = await attendanceService.listByClass(attendanceClassId);
+                                        setAttendances(updated);
                                       } catch (err) { console.error(err); }
                                     }}
                                     className={`w-8 h-8 rounded-full transition ${
-                                      !presente
+                                      !present
                                         ? 'bg-red-500 text-white shadow-sm'
                                         : 'bg-slate-100 text-slate-300 hover:bg-slate-200'
                                     }`}
@@ -625,32 +625,32 @@ const SubjectDetail: FC = (): ReactElement | null => {
         </>
       )}
 
-      <ClaseFormModal
-        isOpen={showClaseModal}
-        onClose={() => { setShowClaseModal(false); setEditingClase(null); }}
+      <ClassFormModal
+        isOpen={showClassModal}
+        onClose={() => { setShowClassModal(false); setEditingClass(null); }}
         onSave={async (data) => {
-          if (editingClase) {
-            await classesService.update(editingClase.id, data);
+          if (editingClass) {
+            await classesService.update(editingClass.id, data);
           } else {
-            await classesService.create({ ...data, cursoAsignaturaId: id });
+            await classesService.create({ ...data, courseSubjectId: id });
           }
-          await loadClases();
+          await loadClasses();
         }}
-        editingClase={editingClase}
+        editingClass={editingClass}
       />
 
-      <HorarioFormModal
-        isOpen={showHorarioModal}
-        onClose={() => { setShowHorarioModal(false); setEditingHorario(null); }}
+      <ScheduleFormModal
+        isOpen={showScheduleModal}
+        onClose={() => { setShowScheduleModal(false); setEditingSchedule(null); }}
         onSave={async (data) => {
-          if (editingHorario) {
-            await scheduleService.update(editingHorario.id, data);
+          if (editingSchedule) {
+            await scheduleService.update(editingSchedule.id, data);
           } else {
-            await scheduleService.create({ ...data, cursoAsignaturaId: id });
+            await scheduleService.create({ ...data, courseSubjectId: id });
           }
-          await loadHorarios();
+          await loadSchedules();
         }}
-        editingHorario={editingHorario}
+        editingSchedule={editingSchedule}
       />
     </DashboardLayout>
   );

@@ -51,7 +51,7 @@ describe('SubjectDetail', () => {
       state: { subjectName: 'Matemáticas', subjectCode: 'MAT101', courseName: '3A', colorIdx: 0 },
     });
     (useNavigate as any).mockReturnValue(mockNavigate);
-    (useAuthStore as any).mockReturnValue({ user: null, role: 'estudiante' });
+    (useAuthStore as any).mockReturnValue({ user: null, role: 'student' });
     vi.mocked(classesService.list).mockResolvedValue([]);
     vi.mocked(scheduleService.list).mockResolvedValue([]);
   });
@@ -69,9 +69,9 @@ describe('SubjectDetail', () => {
   });
 
   /**
-   * Verifies the estudiante role sees Horario and Clases tabs but not Asistencia
+   * Verifies the student role sees Horario and Clases tabs but not Asistencia
    */
-  it('should show tabs for estudiante role', async () => {
+  it('should show tabs for student role', async () => {
     render(<SubjectDetail />);
     await waitFor(() => {
       expect(screen.getByText('Horario')).toBeInTheDocument();
@@ -81,13 +81,13 @@ describe('SubjectDetail', () => {
   });
 
   /**
-   * Verifies the profesor role sees the Asistencia tab in addition to the other tabs
+   * Verifies the professor role sees the Asistencia tab in addition to the other tabs
    */
-  it('should show asistencia tab for profesor role', async () => {
+  it('should show asistencia tab for professor role', async () => {
     sessionStorage.setItem('user', JSON.stringify({ id: 1, rut: 't1' }));
-    sessionStorage.setItem('role', 'profesor');
-    (useAuthStore as any).mockReturnValue({ user: { id: 1 }, role: 'profesor' });
-    vi.mocked(classesService.list).mockResolvedValue([{ id: 1, title: 'Clase 1', fecha: '2024-06-15', startTime: '10:00', endTime: '11:00', estado: 'pending', courseSubjectId: 5 }]);
+    sessionStorage.setItem('role', 'professor');
+    (useAuthStore as any).mockReturnValue({ user: { id: 1 }, role: 'professor' });
+    vi.mocked(classesService.list).mockResolvedValue([{ id: 1, title: 'Clase 1', date: '2024-06-15', startTime: '10:00', endTime: '11:00', state: 'pending', courseSubjectId: 5 }]);
     vi.mocked(scheduleService.list).mockResolvedValue([]);
 
     render(<SubjectDetail />);
@@ -102,7 +102,7 @@ describe('SubjectDetail', () => {
   it('should show empty horario state', async () => {
     render(<SubjectDetail />);
     await waitFor(() => {
-      expect(screen.getByText('Sin horario definido')).toBeInTheDocument();
+      expect(screen.getByText('No schedule defined')).toBeInTheDocument();
     });
   });
 
@@ -113,7 +113,7 @@ describe('SubjectDetail', () => {
     render(<SubjectDetail />);
     fireEvent.click(screen.getByText('Clases'));
     await waitFor(() => {
-      expect(screen.getByText('No hay clases registradas')).toBeInTheDocument();
+      expect(screen.getByText('No classes registered')).toBeInTheDocument();
     });
   });
 
@@ -123,9 +123,9 @@ describe('SubjectDetail', () => {
   it('should navigate back', async () => {
     render(<SubjectDetail />);
     await waitFor(() => {
-      expect(screen.getByText('Volver al panel')).toBeInTheDocument();
+      expect(screen.getByText('Back to dashboard')).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByText('Volver al panel'));
+    fireEvent.click(screen.getByText('Back to dashboard'));
     expect(mockNavigate).toHaveBeenCalled();
   });
 });

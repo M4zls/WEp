@@ -1,4 +1,4 @@
 export const MENSAJERIA_ERRORS = {
-  CONVERSACION_NOT_FOUND: 'Conversación no encontrada',
-  MENSAJE_NOT_FOUND: 'Mensaje no encontrado',
+  CONVERSATION_NOT_FOUND: 'Conversación no encontrada',
+  MESSAGE_NOT_FOUND: 'Mensaje no encontrado',
 } as const;

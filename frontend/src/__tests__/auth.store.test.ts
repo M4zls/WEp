@@ -24,30 +24,30 @@ describe('AuthStore', () => {
     expect(state.error).toBeNull();
   });
 
-  it('should login successfully as estudiante', async () => {
-    const result = await useAuthStore.getState().login('test@alumnocbo.cl', '123456', 'estudiante');
+  it('should login successfully as student', async () => {
+    const result = await useAuthStore.getState().login('test@alumnocbo.cl', '123456', 'student');
     expect(result).toBe(true);
 
     const state = useAuthStore.getState();
     expect(state.isAuthenticated).toBe(true);
     expect(state.isLoading).toBe(false);
     expect(state.user?.email).toBe('test@alumnocbo.cl');
-    expect(state.role).toBe('estudiante');
+    expect(state.role).toBe('student');
     expect(state.token).toMatch(/^token_/);
   });
 
-  it('should login successfully as profesor', async () => {
-    const result = await useAuthStore.getState().login('test@profesorcbo.cl', '123456', 'profesor');
+  it('should login successfully as professor', async () => {
+    const result = await useAuthStore.getState().login('test@profesorcbo.cl', '123456', 'professor');
     expect(result).toBe(true);
 
     const state = useAuthStore.getState();
     expect(state.isAuthenticated).toBe(true);
-    expect(state.role).toBe('profesor');
+    expect(state.role).toBe('professor');
     expect(state.user?.email).toBe('test@profesorcbo.cl');
   });
 
   it('should logout and clear state', () => {
-    useAuthStore.getState().login('test@alumnocbo.cl', '123456', 'estudiante');
+    useAuthStore.getState().login('test@alumnocbo.cl', '123456', 'student');
     useAuthStore.getState().logout();
 
     const state = useAuthStore.getState();
@@ -67,9 +67,9 @@ describe('AuthStore', () => {
 
   it('should set login success', () => {
     useAuthStore.getState().setLoginSuccess(
-      { email: 'test@test.com', role: 'profesor' },
+      { email: 'test@test.com', role: 'professor' },
       'token123',
-      'profesor',
+      'professor',
     );
 
     const state = useAuthStore.getState();
@@ -77,7 +77,7 @@ describe('AuthStore', () => {
     expect(state.isLoading).toBe(false);
     expect(state.user?.email).toBe('test@test.com');
     expect(state.token).toBe('token123');
-    expect(state.role).toBe('profesor');
+    expect(state.role).toBe('professor');
     expect(state.error).toBeNull();
   });
 });

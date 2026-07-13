@@ -1,36 +1,36 @@
-export interface Clase {
+export interface SchoolClass {
   id: number;
-  cursoAsignaturaId: number;
-  titulo: string;
-  descripcion?: string | null;
-  fecha: string;
-  horaInicio: string;
-  horaTermino: string;
-  estado: string;
+  courseSubjectId: number;
+  title: string;
+  description?: string | null;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: string;
   createdAt?: string | null;
 }
 
-export interface CreateClaseDto {
-  cursoAsignaturaId: number;
-  titulo: string;
-  descripcion?: string;
-  fecha: string;
-  horaInicio: string;
-  horaTermino: string;
-  estado?: string;
+export interface CreateClassDto {
+  courseSubjectId: number;
+  title: string;
+  description?: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status?: string;
 }
 
-export interface UpdateClaseDto {
-  titulo?: string;
-  descripcion?: string;
-  fecha?: string;
-  horaInicio?: string;
-  horaTermino?: string;
-  estado?: string;
+export interface UpdateClassDto {
+  title?: string;
+  description?: string;
+  date?: string;
+  startTime?: string;
+  endTime?: string;
+  status?: string;
 }
 
 export const CLASS_STATUSES = {
-  PENDING: 'pendiente',
-  COMPLETED: 'realizada',
-  CANCELLED: 'cancelada',
+  PENDING: 'pending',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
 } as const;

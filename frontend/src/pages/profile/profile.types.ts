@@ -1,22 +1,22 @@
 export interface ProfileData {
-  nombre: string;
-  apellido: string;
+  firstName: string;
+  lastName: string;
   email: string;
   rut: string;
-  telefono?: string | null;
-  cursos?: string;
-  apoderado?: string | null;
-  materia?: string;
-  fechaRegistro?: string;
-  fechaIngreso?: string;
+  phone?: string | null;
+  courses?: string;
+  guardian?: string | null;
+  subject?: string;
+  registrationDate?: string;
+  admissionDate?: string;
 }
 
 export interface ProfilePageProps {
-  userData: { nombre?: string; apellido?: string; email?: string; rut?: string } | null;
-  role: 'estudiante' | 'profesor';
+  userData: { firstName?: string; lastName?: string; email?: string; rut?: string } | null;
+  role: 'student' | 'professor';
 }
 
 export interface StatusMessage {
-  tipo: 'ok' | 'error';
-  texto: string;
+  type: 'ok' | 'error';
+  text: string;
 }

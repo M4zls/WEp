@@ -11,18 +11,18 @@ try {
   await sql.unsafe('CREATE SCHEMA IF NOT EXISTS "grades";');
   await sql.unsafe(`CREATE TABLE IF NOT EXISTS "grades"."grades" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"estudiante_rut" text NOT NULL,
-	"asignatura" text NOT NULL,
-	"curso" text NOT NULL,
-	"nota" numeric(4,1) NOT NULL,
-	"tipo_evaluacion" text NOT NULL,
-	"fecha" text NOT NULL,
-	"profesor_rut" text NOT NULL,
-	"coeficiente" integer NOT NULL DEFAULT 1
+	"student_rut" text NOT NULL,
+	"subject" text NOT NULL,
+	"course" text NOT NULL,
+	"grade" numeric(4,1) NOT NULL,
+	"evaluation_type" text NOT NULL,
+	"date" text NOT NULL,
+	"professor_rut" text NOT NULL,
+	"coefficient" integer NOT NULL DEFAULT 1
   );`);
 
   try {
-    await sql.unsafe(`ALTER TABLE "grades"."grades" ADD COLUMN "coeficiente" integer NOT NULL DEFAULT 1;`);
+    await sql.unsafe(`ALTER TABLE "grades"."grades" ADD COLUMN "coefficient" integer NOT NULL DEFAULT 1;`);
   } catch {
     // la columna ya existe, ignorar
   }

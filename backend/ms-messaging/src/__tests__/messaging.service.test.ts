@@ -31,7 +31,7 @@ describe('MessagingService', () => {
   describe('getOrCreateConversation', () => {
     const data = {
       participantIds: ['1', '2'],
-      participantNames: ['Juan', 'Maria'],
+      participantFirstNames: ['Juan', 'Maria'],
       participantLastNames: ['Perez', 'Lopez'],
       participantRoles: ['profesor', 'apoderado'],
     };
@@ -73,7 +73,7 @@ describe('MessagingService', () => {
     const data = {
       conversationId: 1,
       senderId: '1',
-      senderName: 'Juan',
+      senderFirstName: 'Juan',
       senderLastName: 'Perez',
       senderRole: 'profesor',
       content: 'Hola',
@@ -86,7 +86,7 @@ describe('MessagingService', () => {
       expect(mockRepo.sendMessage).toHaveBeenCalledWith({
         conversationId: 1,
         senderId: '1',
-        senderName: 'Juan',
+        senderFirstName: 'Juan',
         senderLastName: 'Perez',
         senderRole: 'profesor',
         content: 'Hola',

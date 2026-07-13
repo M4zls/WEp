@@ -5,9 +5,9 @@ export const scheduleSchema = pgSchema('schedule');
 
 export const schedules = scheduleSchema.table('schedules', {
   id: serial('id').primaryKey(),
-  courseSubjectId: integer('curso_asignatura_id').notNull(),
-  weekDay: integer('dia_semana').notNull(),
-  startTime: text('hora_inicio').notNull(),
-  endTime: text('hora_termino').notNull(),
+  courseSubjectId: integer('course_subject_id').notNull(),
+  weekDay: integer('week_day').notNull(),
+  startTime: text('start_time').notNull(),
+  endTime: text('end_time').notNull(),
   createdAt: text('created_at').default(sql`now()::text`),
 });

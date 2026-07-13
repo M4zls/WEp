@@ -1,13 +1,17 @@
 import { Hono } from 'hono'
-import { cors } from 'hono/cors';
+import { lifecycle, initGlitchtip, glitchtipErrorHandler, glitchtipMiddleware } from './glitchtip/index.js'
+import { tracingMiddleware } from './tracing/index.js'
 import { notificationsController } from './controllers/notifications.controller.js';
 
 await import('../drizzle/migrate.ts');
 await import('../drizzle/seed.js');
 
 const app = new Hono()
-
-app.use(cors());
+lifecycle()
+initGlitchtip()
+app.use('*', tracingMiddleware())
+app.use('*', glitchtipMiddleware())
+app.onError(glitchtipErrorHandler)
 
 app.route('/notifications', notificationsController);
 

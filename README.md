@@ -14,6 +14,8 @@ Plataforma web integral para la gestión académica del Colegio Bernardo O'Higgi
 | **PostgreSQL 16** | Base de datos relacional |
 | **Docker Compose** | Orquestación de contenedores (desarrollo) |
 | **Kubernetes** | Orquestación de contenedores (producción) — manifests en `k8s/` |
+| **KrakenD** | API Gateway — punto de entrada único para el frontend (puerto 3100) |
+| **GlitchTip** | Plataforma de error tracking y performance monitoring (Sentry-compatible) |
 | **Vitest** | Test runner del frontend |
 
 ---
@@ -44,8 +46,8 @@ docker compose up -d
 
 La aplicación queda disponible en:
 - **Frontend**: `http://localhost:8080`
-- **BFF (API)**: `http://localhost:3000`
-- **Documentación API**: `http://localhost:3000/docs`
+- **API (via KrakenD)**: `http://localhost:3100`
+- **GlitchTip UI**: `http://localhost:8000`
 
 > PostgreSQL se expone externamente en `localhost:5433` (puerto interno 5432).
 
@@ -63,7 +65,7 @@ npm install        # solo la primera vez
 npm run dev        # http://localhost:8081
 ```
 
-El frontend en `localhost:8081` se conecta automáticamente al BFF en `localhost:3000` (Docker). Los cambios en el código se reflejan al instante gracias al HMR de Vite.
+El frontend en `localhost:8081` se conecta automáticamente a KrakenD en `localhost:3100` (Docker). Los cambios en el código se reflejan al instante gracias al HMR de Vite.
 
 > También puedes correr microservicios individuales fuera de Docker con `bun run dev` dentro de cada carpeta, si prefieres desarrollar backend con hot-reload.
 
@@ -84,7 +86,7 @@ Esto crea:
 - ConfigMap con URLs de servicios internos
 - Secret con credenciales de DB
 - PostgreSQL 16 (1 réplica, ClusterIP)
-- 11 deployments con sus servicios (BFF como LoadBalancer, frontend como LoadBalancer, microservicios como ClusterIP)
+- 11 deployments con sus servicios (KrakenD como entrada, frontend como LoadBalancer, microservicios como ClusterIP)
 
 > Las imágenes usan `imagePullPolicy: Never` — asumen que están cargadas localmente. Para producción, cambiá a `Always` y usá un registry.
 
@@ -102,13 +104,11 @@ flowchart TB
         Shared["api / layout"]
     end
 
-    subgraph BFF["BFF - Hono :3000"]
-        AuthMW["authMiddleware<br/>JWT verify en /api/*"]
-        BFFRoutes["routes/*.ts"]
-        OpenAPI["openapi.ts<br/>Swagger UI"]
+    subgraph APIGateway["API Gateway - KrakenD :3100"]
+        KrakenD["krakend.json<br/>rutas explícitas → microservicios<br/>CORS, proxy"]
     end
 
-    subgraph Microservices["Microservicios Backend"]
+    subgraph Microservices["Microservicios Backend (Hono)"]
         Auth["Autentificación<br/>:3002"]
         Students["Estudiantes<br/>:3001"]
         Teachers["Profesores<br/>:3004"]
@@ -119,6 +119,10 @@ flowchart TB
         Horario["Horario<br/>:3007"]
         Asistencia["Asistencia<br/>:3008"]
         Mensajeria["Mensajería<br/>:3009"]
+    end
+
+    subgraph Monitoring["Monitoreo"]
+        GlitchTip["GlitchTip<br/>Error tracking<br/>Performance traces"]
     end
 
     subgraph DB["PostgreSQL 16 (5432 / host :5433)"]
@@ -135,17 +139,17 @@ flowchart TB
     end
 
     Browser --> ReactApp
-    ReactApp --> BFFRoutes
-    BFFRoutes --> Auth
-    BFFRoutes --> Students
-    BFFRoutes --> Teachers
-    BFFRoutes --> Courses
-    BFFRoutes --> Notif
-    BFFRoutes --> Classes
-    BFFRoutes --> Notas
-    BFFRoutes --> Horario
-    BFFRoutes --> Asistencia
-    BFFRoutes --> Mensajeria
+    ReactApp -->|"fetch a :3100/api/*"| KrakenD
+    KrakenD --> Auth
+    KrakenD --> Students
+    KrakenD --> Teachers
+    KrakenD --> Courses
+    KrakenD --> Notif
+    KrakenD --> Classes
+    KrakenD --> Notas
+    KrakenD --> Horario
+    KrakenD --> Asistencia
+    KrakenD --> Mensajeria
     Auth --> S1
     Students --> S2
     Teachers --> S3
@@ -156,21 +160,57 @@ flowchart TB
     Horario --> S8
     Asistencia --> S9
     Mensajeria --> S10
+
+    Auth -.->|"@sentry/bun"| GlitchTip
+    Students -.->|"@sentry/bun"| GlitchTip
+    Teachers -.->|"@sentry/bun"| GlitchTip
+    Courses -.->|"@sentry/bun"| GlitchTip
+    Notif -.->|"@sentry/bun"| GlitchTip
+    Classes -.->|"@sentry/bun"| GlitchTip
+    Notas -.->|"@sentry/bun"| GlitchTip
+    Horario -.->|"@sentry/bun"| GlitchTip
+    Asistencia -.->|"@sentry/bun"| GlitchTip
+    Mensajeria -.->|"@sentry/bun"| GlitchTip
 ```
 
-- **Frontend**: aplicación React SPA que consume una sola API (el BFF)
-- **BFF**: única puerta de entrada para el frontend, orquesta los microservicios internos — middleware JWT valida cada request en `/api/*`
-- **Microservicios**: 10 servicios independientes, cada uno con su propio schema de DB
-- **Base de datos**: PostgreSQL con schemas aislados por microservicio
+### Flujo de peticiones
 
-### Microservicios
+1. **Frontend** (React SPA) envía todas las peticiones a `http://localhost:3100/api/*`
+2. **KrakenD** recibe la petición, aplica CORS y la enruta al microservicio correspondiente según el patrón de URL
+3. **Microservicio** procesa la lógica de negocio y accede a su schema de PostgreSQL
+4. Si hay errores o trazas de rendimiento, se envían a **GlitchTip** via `@sentry/bun`
+
+### KrakenD — API Gateway
+
+**KrakenD** es un API Gateway de alto rendimiento escrito en Go, sin estado y configurable via JSON. En este proyecto:
+
+- **Punto de entrada único**: el frontend solo conoce `localhost:3100`, no los puertos internos de cada microservicio
+- **Enrutamiento explícito**: cada endpoint está definido en `backend/krakend/krakend.json` con su método HTTP, ruta y backend destino
+- **CORS**: se maneja a nivel de gateway, evitando configurar CORS en cada microservicio
+- **Sin plugins**: se usa en modo "pure config" — sin plugins Go, sin JWT validation a nivel gateway
+- **Proxy directo**: KrakenD reenvía la petición al microservicio correspondiente (ej. `/api/students` → `http://ms-students:3001/students`)
+
+### GlitchTip — Error Tracking y Performance
+
+**GlitchTip** es una plataforma open-source para monitoreo de errores y rendimiento, compatible con el protocolo de Sentry. En este proyecto:
+
+- **Cada microservicio** tiene su propia integración con `@sentry/bun` en las carpetas `glitchtip/` y `tracing/`
+- **Inicialización**: al arrancar el servicio, se configura el DSN vía `SENTRY_DSN` (env var). Si no está definida, se omite la inicialización.
+- **Middleware**: cada request se envuelve en un `Sentry.startSpan()` para capturar trazas de rendimiento
+- **Error handler**: captura errores no manejados y los reporta automáticamente
+- **DSN normalization**: `@sentry/bun@10.x` rechaza UUIDs con guiones — el init normaliza el DSN usando `new URL()` y removiendo guiones del public key
+- **Performance traces**: se habilitan con `SENTRY_TRACES_SAMPLE_RATE` (entero 0-100, default 0)
+
+---
+
+## Microservicios
 
 | Servicio | Puerto | Responsabilidad |
 |---|---|---|
-| **BFF** | 3000 | Orquestación — única API que consume el frontend — valida JWT en `/api/*` |
+| **KrakenD** | 3100 | API Gateway — punto de entrada único para el frontend |
 | **Estudiantes** | 3001 | CRUD de estudiantes |
 | **Autentificación** | 3002 | Login, registro, manejo de sesiones JWT |
-| **Notificaciones** | 3003 | Notificaciones del sistema |
+| **Notificaciones** | 3003 | Notificaciones del sistema (Novu) |
 | **Profesores** | 3004 | CRUD de profesores |
 | **Cursos** | 3005 | Gestión de cursos, asignaturas y asignaciones |
 | **Clases** | 3006 | Gestión de clases |
@@ -178,33 +218,6 @@ flowchart TB
 | **Asistencia** | 3008 | Registro de asistencia por clase y estudiante |
 | **Mensajería** | 3009 | Mensajería interna entre usuarios |
 | **Notas** | 3010 | Gestión de calificaciones de alumnos |
-
----
-
-## Autenticación JWT
-
-Todas las rutas `/api/*` del BFF están protegidas por un middleware JWT (`backend/bff/src/middleware/auth.ts`).
-
-| Concepto | Detalle |
-|---|---|
-| **Algoritmo** | HS256 (HMAC-SHA256) |
-| **Secret** | `JWT_SECRET` env var — fallback `colegio_ohiggins_secret_changeme` |
-| **Rutas públicas** | `/api/auth/login`, `/api/auth/register`, `/api/estudiantes/login`, `/health`, `/docs` |
-| **Header esperado** | `Authorization: Bearer <token>` |
-| **Respuesta 401** | `{ error: "Token no proporcionado" }` o `{ error: "Token inválido o expirado" }` |
-
-### Flujo
-
-1. **Login** (ruta pública) → el BFF o microservicio genera y devuelve un JWT
-2. **Frontend** guarda el token en `sessionStorage` clave `'token'`
-3. **Cada request** → `apiClient.ts` lee el token y lo inyecta en el header `Authorization`
-4. **BFF** verifica la firma con `hono/jwt.verify()` — si es inválido responde 401
-5. El **payload** decodificado queda disponible como `c.get('user')` en las rutas
-
-### Generación de tokens
-
-- **Profesores**: el microservicio de autentificación genera el JWT en `POST /api/auth/login`
-- **Estudiantes**: el BFF genera el JWT en `POST /api/estudiantes/login` (el microservicio de estudiantes no maneja auth)
 
 ---
 
@@ -225,7 +238,7 @@ Ver README de cada capa para detalles de cobertura y estructura de tests. Report
 Wep/
 ├── frontend/           → Aplicación React (Vite + TailwindCSS + Zustand)
 ├── backend/
-│   ├── bff/            → Backend for Frontend (Hono + Zod OpenAPI)
+│   ├── krakend/        → API Gateway (KrakenD 2.13, configuración JSON pura)
 │   └── microservicios/ → 10 microservicios independientes
 │       ├── autentificacion/
 │       ├── estudiantes/
@@ -247,6 +260,16 @@ Wep/
 
 ---
 
-## Documentación API
 
-Swagger UI disponible en `GET /docs` del BFF (`http://localhost:3000/docs`). Generado automáticamente desde los schemas Zod usando `@hono/zod-openapi`.
+
+## Variables de Entorno
+
+Cada servicio requiere ciertas variables de entorno. Las principales:
+
+| Variable | Servicios | Descripción |
+|---|---|---|
+| `SENTRY_DSN` | Todos los microservicios | DSN de GlitchTip/Sentry para error tracking |
+| `SENTRY_ENVIRONMENT` | Todos | Entorno (`development`, `production`) |
+| `SENTRY_TRACES_SAMPLE_RATE` | Todos | Muestreo de trazas 0-100 (default 0) |
+| `JWT_SECRET` | ms-auth | Secreto para firmar/verificar JWT |
+| `NOVU_SECRET_KEY` | ms-notifications | API key de Novu para notificaciones push |

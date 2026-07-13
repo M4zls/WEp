@@ -4,7 +4,7 @@ import { useAuthStore } from '../store';
 import studentService from '../../student/student.service';
 import apiClient from '../../../api/apiClient';
 
-type Role = 'estudiante' | 'profesor';
+type Role = 'student' | 'professor';
 
 const LoginForm: FC = (): ReactElement => {
   const navigate = useNavigate();
@@ -18,8 +18,8 @@ const LoginForm: FC = (): ReactElement => {
 
   const detectRole = (email: string): Role | null => {
     const domain = email.split('@')[1]?.toLowerCase();
-    if (domain?.includes('alumnocbo')) return 'estudiante';
-    if (domain?.includes('profesorcbo')) return 'profesor';
+    if (domain?.includes('alumnocbo')) return 'student';
+    if (domain?.includes('profesorcbo')) return 'professor';
     return null;
   };
 
@@ -34,13 +34,13 @@ const LoginForm: FC = (): ReactElement => {
     }
 
     try {
-      if (role === 'estudiante') {
+      if (role === 'student') {
         const response = await studentService.login(email, password);
         if (response && response.rut) {
           const token = response.token || '';
-          setLoginSuccess({ email, role: 'estudiante' }, token, 'estudiante');
+          setLoginSuccess({ email, role: 'student' }, token, 'student');
           sessionStorage.setItem('user', JSON.stringify(response));
-          sessionStorage.setItem('role', 'estudiante');
+          sessionStorage.setItem('role', 'student');
           sessionStorage.setItem('token', token);
           navigate('/dashboard');
         }
@@ -50,15 +50,15 @@ const LoginForm: FC = (): ReactElement => {
           password,
         });
         if (authResponse && authResponse.token) {
-          setLoginSuccess({ email, role: 'profesor' }, authResponse.token, 'profesor');
-          sessionStorage.setItem('user', JSON.stringify(authResponse.usuario));
-          sessionStorage.setItem('role', 'profesor');
+          setLoginSuccess({ email, role: 'professor' }, authResponse.token, 'professor');
+          sessionStorage.setItem('user', JSON.stringify(authResponse.user));
+          sessionStorage.setItem('role', 'professor');
           sessionStorage.setItem('token', authResponse.token);
           navigate('/dashboard');
         }
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al iniciar sesión';
+      const errorMessage = err instanceof Error ? err.message : 'Error during login';
       setError(errorMessage);
     }
   };

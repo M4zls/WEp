@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const createGradeSchema = z.object({
   studentRut: z.string().min(1, 'El RUT del estudiante es obligatorio'),
   subject: z.string().min(1, 'La asignatura es obligatoria'),
-  curso: z.string().min(1, 'El curso es obligatorio'),
+  course: z.string().min(1, 'El curso es obligatorio'),
   grade: z
     .string()
     .min(1, 'El valor de la nota es obligatorio')
@@ -36,7 +36,7 @@ export const gradesForStudentSchema = z.object({
 
 /** @const Esquema Zod para consultar notas por curso */
 export const gradesForCourseSchema = z.object({
-  curso: z.string().min(1, 'El curso es obligatorio'),
+  course: z.string().min(1, 'El curso es obligatorio'),
   professorRut: z.string().min(1, 'El RUT del profesor es obligatorio'),
 });
 

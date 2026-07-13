@@ -2,16 +2,16 @@ import React, { FC, ReactElement, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../auth/store';
 import coursesService from '../../courses/courses.service';
-import type { CursoInfo, UserData } from '../teacher.types';
+import type { CourseInfo, UserData } from '../teacher.types';
 import DashboardLayout from '../../../layout/DashboardLayout';
 
-interface FlatMateria {
+interface FlatSubject {
   id: number;
-  asignatura_nombre: string;
-  asignatura_codigo?: string;
-  estudiantes: number;
-  curso_nombre: string;
-  curso_id: number;
+  subjectName: string;
+  subjectCode?: string;
+  students: number;
+  courseName: string;
+  courseId: number;
 }
 
 const cardColors = [
@@ -49,8 +49,8 @@ const TeacherDashboard: FC = (): ReactElement => {
   const locationState = location.state as { section?: string } | null;
 
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [materias, setMaterias] = useState<FlatMateria[]>([]);
-  const [cursos, setCursos] = useState<CursoInfo[]>([]);
+  const [flatSubjects, setFlatSubjects] = useState<FlatSubject[]>([]);
+  const [courses, setCourses] = useState<CourseInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -62,57 +62,57 @@ const TeacherDashboard: FC = (): ReactElement => {
     const profesorId = storedUser?.id;
 
     coursesService.getCourses().then(async (lista) => {
-      const cursosConMaterias: CursoInfo[] = [];
-      const todasMaterias: FlatMateria[] = [];
+      const coursesWithSubjects: CourseInfo[] = [];
+      const allSubjects: FlatSubject[] = [];
 
       for (const c of lista) {
         try {
-          const materiasData = await coursesService.getSubjectsByCourse(c.id);
-          const materiasFiltradas = profesorId
-            ? materiasData.filter((m: any) => m.profesorId === profesorId)
+          const subjectsData = await coursesService.getSubjectsByCourse(c.id);
+          const filteredSubjects = profesorId
+            ? subjectsData.filter((m: any) => m.professorId === profesorId)
             : [];
 
-          if (materiasFiltradas.length > 0) {
-            let estudiantesCount = 0;
+          if (filteredSubjects.length > 0) {
+            let studentCount = 0;
             try {
-              const estudiantesData = await coursesService.getStudentsByCourse(c.nombre);
-              estudiantesCount = Array.isArray(estudiantesData) ? estudiantesData.length : 0;
+              const studentsData = await coursesService.getStudentsByCourse(c.name);
+              studentCount = Array.isArray(studentsData) ? studentsData.length : 0;
             } catch {
-              estudiantesCount = 0;
+              studentCount = 0;
             }
 
-            cursosConMaterias.push({
+            coursesWithSubjects.push({
               id: c.id,
-              nombre: c.nombre,
-              nivel: c.nivel || '',
-              letra: c.letra || '',
-              materias: materiasFiltradas.map((m: any) => ({
+              name: c.name,
+              level: c.level || '',
+              letter: c.letter || '',
+              subjects: filteredSubjects.map((m: any) => ({
                 id: m.id,
-                asignatura_nombre: m.asignaturaNombre,
-                asignatura_codigo: m.asignaturaCodigo,
-                estudiantes: estudiantesCount,
+                subjectName: m.subjectName,
+                subjectCode: m.subjectCode,
+                students: studentCount,
               })),
             });
 
-            for (const raw of materiasFiltradas) {
+            for (const raw of filteredSubjects) {
               const m = raw as any;
-              todasMaterias.push({
+              allSubjects.push({
                 id: m.id,
-                asignatura_nombre: m.asignaturaNombre,
-                asignatura_codigo: m.asignaturaCodigo,
-                estudiantes: estudiantesCount,
-                curso_nombre: c.nombre,
-                curso_id: c.id,
+                subjectName: m.subjectName,
+                subjectCode: m.subjectCode,
+                students: studentCount,
+                courseName: c.name,
+                courseId: c.id,
               });
             }
           }
         } catch {
-          // skip curso if materias fetch fails
+          // skip course if subjects fetch fails
         }
       }
 
-      setCursos(cursosConMaterias);
-      setMaterias(todasMaterias);
+      setCourses(coursesWithSubjects);
+      setFlatSubjects(allSubjects);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -123,11 +123,11 @@ const TeacherDashboard: FC = (): ReactElement => {
   };
 
   return (
-    <DashboardLayout userData={userData} role="profesor" onLogout={handleLogout} defaultSection={locationState?.section}>
+    <DashboardLayout userData={userData} role="professor" onLogout={handleLogout} defaultSection={locationState?.section}>
 
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-slate-800">Mis Asignaturas</h3>
-        <p className="text-sm text-slate-500 mt-1">Vista general de tus asignaturas por curso</p>
+        <p className="text-sm text-slate-500 mt-1">Resumen de tus asignaturas por curso</p>
       </div>
 
       {loading ? (
@@ -142,18 +142,18 @@ const TeacherDashboard: FC = (): ReactElement => {
             </div>
           ))}
         </div>
-      ) : materias.length > 0 ? (
+      ) : flatSubjects.length > 0 ? (
         <div className="space-y-4">
-          {materias.map((mat, idx) => {
+          {flatSubjects.map((mat, idx) => {
             const color = cardColors[idx % cardColors.length];
             return (
               <div
                 key={mat.id}
-                onClick={() => navigate(`/dashboard/materia/${mat.id}`, {
+                onClick={() => navigate(`/dashboard/subject/${mat.id}`, {
                   state: {
-                    subjectName: mat.asignatura_nombre,
-                    subjectCode: mat.asignatura_codigo,
-                    courseName: mat.curso_nombre,
+                    subjectName: mat.subjectName,
+                    subjectCode: mat.subjectCode,
+                    courseName: mat.courseName,
                     colorIdx: idx,
                   },
                 })}
@@ -162,21 +162,21 @@ const TeacherDashboard: FC = (): ReactElement => {
                 <div className={`w-1.5 flex-shrink-0 ${color.bar}`} />
                 <div className="flex-1 p-5 flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-xl ${color.light} flex items-center justify-center text-2xl flex-shrink-0`}>
-                    {getSubjectIcon(mat.asignatura_nombre)}
+                    {getSubjectIcon(mat.subjectName)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h4 className="text-lg font-semibold text-slate-800">{mat.asignatura_nombre}</h4>
-                      {mat.asignatura_codigo && (
+                      <h4 className="text-lg font-semibold text-slate-800">{mat.subjectName}</h4>
+                      {mat.subjectCode && (
                         <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${color.badge}`}>
-                          {mat.asignatura_codigo}
+                          {mat.subjectCode}
                         </span>
                       )}
                     </div>
                     <p className="text-sm text-slate-500 mt-1">
-                      Curso: <span className="font-medium text-slate-600">{mat.curso_nombre}</span>
+                      Curso: <span className="font-medium text-slate-600">{mat.courseName}</span>
                       <span className="mx-2">·</span>
-                      {mat.estudiantes} estudiante(s)
+                      {mat.students} estudiante(s)
                     </p>
                   </div>
                 </div>

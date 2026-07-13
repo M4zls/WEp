@@ -5,12 +5,12 @@ import type { User } from '../../common/types';
 interface AuthState {
   user: User | null;
   token: string | null;
-  role: 'estudiante' | 'profesor' | null;
+  role: 'student' | 'professor' | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (email: string, password: string, role: 'estudiante' | 'profesor') => Promise<boolean>;
-  setLoginSuccess: (user: User, token: string, role: 'estudiante' | 'profesor') => void;
+  login: (email: string, password: string, role: 'student' | 'professor') => Promise<boolean>;
+  setLoginSuccess: (user: User, token: string, role: 'student' | 'professor') => void;
   logout: () => void;
   setError: (error: string | null) => void;
   clearError: () => void;

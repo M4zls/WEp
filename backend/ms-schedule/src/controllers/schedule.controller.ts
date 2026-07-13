@@ -9,7 +9,7 @@ export const scheduleController = new Hono();
 
 scheduleController.get('/', async (c) => {
   try {
-    const courseSubjectId = c.req.query('curso_asignatura_id');
+    const courseSubjectId = c.req.query('course_subject_id');
     const id = courseSubjectId ? parseInt(courseSubjectId) : undefined;
     const horarios = await service.listHorarios(id);
     return c.json(horarios);
@@ -54,7 +54,7 @@ scheduleController.put('/:id', async (c) => {
       return c.json({ error: msgs }, 400);
     }
     await service.updateSchedule(id, parsed.data);
-    return c.json({ message: 'Horario actualizado correctamente' });
+    return c.json({ message: 'Schedule updated successfully' });
   } catch (err: any) {
     const status = err.message === SCHEDULE_ERRORS.NOT_FOUND ? 404 : 400;
     return c.json({ error: err.message }, status);
@@ -65,7 +65,7 @@ scheduleController.delete('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
     await service.deleteSchedule(id);
-    return c.json({ message: 'Horario eliminado correctamente' });
+    return c.json({ message: 'Schedule deleted successfully' });
   } catch (err: any) {
     const status = err.message === SCHEDULE_ERRORS.NOT_FOUND ? 404 : 400;
     return c.json({ error: err.message }, status);

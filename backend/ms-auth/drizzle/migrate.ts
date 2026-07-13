@@ -13,12 +13,12 @@ try {
 	"id" serial PRIMARY KEY NOT NULL,
 	"rut" text NOT NULL,
 	"dv" text NOT NULL,
-	"nombre" text NOT NULL,
-	"apellido" text NOT NULL,
+    "first_name" text NOT NULL,
+	"last_name" text NOT NULL,
 	"email" text NOT NULL,
 	"password" text NOT NULL,
-	"rol" text NOT NULL DEFAULT 'estudiante',
-	"activo" boolean DEFAULT true,
+	"role" text NOT NULL DEFAULT 'student',
+	"active" boolean DEFAULT true,
 	"created_at" text DEFAULT (now()::text),
 	CONSTRAINT "users_rut_unique" UNIQUE ("rut"),
 	CONSTRAINT "users_email_unique" UNIQUE ("email")
@@ -36,14 +36,14 @@ try {
 	"user_id" integer NOT NULL,
 	"token" text NOT NULL,
 	"expires_at" text NOT NULL,
-	"usado" boolean DEFAULT false,
+    "used" boolean DEFAULT false,
 	"created_at" text DEFAULT (now()::text),
 	CONSTRAINT "recovery_tokens_token_unique" UNIQUE ("token")
   );`);
   await sql.unsafe(`CREATE TABLE IF NOT EXISTS "auth"."permissions" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
-	"modulo" text NOT NULL,
+    "module" text NOT NULL,
 	"read" boolean DEFAULT false,
 	"write" boolean DEFAULT false,
 	"delete" boolean DEFAULT false

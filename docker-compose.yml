@@ -1,12 +1,11 @@
 services:
-  # PostgreSQL Database
   db:
     image: postgres:16-alpine
     container_name: wep-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: wep
+      POSTGRES_DB: postgres
     ports:
       - "5433:5432"
     volumes:
@@ -15,11 +14,10 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
     networks:
       - wep-network
 
-  # Backend - Auth Microservice
   ms-auth:
     build:
       context: ./backend/ms-auth
@@ -30,14 +28,16 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3002
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_auth
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
     networks:
       - wep-network
 
-  # Backend - Students Microservice
   ms-students:
     build:
       context: ./backend/ms-students
@@ -48,14 +48,16 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_students
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
     networks:
       - wep-network
 
-  # Backend - Teachers Microservice
   ms-teachers:
     build:
       context: ./backend/ms-teachers
@@ -66,14 +68,16 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3004
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_teachers
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
     networks:
       - wep-network
 
-  # Backend - Notifications Microservice
   ms-notifications:
     build:
       context: ./backend/ms-notifications
@@ -84,15 +88,19 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3003
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_notifications
+      - MS_STUDENTS_SERVICE=http://ms-students:3001
+      - MS_AUTH_SERVICE=http://ms-auth:3002
       - NOVU_SECRET_KEY=${NOVU_SECRET_KEY}
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
     networks:
       - wep-network
 
-  # Backend - Courses Microservice
   ms-courses:
     build:
       context: ./backend/ms-courses
@@ -103,14 +111,17 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3005
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_courses
+      - MS_TEACHERS_SERVICE=http://ms-teachers:3004
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
     networks:
       - wep-network
 
-  # Backend - Classes Microservice
   ms-classes:
     build:
       context: ./backend/ms-classes
@@ -121,34 +132,108 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3006
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_classes
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
     depends_on:
       db:
         condition: service_healthy
     networks:
       - wep-network
 
-  # Backend - BFF (Backend for Frontend)
-  bff:
+  ms-schedule:
     build:
-      context: ./backend/bff
+      context: ./backend/ms-schedule
       dockerfile: Dockerfile
-    container_name: bff-service
+    container_name: ms-schedule-service
     ports:
-      - "3000:3000"
+      - "3007:3007"
     environment:
       - NODE_ENV=production
-      - PORT=3000
-      - MS_AUTH_SERVICE=http://ms-auth:3002
+      - PORT=3007
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_schedule
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  ms-attendance:
+    build:
+      context: ./backend/ms-attendance
+      dockerfile: Dockerfile
+    container_name: ms-attendance-service
+    ports:
+      - "3008:3008"
+    environment:
+      - NODE_ENV=production
+      - PORT=3008
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_attendance
+      - MS_NOTIFICATIONS_SERVICE=http://ms-notifications:3003
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  ms-messaging:
+    build:
+      context: ./backend/ms-messaging
+      dockerfile: Dockerfile
+    container_name: ms-messaging-service
+    ports:
+      - "3009:3009"
+    environment:
+      - NODE_ENV=production
+      - PORT=3009
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_messaging
+      - MS_NOTIFICATIONS_SERVICE=http://ms-notifications:3003
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  ms-grades:
+    build:
+      context: ./backend/ms-grades
+      dockerfile: Dockerfile
+    container_name: ms-grades-service
+    ports:
+      - "3010:3010"
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_grades
       - MS_STUDENTS_SERVICE=http://ms-students:3001
       - MS_TEACHERS_SERVICE=http://ms-teachers:3004
       - MS_NOTIFICATIONS_SERVICE=http://ms-notifications:3003
-      - MS_COURSES_SERVICE=http://ms-courses:3005
-      - MS_CLASSES_SERVICE=http://ms-classes:3006
-      - MS_SCHEDULE_SERVICE=http://ms-schedule:3007
-      - MS_ATTENDANCE_SERVICE=http://ms-attendance:3008
-      - MS_MESSAGING_SERVICE=http://ms-messaging:3009
-      - MS_GRADES_SERVICE=http://ms-grades:3010
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wep-network
+
+  krakend:
+    build:
+      context: ./backend/krakend
+      dockerfile: Dockerfile
+    container_name: krakend-service
+    ports:
+      - "3100:8080"
     depends_on:
       - ms-auth
       - ms-students
@@ -163,79 +248,6 @@ services:
     networks:
       - wep-network
 
-  # Backend - Schedule Microservice
-  ms-schedule:
-    build:
-      context: ./backend/ms-schedule
-      dockerfile: Dockerfile
-    container_name: ms-schedule-service
-    ports:
-      - "3007:3007"
-    environment:
-      - NODE_ENV=production
-      - PORT=3007
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - wep-network
-
-  # Backend - Attendance Microservice
-  ms-attendance:
-    build:
-      context: ./backend/ms-attendance
-      dockerfile: Dockerfile
-    container_name: ms-attendance-service
-    ports:
-      - "3008:3008"
-    environment:
-      - NODE_ENV=production
-      - PORT=3008
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - wep-network
-
-  # Backend - Messaging Microservice
-  ms-messaging:
-    build:
-      context: ./backend/ms-messaging
-      dockerfile: Dockerfile
-    container_name: ms-messaging-service
-    ports:
-      - "3009:3009"
-    environment:
-      - NODE_ENV=production
-      - PORT=3009
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - wep-network
-
-  # Backend - Grades Microservice
-  ms-grades:
-    build:
-      context: ./backend/ms-grades
-      dockerfile: Dockerfile
-    container_name: ms-grades-service
-    ports:
-      - "3010:3010"
-    environment:
-      - NODE_ENV=production
-      - PORT=3010
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - wep-network
-
-  # Frontend - React
   frontend:
     build:
       context: ./frontend
@@ -243,15 +255,63 @@ services:
     container_name: frontend-app
     ports:
       - "8080:8080"
-    environment:
-      - REACT_APP_API_URL=http://bff:3000
     depends_on:
-      - bff
+      - krakend
+    networks:
+      - wep-network
+
+  glitchtip-db:
+    image: postgres:16-alpine
+    container_name: glitchtip-db
+    environment:
+      POSTGRES_USER: glitchtip
+      POSTGRES_PASSWORD: glitchtip
+      POSTGRES_DB: glitchtip
+    volumes:
+      - glitchtip-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U glitchtip"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - wep-network
+
+  glitchtip-redis:
+    image: redis:7-alpine
+    container_name: glitchtip-redis
+    networks:
+      - wep-network
+
+  glitchtip:
+    image: glitchtip/glitchtip
+    container_name: glitchtip
+    ports:
+      - "8000:8000"
+    depends_on:
+      glitchtip-db:
+        condition: service_healthy
+      glitchtip-redis:
+        condition: service_started
+    environment:
+      - DATABASE_URL=postgres://glitchtip:glitchtip@glitchtip-db:5432/glitchtip
+      - REDIS_URL=redis://glitchtip-redis:6379/0
+      - VALKEY_URL=redis://glitchtip-redis:6379/0
+      - GLITCHTIP_DOMAIN=http://localhost:8000
+      - GLITCHTIP_EMBED_WORKER=true
+      - SECRET_KEY=changeme-super-secret-key-glitchtip-2026
+      - DEFAULT_FROM_EMAIL=admin@localhost
+      - DISABLE_USER_REGISTRATION=false
+      - ENABLE_LOGS=true
+      - CSP_STYLE_SRC='self' 'unsafe-inline'
+      - CSP_SCRIPT_SRC='self' 'unsafe-eval' https://*.glitchtip.com
+      - CSP_STYLE_SRC_ELEM='self' 'unsafe-inline'
     networks:
       - wep-network
 
 volumes:
   pgdata:
+  glitchtip-pgdata:
 
 networks:
   wep-network:

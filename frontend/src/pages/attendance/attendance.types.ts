@@ -1,22 +1,22 @@
-export interface Asistencia {
+export interface Attendance {
   id: number;
-  claseId: number;
-  cursoAsignaturaId: number;
-  estudianteRut: string;
-  estudianteNombre: string;
-  presente: boolean;
-  justificacion?: string | null;
-  fecha?: string | null;
+  classId: number;
+  courseSubjectId: number;
+  studentRut: string;
+  studentFirstName: string;
+  present: boolean;
+  justification?: string | null;
+  date?: string | null;
   createdAt?: string | null;
 }
 
-export interface MarcarAsistenciaDto {
-  claseId: number;
-  cursoAsignaturaId: number;
-  registros: {
-    estudianteRut: string;
-    estudianteNombre: string;
-    presente: boolean;
-    justificacion?: string;
+export interface MarkAttendanceDto {
+  classId: number;
+  courseSubjectId: number;
+  records: {
+    studentRut: string;
+    studentFirstName: string;
+    present: boolean;
+    justification?: string;
   }[];
 }

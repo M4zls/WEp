@@ -21,10 +21,21 @@ teachersController.post('/login', async (c) => {
   }
 });
 
+teachersController.get('/id/:id', async (c) => {
+  try {
+    const id = parseInt(c.req.param('id'));
+    if (isNaN(id)) return c.json({ error: 'Invalid ID' }, 400);
+    const p = await service.getTeacherById(id);
+    return c.json({ id: p.id, rut: p.rut, dv: p.dv, firstName: p.firstName, lastName: p.lastName, email: p.email, phone: p.phone, subject: p.subject, createdAt: p.createdAt });
+  } catch (err: any) {
+    return c.json({ error: err.message }, 404);
+  }
+});
+
 teachersController.get('/', async (c) => {
   try {
     const profesores = await service.getAllTeachers();
-    return c.json(profesores.map(p => ({ id: p.id, rut: p.rut, dv: p.dv, nombre: p.name, apellido: p.lastName, email: p.email, telefono: p.phone, especialidad: p.subject, createdAt: p.createdAt })));
+    return c.json(profesores.map(p => ({ id: p.id, rut: p.rut, dv: p.dv, firstName: p.firstName, lastName: p.lastName, email: p.email, phone: p.phone, subject: p.subject, createdAt: p.createdAt })));
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
@@ -34,7 +45,7 @@ teachersController.get('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
     const p = await service.getTeacherByRut(rut);
-    return c.json({ id: p.id, rut: p.rut, dv: p.dv, nombre: p.name, apellido: p.lastName, email: p.email, telefono: p.phone, especialidad: p.subject, createdAt: p.createdAt });
+    return c.json({ id: p.id, rut: p.rut, dv: p.dv, firstName: p.firstName, lastName: p.lastName, email: p.email, phone: p.phone, subject: p.subject, createdAt: p.createdAt });
   } catch (err: any) {
     return c.json({ error: err.message }, 404);
   }
@@ -42,14 +53,14 @@ teachersController.get('/:rut', async (c) => {
 
 teachersController.post('/', async (c) => {
   try {
-    const datos = await c.req.json();
-    const parsed = createTeacherSchema.safeParse(datos);
+    const data = await c.req.json();
+    const parsed = createTeacherSchema.safeParse(data);
     if (!parsed.success) {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
     }
     await service.createTeacher(parsed.data);
-    return c.json({ message: 'Profesor creado correctamente', datos: parsed.data }, 201);
+    return c.json({ message: 'Teacher created successfully', data: parsed.data }, 201);
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }
@@ -58,14 +69,14 @@ teachersController.post('/', async (c) => {
 teachersController.put('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
-    const datos = await c.req.json();
-    const parsed = updateTeacherSchema.safeParse(datos);
+    const data = await c.req.json();
+    const parsed = updateTeacherSchema.safeParse(data);
     if (!parsed.success) {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
     }
     await service.updateTeacher(rut, parsed.data);
-    return c.json({ message: 'Profesor actualizado correctamente', datos: parsed.data });
+    return c.json({ message: 'Teacher updated successfully', data: parsed.data });
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }
@@ -75,7 +86,7 @@ teachersController.delete('/:rut', async (c) => {
   try {
     const rut = c.req.param('rut');
     await service.deleteTeacher(rut);
-    return c.json({ message: 'Profesor eliminado correctamente' });
+    return c.json({ message: 'Teacher deleted successfully' });
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }

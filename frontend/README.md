@@ -1,6 +1,6 @@
 # Frontend — Portal Educativo
 
-Aplicación web React que provee la interfaz de usuario para la gestión académica del Colegio Bernardo O'Higgins. Consume el BFF como única puerta de entrada a los microservicios del backend.
+Aplicación web React que provee la interfaz de usuario para la gestión académica del Colegio Bernardo O'Higgins. Consume KrakenD (API Gateway) como única puerta de entrada a los microservicios del backend.
 
 ---
 
@@ -75,7 +75,7 @@ npm install        # solo la primera vez
 npm run dev        # http://localhost:8081
 ```
 
-El frontend se conecta automáticamente al BFF en `http://localhost:3000/api` (Docker) sin configuración adicional.
+El frontend se conecta automáticamente a KrakenD en `http://localhost:3100/api` (Docker) sin configuración adicional.
 
 ### Solo frontend (mockeando API)
 
@@ -96,22 +96,23 @@ PORT=8081                    # Puerto del dev server (vite.config.ts)
 
 ## Flujo JWT
 
-1. **Login**: `pages/auth/components/LoginForm.tsx` llama al BFF, recibe `{ ..., token }`
+1. **Login**: `pages/auth/components/LoginForm.tsx` llama a KrakenD, recibe `{ ..., token }`
 2. **Persistencia**: el token se guarda en `sessionStorage.setItem('token', token)` — tanto para estudiantes como profesores
 3. **Inyección automática**: `shared/api/apiClient.ts`:
    ```ts
    const token = authService.getToken();   // sessionStorage.getItem('token')
    if (token) headers.Authorization = `Bearer ${token}`;
    ```
-4. **BFF valida**: el middleware del BFF verifica la firma del token en cada request a `/api/*`
-5. **401**: si el token falta o es inválido, el BFF responde con error y el frontend redirige al login
+4. **KrakenD reenvía**: el gateway pasa el token al microservicio destino
+5. **Microservicio valida**: el middleware del microservicio verifica la firma del token
+6. **401**: si el token falta o es inválido, el microservicio responde con error y el frontend redirige al login
 
 ---
 
 ## Convenciones
 
 - **Rutas**: definidas como constantes en `config/routes.ts`
-- **API Client**: singleton genérico en `api/apiClient.ts` — lee el token de `sessionStorage` y lo inyecta como `Authorization: Bearer <token>`
+- **API Client**: singleton genérico en `api/apiClient.ts` — apunta a `http://localhost:3100/api` (KrakenD), lee el token de `sessionStorage` y lo inyecta como `Authorization: Bearer <token>`
 - **Token JWT**: se guarda en `sessionStorage.setItem('token', token)` al hacer login (estudiante o profesor)
 - **Estado global**: Zustand con middleware `persist` para sesión de usuario
 - **Estilos**: TailwindCSS utility-first

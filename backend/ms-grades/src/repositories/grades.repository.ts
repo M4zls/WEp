@@ -31,7 +31,7 @@ export class GradesRepository implements IGradesRepository {
     const resultado = await this.db
       .select()
       .from(grades)
-      .where(eq(grades.curso, curso));
+      .where(eq(grades.course, curso));
     return resultado;
   }
 
@@ -40,7 +40,7 @@ export class GradesRepository implements IGradesRepository {
     const resultado = await this.db
       .select()
       .from(grades)
-      .where(and(eq(grades.curso, curso), eq(grades.professorRut, professorRut)));
+      .where(and(eq(grades.course, curso), eq(grades.professorRut, professorRut)));
     return resultado;
   }
 
@@ -67,7 +67,7 @@ export class GradesRepository implements IGradesRepository {
     await this.db.insert(grades).values({
       studentRut: datos.studentRut,
       subject: datos.subject,
-      curso: datos.curso,
+      course: datos.course,
       grade: datos.grade,
       evaluationType: datos.evaluationType,
       date: datos.date,

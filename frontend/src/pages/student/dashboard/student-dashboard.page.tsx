@@ -2,7 +2,7 @@ import React, { FC, ReactElement, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../auth/store';
 import coursesService from '../../courses/courses.service';
-import type { CursoInfo, UserData } from '../student.types';
+import type { CourseInfo, UserData } from '../student.types';
 import DashboardLayout from '../../../layout/DashboardLayout';
 
 const cardColors = [
@@ -40,7 +40,7 @@ const StudentDashboard: FC = (): ReactElement => {
   const logout = useAuthStore((s) => s.logout);
 
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [curso, setCurso] = useState<CursoInfo | null>(null);
+  const [curso, setCurso] = useState<CourseInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -56,31 +56,31 @@ const StudentDashboard: FC = (): ReactElement => {
 
     const loadCurso = async () => {
       try {
-        const cursoNombre = user.cursos;
-        if (!cursoNombre) {
+        const courseName = user.courses;
+        if (!courseName) {
           setLoading(false);
           return;
         }
 
         const lista = await coursesService.getCourses();
-        const miCurso = lista.find((c: any) => c.nombre === cursoNombre);
+        const miCurso = lista.find((c: any) => c.name === courseName);
         if (!miCurso) {
           setLoading(false);
           return;
         }
 
-        const materias = await coursesService.getSubjectsByCourse(miCurso.id);
+        const subjectsData = await coursesService.getSubjectsByCourse(miCurso.id);
         setCurso({
           id: miCurso.id,
-          nombre: miCurso.nombre,
-          nivel: miCurso.nivel || '',
-          letra: miCurso.letra || '',
-          materias: materias.map((m: any) => ({
+          name: miCurso.name,
+          level: miCurso.level || '',
+          letter: miCurso.letter || '',
+          subjects: subjectsData.map((m: any) => ({
             id: m.id,
-            asignatura_nombre: m.asignaturaNombre,
-            asignatura_codigo: m.asignaturaCodigo,
-            profesor_nombre: m.profesorNombre || '',
-            profesor_apellido: m.profesorApellido || '',
+            subjectName: m.subjectName,
+            subjectCode: m.subjectCode,
+            professorFirstName: m.professorFirstName || '',
+            professorLastName: m.professorLastName || '',
           })),
         });
       } catch {
@@ -98,15 +98,15 @@ const StudentDashboard: FC = (): ReactElement => {
     navigate('/');
   };
 
-  const allMaterias = curso?.materias || [];
+  const allSubjects = curso?.subjects || [];
 
   return (
-    <DashboardLayout userData={userData} role="estudiante" onLogout={handleLogout} defaultSection={locationState?.section}>
+    <DashboardLayout userData={userData} role="student" onLogout={handleLogout} defaultSection={locationState?.section}>
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-slate-800">Mis Asignaturas</h3>
           <p className="text-sm text-slate-500 mt-1">
-            {curso ? `Curso: ${curso.nombre}` : 'Curso no asignado'}
+            {curso ? `Curso: ${curso.name}` : 'Curso no asignado'}
           </p>
         </div>
 
@@ -124,18 +124,18 @@ const StudentDashboard: FC = (): ReactElement => {
             </div>
           ))}
         </div>
-      ) : allMaterias.length > 0 ? (
+      ) : allSubjects.length > 0 ? (
         <div className="space-y-4">
-          {allMaterias.map((mat, idx) => {
+          {allSubjects.map((mat, idx) => {
             const color = cardColors[idx % cardColors.length];
             return (
               <div
                 key={mat.id}
-                onClick={() => navigate(`/dashboard/materia/${mat.id}`, {
+                onClick={() => navigate(`/dashboard/subject/${mat.id}`, {
                   state: {
-                    subjectName: mat.asignatura_nombre,
-                    subjectCode: mat.asignatura_codigo,
-                    courseName: curso?.nombre,
+                    subjectName: mat.subjectName,
+                    subjectCode: mat.subjectCode,
+                    courseName: curso?.name,
                     colorIdx: idx,
                   },
                 })}
@@ -144,23 +144,23 @@ const StudentDashboard: FC = (): ReactElement => {
                 <div className={`w-1.5 flex-shrink-0 ${color.bar}`} />
                 <div className="flex-1 p-5 flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-xl ${color.light} flex items-center justify-center text-2xl flex-shrink-0`}>
-                    {getSubjectIcon(mat.asignatura_nombre)}
+                    {getSubjectIcon(mat.subjectName)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h4 className="text-lg font-semibold text-slate-800">{mat.asignatura_nombre}</h4>
-                      {mat.asignatura_codigo && (
+                      <h4 className="text-lg font-semibold text-slate-800">{mat.subjectName}</h4>
+                      {mat.subjectCode && (
                         <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${color.badge}`}>
-                          {mat.asignatura_codigo}
+                          {mat.subjectCode}
                         </span>
                       )}
                     </div>
                     <p className="text-sm text-slate-500 mt-1">
-                      {mat.profesor_nombre && mat.profesor_apellido
-                        ? `${mat.profesor_nombre} ${mat.profesor_apellido}`
-                        : mat.profesor_nombre || 'Sin profesor'}
+                      {mat.professorFirstName && mat.professorLastName
+                        ? `${mat.professorFirstName} ${mat.professorLastName}`
+                        : mat.professorFirstName || 'Sin profesor'}
                       {curso && <span className="mx-2">·</span>}
-                      {curso && <span className="text-slate-400">{curso.nombre}</span>}
+                      {curso && <span className="text-slate-400">{curso.name}</span>}
                     </p>
                   </div>
                 </div>

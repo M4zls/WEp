@@ -16,13 +16,13 @@ export class AttendanceRepository implements IAttendanceRepository {
   async findByStudentRut(studentRut: string): Promise<Attendance[]> {
     return  this.db.select().from(attendance)
       .where(eq(attendance.studentRut, studentRut))
-      .orderBy(attendance.fecha);
+      .orderBy(attendance.date);
   }
 
   async findByCourseSubjectId(courseSubjectId: number): Promise<Attendance[]> {
     return  this.db.select().from(attendance)
       .where(eq(attendance.courseSubjectId, courseSubjectId))
-      .orderBy(attendance.fecha, attendance.studentName);
+      .orderBy(attendance.date, attendance.studentName);
   }
 
   async findOne(classId: number, studentRut: string): Promise<Attendance | null> {

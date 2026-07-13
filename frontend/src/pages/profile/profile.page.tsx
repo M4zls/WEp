@@ -4,26 +4,26 @@ import type { ProfilePageProps, ProfileData } from './profile.types';
 
 interface FieldProps {
   label: string;
-  valor: string;
+  value: string;
   editable: boolean;
   editing?: boolean;
-  campo?: keyof ProfileData;
-  onChange?: (campo: keyof ProfileData, valor: string) => void;
+  field?: keyof ProfileData;
+  onChange?: (field: keyof ProfileData, value: string) => void;
 }
 
-const Field: FC<FieldProps> = ({ label, valor, editable, editing, campo, onChange }) => (
+const Field: FC<FieldProps> = ({ label, value, editable, editing, field, onChange }) => (
   <div>
     <label className="block text-sm font-medium text-slate-600 mb-1">{label}</label>
-    {editing && editable && campo && onChange ? (
+    {editing && editable && field && onChange ? (
       <input
         type="text"
-        value={valor || ''}
-        onChange={(e) => onChange(campo, e.target.value)}
+        value={value || ''}
+        onChange={(e) => onChange(field, e.target.value)}
         className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all bg-white"
       />
     ) : (
       <p className="px-4 py-2.5 text-slate-800 bg-slate-50 rounded-xl border border-slate-200">
-        {valor || <span className="text-slate-400 italic">No registrado</span>}
+        {value || <span className="text-slate-400 italic">No registrado</span>}
       </p>
     )}
   </div>
@@ -57,26 +57,26 @@ const ProfilePage: FC<ProfilePageProps> = ({ userData, role }): ReactElement => 
     <div className="max-w-2xl mx-auto">
       {message && (
         <div className={`mb-6 px-5 py-3 rounded-xl text-sm font-medium ${
-          message.tipo === 'ok'
+          message.type === 'ok'
             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
             : 'bg-red-50 text-red-700 border border-red-200'
         }`}>
-          {message.texto}
+          {message.text}
         </div>
       )}
 
       <div className="flex items-center gap-5 mb-8">
         <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-3xl shadow-lg">
-          {(profile.nombre?.charAt(0) || '?') + (profile.apellido?.charAt(0) || '')}
+          {(profile.firstName?.charAt(0) || '?') + (profile.lastName?.charAt(0) || '')}
         </div>
         <div>
           <h2 className="text-2xl font-bold text-slate-800">
-            {profile.nombre} {profile.apellido}
+            {profile.firstName} {profile.lastName}
           </h2>
           <span className={`inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold ${
-            role === 'estudiante' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+            role === 'student' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
           }`}>
-            {role === 'estudiante' ? 'Estudiante' : 'Profesor'}
+            {role === 'student' ? 'Estudiante' : 'Profesor'}
           </span>
         </div>
       </div>
@@ -111,27 +111,27 @@ const ProfilePage: FC<ProfilePageProps> = ({ userData, role }): ReactElement => 
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="RUT" valor={profile.rut} editable={false} />
-          <Field label="Email" valor={profile.email} editable editing={editing} campo="email" onChange={handleChange} />
-          <Field label="Nombre" valor={profile.nombre} editable editing={editing} campo="nombre" onChange={handleChange} />
-          <Field label="Apellido" valor={profile.apellido} editable editing={editing} campo="apellido" onChange={handleChange} />
-          <Field label="Teléfono" valor={profile.telefono || ''} editable editing={editing} campo="telefono" onChange={handleChange} />
+          <Field label="RUT" value={profile.rut} editable={false} />
+          <Field label="Email" value={profile.email} editable editing={editing} field="email" onChange={handleChange} />
+          <Field label="Nombre" value={profile.firstName} editable editing={editing} field="firstName" onChange={handleChange} />
+          <Field label="Apellido" value={profile.lastName} editable editing={editing} field="lastName" onChange={handleChange} />
+          <Field label="Teléfono" value={profile.phone || ''} editable editing={editing} field="phone" onChange={handleChange} />
 
-          {role === 'estudiante' ? (
+          {role === 'student' ? (
             <>
-              <Field label="Curso(s)" valor={profile.cursos || ''} editable={false} />
-              <Field label="Apoderado" valor={profile.apoderado || ''} editable editing={editing} campo="apoderado" onChange={handleChange} />
+              <Field label="Curso(s)" value={profile.courses || ''} editable={false} />
+              <Field label="Apoderado" value={profile.guardian || ''} editable editing={editing} field="guardian" onChange={handleChange} />
             </>
           ) : (
-            <Field label="Materia" valor={profile.materia || ''} editable={false} />
+            <Field label="Asignatura" value={profile.subject || ''} editable={false} />
           )}
         </div>
 
         <div className="border-t border-slate-100 pt-4">
           <p className="text-xs text-slate-400">
-            {role === 'estudiante'
-              ? `Registrado el ${profile.fechaRegistro ? new Date(profile.fechaRegistro).toLocaleDateString('es-CL') : '—'}`
-              : `Ingresó el ${profile.fechaIngreso ? new Date(profile.fechaIngreso).toLocaleDateString('es-CL') : '—'}`
+            {role === 'student'
+              ? `Registrado: ${profile.registrationDate ? new Date(profile.registrationDate).toLocaleDateString('es-CL') : '—'}`
+              : `Inicio: ${profile.admissionDate ? new Date(profile.admissionDate).toLocaleDateString('es-CL') : '—'}`
             }
           </p>
         </div>
@@ -146,7 +146,7 @@ const ProfilePage: FC<ProfilePageProps> = ({ userData, role }): ReactElement => 
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Dejar vacío para mantener"
+                  placeholder="Vacío para mantener actual"
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all"
                 />
               </div>

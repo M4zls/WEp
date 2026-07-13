@@ -19,16 +19,16 @@ const GradesPage: FC = (): ReactElement => {
     navigate('/');
   };
 
-  if (role === 'profesor') {
+  if (role === 'professor') {
     return (
-      <DashboardLayout userData={user} role="profesor" onLogout={handleLogout}>
+      <DashboardLayout userData={user} role="professor" onLogout={handleLogout}>
         <ManageGradesView />
       </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout userData={user} role="estudiante" onLogout={handleLogout}>
+    <DashboardLayout userData={user} role="student" onLogout={handleLogout}>
       <GradesView />
     </DashboardLayout>
   );

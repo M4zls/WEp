@@ -11,24 +11,24 @@ import notificationsService from '../pages/notifications/notifications.service';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  userData: { id?: number; nombre?: string; apellido?: string; email?: string } | null;
-  role: 'estudiante' | 'profesor';
+  userData: { id?: number; firstName?: string; lastName?: string; email?: string } | null;
+  role: 'student' | 'professor';
   onLogout: () => void;
   defaultSection?: string;
 }
 
 const wipSections: Record<string, { title: string; description: string }> = {
   messaging: {
-    title: 'Mensajería',
-    description: 'Bandeja de mensajes y conversaciones con profesores y alumnos.',
+    title: 'Messaging',
+    description: 'Message inbox and conversations with teachers and students.',
   },
   contact: {
-    title: 'Contacto',
-    description: 'Directorio de contactos y información institucional.',
+    title: 'Contact',
+    description: 'Contact directory and institutional information.',
   },
   profile: {
-    title: 'Mi Perfil',
-    description: 'Edita tu información personal y configura tu cuenta.',
+    title: 'My Profile',
+    description: 'Edit your personal information and configure your account.',
   },
 };
 
@@ -39,10 +39,10 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, o
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchUnread = useCallback(async () => {
-    const usuarioId = userData?.id;
-    if (!usuarioId) return;
+    const userId = userData?.id;
+    if (!userId) return;
     try {
-      const result = await notificationsService.getUnreadCount(usuarioId);
+      const result = await notificationsService.getUnreadCount(userId);
       setUnreadCount(result.count);
     } catch {
       // silent
@@ -61,14 +61,14 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, o
 
   const getInitials = (): string => {
     if (!userData) return '?';
-    const first = userData.nombre?.charAt(0) || '';
-    const last = userData.apellido?.charAt(0) || '';
+    const first = userData.firstName?.charAt(0) || '';
+    const last = userData.lastName?.charAt(0) || '';
     return `${first}${last}`;
   };
 
-  const userName = userData ? `${userData.nombre} ${userData.apellido}`.trim() : 'Usuario';
+  const userName = userData ? `${userData.firstName} ${userData.lastName}`.trim() : 'User';
 
-  const roleLabel = role === 'estudiante' ? 'Estudiante' : 'Profesor';
+  const roleLabel = role === 'student' ? 'Student' : 'Professor';
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -85,16 +85,16 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, o
       <main className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto py-8 px-6">
           {selectedSection === 'home' ? (
-            <HomeView role={role} userData={userData} onGoToSubjects={() => setSelectedSection(role === 'estudiante' ? 'classes' : 'courses')} />
+            <HomeView role={role} userData={userData} onGoToSubjects={() => setSelectedSection(role === 'student' ? 'classes' : 'courses')} />
           ) : selectedSection === 'profile' ? (
             <ProfilePage userData={userData} role={role} />
           ) : selectedSection === 'messaging' ? (
             <MessagingPage />
           ) : selectedSection === 'contact' ? (
             <ContactPage />
-          ) : selectedSection === 'grades' && role === 'estudiante' ? (
+          ) : selectedSection === 'grades' && role === 'student' ? (
             <GradesView />
-          ) : selectedSection === 'manage-grades' && role === 'profesor' ? (
+          ) : selectedSection === 'manage-grades' && role === 'professor' ? (
             <ManageGradesView />
           ) : selectedSection === 'notifications' ? (
             <NotificationsPage />
@@ -102,8 +102,8 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children, userData, role, o
             children
           ) : (
             <WorkInProgress
-              title={wipSections[selectedSection]?.title || 'Sección'}
-              description={wipSections[selectedSection]?.description || 'Esta sección está en desarrollo.'}
+              title={wipSections[selectedSection]?.title || 'Section'}
+              description={wipSections[selectedSection]?.description || 'This section is under development.'}
             />
           )}
         </div>

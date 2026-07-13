@@ -1,23 +1,23 @@
-export interface Horario {
+export interface Schedule {
   id: number;
-  cursoAsignaturaId: number;
-  diaSemana: number;
-  horaInicio: string;
-  horaTermino: string;
+  courseSubjectId: number;
+  weekDay: number;
+  startTime: string;
+  endTime: string;
   createdAt?: string | null;
 }
 
-export interface CreateHorarioDto {
-  cursoAsignaturaId: number;
-  diaSemana: number;
-  horaInicio: string;
-  horaTermino: string;
+export interface CreateScheduleDto {
+  courseSubjectId: number;
+  weekDay: number;
+  startTime: string;
+  endTime: string;
 }
 
-export interface UpdateHorarioDto {
-  diaSemana?: number;
-  horaInicio?: string;
-  horaTermino?: string;
+export interface UpdateScheduleDto {
+  weekDay?: number;
+  startTime?: string;
+  endTime?: string;
 }
 
 export const WEEK_DAYS: Record<number, string> = {

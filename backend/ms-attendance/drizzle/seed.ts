@@ -7,39 +7,36 @@ if (!connectionString) throw new Error('DATABASE_URL is required');
 
 const sql = postgres(connectionString, { max: 1 });
 
-type ClaseRealizada = { id: number; cursoAsignaturaId: number; fecha: string };
-type Estudiante = { rut: string; nombre: string; apellido: string; cursos: string };
+type Estudiante = { rut: string; firstName: string; lastName: string; courses: string };
+
+const HARDCODED_CLASES = [
+  { courseSubjectId: 1, date: '2026-03-01' },
+  { courseSubjectId: 1, date: '2026-03-03' },
+  { courseSubjectId: 2, date: '2026-03-01' },
+  { courseSubjectId: 3, date: '2026-03-02' },
+];
+const HARDCODED_ESTUDIANTES: Estudiante[] = [
+  { rut: '11111111', firstName: 'Mateo', lastName: 'Sánchez', courses: '3°A' },
+  { rut: '22222222', firstName: 'Valentina', lastName: 'Muñoz', courses: '3°A' },
+];
 
 async function seed() {
   try {
-    const clasesRealizadas: ClaseRealizada[] = await sql`SELECT id, course_subject_id as "cursoAsignaturaId", date as fecha FROM "classes"."classes" WHERE status = 'completed' ORDER BY id`;
-    const estudiantes: Estudiante[] = await sql`SELECT rut, nombre, apellido, cursos FROM "students"."students" ORDER BY id`;
-
-    if (clasesRealizadas.length === 0 || estudiantes.length === 0) {
-      console.log('No hay clases realizadas o estudiantes disponibles. Saltando seed de asistencia.');
+    const existing = await sql`SELECT COUNT(*) as count FROM "attendance"."attendance"`;
+    if (existing[0].count > 0) {
+      console.log('Attendance seed: datos ya existen, se omite');
       return;
     }
 
-    const cursoPorCa: Record<number, string> = {};
-    const caRows = await sql`SELECT id, course_id as "curso_id" FROM "courses"."course_subject" ORDER BY id`;
-    const cursoRows = await sql`SELECT id, name as nombre FROM "courses"."courses" ORDER BY id`;
-    const cursoMap: Record<number, string> = {};
-    for (const r of cursoRows) cursoMap[r.id] = r.nombre;
-    for (const r of caRows) cursoPorCa[r.id] = cursoMap[r.curso_id] || '';
-
     let totalInsertados = 0;
-    for (const clase of clasesRealizadas) {
-      const cursoNombre = cursoPorCa[clase.cursoAsignaturaId];
-      if (!cursoNombre) continue;
-
-      const estudiantesCurso = estudiantes.filter(e => e.cursos === cursoNombre);
-      for (const est of estudiantesCurso) {
+    for (const clase of HARDCODED_CLASES) {
+      for (const est of HARDCODED_ESTUDIANTES) {
         const presente = Math.random() > 0.15;
         const justificacion = presente ? null : (['Enfermedad', 'Permiso médico', 'Familiar', 'Problemas personales', 'Cita médica'][Math.floor(Math.random() * 5)]);
 
         const result = await sql`
-          INSERT INTO "attendance"."attendance" (class_id, course_subject_id, student_rut, student_name, present, justification, fecha)
-          VALUES (${clase.id}, ${clase.cursoAsignaturaId}, ${est.rut}, ${est.nombre + ' ' + est.apellido}, ${presente}, ${justificacion}, ${clase.fecha})
+          INSERT INTO "attendance"."attendance" (class_id, course_subject_id, student_rut, student_name, present, justification, date)
+          VALUES (${1}, ${clase.courseSubjectId}, ${est.rut}, ${est.firstName + ' ' + est.lastName}, ${presente}, ${justificacion}, ${clase.date})
           ON CONFLICT (class_id, student_rut) DO NOTHING
           RETURNING id
         `;

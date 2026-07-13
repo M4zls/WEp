@@ -32,7 +32,7 @@ export class NotificationsService implements INotificationsService {
         userId: estudiante.id,
         title: 'Inasistencia',
         message: `Se registró una inasistencia el día ${data.date}`,
-        type: 'asistencia',
+        type: 'attendance',
         url: '/asistencia',
       });
     }
@@ -74,7 +74,7 @@ export class NotificationsService implements INotificationsService {
       userId: estudiante?.id ?? 0,
       title: 'Nueva calificación',
       message: `Tienes una nueva calificación registrada en ${data.subject}`,
-      type: 'nota',
+      type: 'grade',
       url: '/calificaciones',
     });
   }
@@ -95,7 +95,7 @@ export class NotificationsService implements INotificationsService {
   async sendMessageNotice(data: MessageAlertDto) {
     let userId = 0;
 
-    if (data.recipientRole === 'estudiante') {
+    if (data.recipientRole === 'student') {
       const estudiante = await this.repo.findStudentByRut(data.recipientRut);
       if (estudiante) userId = estudiante.id;
     } else {
@@ -107,9 +107,9 @@ export class NotificationsService implements INotificationsService {
 
     await this.repo.insertNotification({
       userId,
-      title: `Nuevo mensaje de ${data.senderName} ${data.senderLastName}`,
+      title: `Nuevo mensaje de ${data.senderFirstName} ${data.senderLastName}`,
       message: 'Tienes un nuevo mensaje sin leer',
-      type: 'mensaje',
+      type: 'message',
       url: '/mensajeria',
     });
   }

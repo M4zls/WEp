@@ -1,13 +1,17 @@
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
+import { lifecycle, initGlitchtip, glitchtipErrorHandler, glitchtipMiddleware } from './glitchtip/index.js'
+import { tracingMiddleware } from './tracing/index.js'
 import { messagingController } from './controllers/messaging.controller.js';
 
 await import('../drizzle/migrate.ts');
 await import('../drizzle/seed.js');
 
-/** Punto de entrada del microservicio de mensajería. */
 const app = new Hono();
-app.use(cors());
+lifecycle()
+initGlitchtip()
+app.use('*', tracingMiddleware())
+app.use('*', glitchtipMiddleware())
+app.onError(glitchtipErrorHandler)
 app.get('/health', (c) => c.json({ status: 'ok' }));
 app.route('/messaging', messagingController);
 

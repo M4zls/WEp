@@ -24,7 +24,7 @@ export class MessagingService implements IMessagingService {
       await this.repo.addParticipant({
         conversationId: conv.id!,
         userId: data.participantIds[i],
-        userName: data.participantNames[i],
+        userFirstName: data.participantFirstNames[i],
         userLastName: data.participantLastNames[i],
         userRole: data.participantRoles[i],
       });
@@ -54,7 +54,7 @@ export class MessagingService implements IMessagingService {
     return this.repo.sendMessage({
       conversationId: data.conversationId,
       senderId: data.senderId,
-      senderName: data.senderName,
+      senderFirstName: data.senderFirstName,
       senderLastName: data.senderLastName,
       senderRole: data.senderRole,
       content: data.content,

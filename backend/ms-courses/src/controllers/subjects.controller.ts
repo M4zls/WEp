@@ -17,8 +17,8 @@ subjectsController.get('/subjects', async (c) => {
 
 subjectsController.post('/subjects', async (c) => {
   try {
-    const data = await c.req.json();
-    const parsed = createSubjectSchema.safeParse(data);
+    const raw = await c.req.json();
+    const parsed = createSubjectSchema.safeParse(raw);
     if (!parsed.success) {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
@@ -33,14 +33,14 @@ subjectsController.post('/subjects', async (c) => {
 subjectsController.put('/subjects/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
-    const data = await c.req.json();
-    const parsed = createSubjectSchema.partial().safeParse(data);
+    const raw = await c.req.json();
+    const parsed = createSubjectSchema.partial().safeParse(raw);
     if (!parsed.success) {
       const msgs = parsed.error.issues.map(i => i.message).join(', ');
       return c.json({ error: msgs }, 400);
     }
     await service.updateSubject(id, parsed.data);
-    return c.json({ message: 'Asignatura actualizada correctamente' });
+    return c.json({ message: 'Subject updated successfully' });
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }
@@ -50,7 +50,7 @@ subjectsController.delete('/subjects/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'));
     await service.deleteSubject(id);
-    return c.json({ message: 'Asignatura eliminada correctamente' });
+    return c.json({ message: 'Subject deleted successfully' });
   } catch (err: any) {
     return c.json({ error: err.message }, 400);
   }

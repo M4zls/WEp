@@ -11,6 +11,6 @@ export const attendance = attendanceSchema.table('attendance', {
   studentName: text('student_name').notNull(),
   present: boolean('present').notNull().default(false),
   justification: text('justification'),
-  fecha: text('fecha').default(sql`now()::text`),
+  date: text('date').default(sql`now()::text`),
   createdAt: text('created_at').default(sql`now()::text`),
 });

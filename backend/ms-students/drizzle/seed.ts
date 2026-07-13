@@ -46,7 +46,7 @@ async function seed() {
     const password = await bcrypt.hash('123456', 10);
     for (const e of NEW_STUDENTS) {
       await sql`
-        INSERT INTO "students"."students" (rut, dv, nombre, apellido, cursos, email, password)
+        INSERT INTO "students"."students" (rut, dv, first_name, last_name, courses, email, password)
         VALUES (${e.rut}, ${e.dv}, ${e.name}, ${e.lastName}, ${e.courses}, ${e.email}, ${password})
       `;
     }

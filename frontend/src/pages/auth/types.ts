@@ -1,10 +1,10 @@
-export type Role = 'estudiante' | 'profesor';
+export type Role = 'student' | 'professor';
 
 export interface LoginResponse {
   token: string;
-  usuario: {
-    nombre?: string;
-    apellido?: string;
+  user: {
+    firstName?: string;
+    lastName?: string;
     email?: string;
     rut?: string;
   };
@@ -12,9 +12,9 @@ export interface LoginResponse {
 
 export interface StudentLoginResponse {
   rut: string;
-  nombre?: string;
-  apellido?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
-  cursos?: string;
+  courses?: string;
   token?: string;
 }

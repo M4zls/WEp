@@ -6,7 +6,7 @@ const service = new NotificationsService();
 
 export const notificationsController = new Hono();
 
-notificationsController.post('/aviso-inasistencia', async (c) => {
+notificationsController.post('/absence-notice', async (c) => {
   try {
     const datos = await c.req.json();
     const parsed = absenceAlertSchema.safeParse(datos);
@@ -15,13 +15,13 @@ notificationsController.post('/aviso-inasistencia', async (c) => {
       return c.json({ error: msgs }, 400);
     }
     await service.sendAttendanceNotice(parsed.data);
-    return c.json({ message: 'Notificación enviada' });
+    return c.json({ message: 'Notification sent' });
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
 });
 
-notificationsController.post('/aviso-nota', async (c) => {
+notificationsController.post('/grade-notice', async (c) => {
   try {
     const datos = await c.req.json();
     const parsed = gradeAlertSchema.safeParse(datos);
@@ -30,13 +30,13 @@ notificationsController.post('/aviso-nota', async (c) => {
       return c.json({ error: msgs }, 400);
     }
     await service.sendGradeNotice(parsed.data);
-    return c.json({ message: 'Notificación de nota enviada' });
+    return c.json({ message: 'Grade notification sent' });
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
 });
 
-notificationsController.post('/aviso-mensaje', async (c) => {
+notificationsController.post('/message-notice', async (c) => {
   try {
     const datos = await c.req.json();
     const parsed = messageAlertSchema.safeParse(datos);
@@ -45,40 +45,40 @@ notificationsController.post('/aviso-mensaje', async (c) => {
       return c.json({ error: msgs }, 400);
     }
     await service.sendMessageNotice(parsed.data);
-    return c.json({ message: 'Notificación de mensaje enviada' });
+    return c.json({ message: 'Message notification sent' });
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
 });
 
-notificationsController.get('/usuario/:usuarioId', async (c) => {
+notificationsController.get('/user/:userId', async (c) => {
   try {
-    const usuarioId = parseInt(c.req.param('usuarioId'), 10);
-    if (isNaN(usuarioId)) return c.json({ error: 'ID de usuario inválido' }, 400);
-    const result = await service.getUserNotifications(usuarioId);
+    const userId = parseInt(c.req.param('userId'), 10);
+    if (isNaN(userId)) return c.json({ error: 'ID de usuario inválido' }, 400);
+    const result = await service.getUserNotifications(userId);
     return c.json(result);
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
 });
 
-notificationsController.get('/usuario/:usuarioId/no-leidas', async (c) => {
+notificationsController.get('/user/:userId/unread', async (c) => {
   try {
-    const usuarioId = parseInt(c.req.param('usuarioId'), 10);
-    if (isNaN(usuarioId)) return c.json({ error: 'ID de usuario inválido' }, 400);
-    const result = await service.getUnreadCount(usuarioId);
+    const userId = parseInt(c.req.param('userId'), 10);
+    if (isNaN(userId)) return c.json({ error: 'ID de usuario inválido' }, 400);
+    const result = await service.getUnreadCount(userId);
     return c.json(result);
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
 });
 
-notificationsController.put('/:id/leer', async (c) => {
+notificationsController.put('/:id/read', async (c) => {
   try {
     const id = parseInt(c.req.param('id'), 10);
-    if (isNaN(id)) return c.json({ error: 'ID inválido' }, 400);
+    if (isNaN(id)) return c.json({ error: 'Invalid ID' }, 400);
     await service.markAsRead(id);
-    return c.json({ message: 'Notificación marcada como leída' });
+    return c.json({ message: 'Notification marked as read' });
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }

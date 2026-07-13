@@ -1,22 +1,22 @@
 import apiClient from '../../api/apiClient';
-import type { Clase, CreateClaseDto, UpdateClaseDto } from './class.types';
+import type { SchoolClass, CreateClassDto, UpdateClassDto } from './class.types';
 
 class ClassesService {
-  async list(cursoAsignaturaId?: number): Promise<Clase[]> {
+  async list(courseSubjectId?: number): Promise<SchoolClass[]> {
     let endpoint = '/classes';
-    if (cursoAsignaturaId) endpoint += `?curso_asignatura_id=${cursoAsignaturaId}`;
+    if (courseSubjectId) endpoint += `?course_subject_id=${courseSubjectId}`;
     return apiClient.get(endpoint);
   }
 
-  async get(id: number): Promise<Clase> {
+  async get(id: number): Promise<SchoolClass> {
     return apiClient.get(`/classes/${id}`);
   }
 
-  async create(data: CreateClaseDto): Promise<Clase> {
+  async create(data: CreateClassDto): Promise<SchoolClass> {
     return apiClient.post('/classes', data);
   }
 
-  async update(id: number, data: UpdateClaseDto): Promise<void> {
+  async update(id: number, data: UpdateClassDto): Promise<void> {
     return apiClient.put(`/classes/${id}`, data);
   }
 

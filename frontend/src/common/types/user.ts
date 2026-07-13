@@ -1,8 +1,8 @@
 export interface User {
   id?: number;
   rut?: string;
-  nombre?: string;
-  apellido?: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
-  role: 'estudiante' | 'profesor';
+  role: 'student' | 'professor';
 }

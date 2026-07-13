@@ -16,7 +16,7 @@ const Dashboard: FC = (): ReactElement => {
   const sessionUser = sessionStorage.getItem('user');
   const role = sessionUser ? sessionRole : storeRole;
 
-  if (role === 'profesor') {
+  if (role === 'professor') {
     return <ProfessorDashboard />;
   }
 
@@ -38,7 +38,7 @@ const App: FC = (): ReactElement => {
           }
         />
         <Route
-          path="/dashboard/materia/:cursoAsignaturaId"
+          path="/dashboard/subject/:courseSubjectId"
           element={
             <ProtectedRoute>
               <SubjectDetail />
