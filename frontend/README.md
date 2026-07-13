@@ -96,7 +96,7 @@ PORT=8081                    # Puerto del dev server (vite.config.ts)
 
 ## Flujo JWT
 
-1. **Login**: `pages/auth/components/LoginForm.tsx` llama al BFF/KrakenD, recibe `{ ..., token }`
+1. **Login**: `pages/auth/components/LoginForm.tsx` llama a KrakenD, recibe `{ ..., token }`
 2. **Persistencia**: el token se guarda en `sessionStorage.setItem('token', token)` — tanto para estudiantes como profesores
 3. **Inyección automática**: `shared/api/apiClient.ts`:
    ```ts

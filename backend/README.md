@@ -136,7 +136,6 @@ Si `SENTRY_DSN` no está definida, el servicio arranca normalmente sin telemetr�
 | Servicio | Puerto | Schema DB | Responsabilidad |
 |---|---|---|---|
 | **KrakenD** | 3100 | — | API Gateway: punto de entrada único del frontend |
-
 | **Estudiantes** | 3001 | `estudiantes` | CRUD de estudiantes |
 | **Autentificación** | 3002 | `autentificacion` | Login, registro, JWT, sesiones |
 | **Notificaciones** | 3003 | `notificaciones` | Notificaciones del sistema (Novu) |

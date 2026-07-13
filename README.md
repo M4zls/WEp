@@ -47,8 +47,7 @@ docker compose up -d
 La aplicación queda disponible en:
 - **Frontend**: `http://localhost:8080`
 - **API (via KrakenD)**: `http://localhost:3100`
-- **Documentación API**: `http://localhost:3000/docs` (BFF original, si está expuesto)
-- **GlitchTip UI**: `http://localhost:8000` (si está configurado)
+- **GlitchTip UI**: `http://localhost:8000`
 
 > PostgreSQL se expone externamente en `localhost:5433` (puerto interno 5432).
 
@@ -87,7 +86,7 @@ Esto crea:
 - ConfigMap con URLs de servicios internos
 - Secret con credenciales de DB
 - PostgreSQL 16 (1 réplica, ClusterIP)
-- 12 deployments con sus servicios (KrakenD como entrada, frontend como LoadBalancer, microservicios como ClusterIP)
+- 11 deployments con sus servicios (KrakenD como entrada, frontend como LoadBalancer, microservicios como ClusterIP)
 
 > Las imágenes usan `imagePullPolicy: Never` — asumen que están cargadas localmente. Para producción, cambiá a `Always` y usá un registry.
 
@@ -261,11 +260,7 @@ Wep/
 
 ---
 
-## Documentación API
 
-Swagger UI disponible en `GET /docs` del BFF original (`http://localhost:3000/docs`). Generado automáticamente desde los schemas Zod usando `@hono/zod-openapi`.
-
----
 
 ## Variables de Entorno
 
