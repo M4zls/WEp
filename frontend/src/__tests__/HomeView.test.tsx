@@ -8,7 +8,7 @@ vi.mock('../pages/classes/classes.service', () => ({
 }));
 
 vi.mock('../pages/courses/courses.service', () => ({
-  default: { getCourses: vi.fn(), getSubjects: vi.fn(), getStudentsByCourse: vi.fn() },
+  default: { getCourses: vi.fn(), getSubjectsByCourse: vi.fn(), getStudentsByCourse: vi.fn() },
 }));
 
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
@@ -33,7 +33,7 @@ describe('HomeView', () => {
     await waitFor(() => {
       expect(screen.getByText(/Juan Perez/)).toBeInTheDocument();
     });
-    expect(screen.getByText('Student')).toBeInTheDocument();
+    expect(screen.getByText('Estudiante')).toBeInTheDocument();
   });
 
   /**
@@ -53,7 +53,7 @@ describe('HomeView', () => {
   it('should render stats for student', async () => {
     sessionStorage.setItem('user', JSON.stringify(mockUser));
     vi.mocked(courseService.getCourses).mockResolvedValue([{ id: 1, name: '3A', level: 'Tercero', letter: 'A' }]);
-    vi.mocked(courseService.getSubjects).mockResolvedValue([{ id: 10, subjectName: 'Matemáticas', subjectCode: 'MAT', professorId: 1 }]);
+    vi.mocked(courseService.getSubjectsByCourse).mockResolvedValue([{ id: 10, subjectName: 'Matemáticas', subjectCode: 'MAT', professorId: 1 }]);
     vi.mocked(classesService.list).mockResolvedValue([]);
 
     render(<HomeView userData={mockUser} role="student" onGoToSubjects={mockOnGoToSubjects} />);
@@ -68,12 +68,12 @@ describe('HomeView', () => {
   it('should show no upcoming classes', async () => {
     sessionStorage.setItem('user', JSON.stringify(mockUser));
     vi.mocked(courseService.getCourses).mockResolvedValue([{ id: 1, name: '3A', level: 'Tercero', letter: 'A' }]);
-    vi.mocked(courseService.getSubjects).mockResolvedValue([]);
+    vi.mocked(courseService.getSubjectsByCourse).mockResolvedValue([]);
     vi.mocked(classesService.list).mockResolvedValue([]);
 
     render(<HomeView userData={mockUser} role="student" onGoToSubjects={mockOnGoToSubjects} />);
     await waitFor(() => {
-      expect(screen.getByText('No classes scheduled for the next days')).toBeInTheDocument();
+      expect(screen.getByText('No hay clases programadas para los próximos días')).toBeInTheDocument();
     });
   });
 
@@ -82,7 +82,7 @@ describe('HomeView', () => {
    */
   it('should call onGoToSubjects when button clicked', async () => {
     render(<HomeView userData={mockUser} role="student" onGoToSubjects={mockOnGoToSubjects} />);
-    const buttons = screen.getAllByText(/Go to My Subjects/);
+    const buttons = screen.getAllByText(/Ir a Mis Asignaturas/);
     fireEvent.click(buttons[0]);
     expect(mockOnGoToSubjects).toHaveBeenCalled();
   });

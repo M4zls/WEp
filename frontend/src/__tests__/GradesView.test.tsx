@@ -20,13 +20,13 @@ describe('GradesView', () => {
     sessionStorage.setItem('user', JSON.stringify({ rut: '123-4' }));
     vi.mocked(gradesService.getStudentGrades).mockReturnValue(new Promise(() => {}));
     render(<GradesView />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Cargando...')).toBeInTheDocument();
   });
 
   it('should show error when no session', async () => {
     render(<GradesView />);
     await waitFor(() => {
-      expect(screen.getByText('No active session')).toBeInTheDocument();
+      expect(screen.getByText('Sin sesión activa')).toBeInTheDocument();
     });
   });
 
@@ -34,7 +34,7 @@ describe('GradesView', () => {
     sessionStorage.setItem('user', JSON.stringify({}));
     render(<GradesView />);
     await waitFor(() => {
-      expect(screen.getByText('Student RUT not found')).toBeInTheDocument();
+      expect(screen.getByText('RUT de estudiante no encontrado')).toBeInTheDocument();
     });
   });
 
@@ -77,7 +77,7 @@ describe('GradesView', () => {
     vi.mocked(gradesService.getStudentGrades).mockResolvedValue(null as any);
     render(<GradesView />);
     await waitFor(() => {
-      expect(screen.getByText('No grades recorded')).toBeInTheDocument();
+      expect(screen.getByText('No hay notas registradas')).toBeInTheDocument();
     });
   });
 });

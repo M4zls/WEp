@@ -27,7 +27,7 @@ describe('ClassesService', () => {
   it('should list clases filtered by courseSubjectId', async () => {
     vi.mocked(apiClient.get).mockResolvedValue([]);
     await classesService.list(5);
-    expect(apiClient.get).toHaveBeenCalledWith('/classes?curso_asignatura_id=5');
+    expect(apiClient.get).toHaveBeenCalledWith('/classes?course_subject_id=5');
   });
 
   it('should fetch a single class by id', async () => {

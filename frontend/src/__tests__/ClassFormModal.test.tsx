@@ -31,9 +31,9 @@ describe('ClassFormModal', () => {
    */
   it('should render modal when isOpen is true', () => {
     render(<ClassFormModal isOpen={true} onClose={mockOnClose} onSave={mockOnSave} />);
-    expect(screen.getByText('Nueva Clase')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Ej: Clase 1: Introducción')).toBeInTheDocument();
-    expect(screen.getByText('Crear Clase')).toBeInTheDocument();
+    expect(screen.getByText('New Class')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('E.g. Class 1: Introduction')).toBeInTheDocument();
+    expect(screen.getByText('Create Class')).toBeInTheDocument();
   });
 
   /**
@@ -41,9 +41,9 @@ describe('ClassFormModal', () => {
    */
   it('should show validation error on empty submit', async () => {
     render(<ClassFormModal isOpen={true} onClose={mockOnClose} onSave={mockOnSave} />);
-    fireEvent.click(screen.getByText('Crear Clase'));
+    fireEvent.click(screen.getByText('Create Class'));
     await waitFor(() => {
-      expect(screen.getByText('Completa todos los campos obligatorios')).toBeInTheDocument();
+      expect(screen.getByText('Complete all required fields')).toBeInTheDocument();
     });
   });
 
@@ -58,7 +58,7 @@ describe('ClassFormModal', () => {
     fireEvent.change(inputs[1], { target: { value: '2024-06-15' } });
     fireEvent.change(inputs[2], { target: { value: '10:00' } });
     fireEvent.change(inputs[3], { target: { value: '11:00' } });
-    fireEvent.click(screen.getByText('Crear Clase'));
+    fireEvent.click(screen.getByText('Create Class'));
     await waitFor(() => {
       expect(screen.getByText('Server error')).toBeInTheDocument();
     });
@@ -67,28 +67,28 @@ describe('ClassFormModal', () => {
   /**
    * Should pre-fill form fields when editingClase is provided.
    */
-  it('should pre-fill fields when editingClase is provided', () => {
-    const editingClase = {
+  it('should pre-fill fields when editingClass is provided', () => {
+    const editingClass = {
       id: 1,       title: 'Edit Title', description: 'Desc', fecha: '2024-06-10',
       startTime: '09:00', endTime: '10:00', estado: CLASS_STATUSES.PENDING, courseSubjectId: 5,
     };
-    render(<ClassFormModal isOpen={true} onClose={mockOnClose} onSave={mockOnSave} editingClase={editingClase} />);
-    expect(screen.getByText('Editar Clase')).toBeInTheDocument();
+    render(<ClassFormModal isOpen={true} onClose={mockOnClose} onSave={mockOnSave} editingClass={editingClass} />);
+    expect(screen.getByText('Edit Class')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Edit Title')).toBeInTheDocument();
-    expect(screen.getByText('Guardar Cambios')).toBeInTheDocument();
+    expect(screen.getByText('Save Changes')).toBeInTheDocument();
   });
 
   /**
    * Should display the estado select options when editing an existing clase.
    */
   it('should show estado select when editing', () => {
-    const editingClase = {
+    const editingClass = {
       id: 1,       title: 'Test', fecha: '2024-06-10',
       startTime: '09:00', endTime: '10:00', estado: CLASS_STATUSES.PENDING, courseSubjectId: 5,
     };
-    render(<ClassFormModal isOpen={true} onClose={mockOnClose} onSave={mockOnSave} editingClase={editingClase} />);
-    expect(screen.getByText('Pendiente')).toBeInTheDocument();
-    expect(screen.getByText('Realizada')).toBeInTheDocument();
-    expect(screen.getByText('Cancelada')).toBeInTheDocument();
+    render(<ClassFormModal isOpen={true} onClose={mockOnClose} onSave={mockOnSave} editingClass={editingClass} />);
+    expect(screen.getByText('Pending')).toBeInTheDocument();
+    expect(screen.getByText('Completed')).toBeInTheDocument();
+    expect(screen.getByText('Cancelled')).toBeInTheDocument();
   });
 });

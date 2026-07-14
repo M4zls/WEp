@@ -27,7 +27,7 @@ describe('ScheduleService', () => {
   it('should list schedules filtered by courseSubjectId', async () => {
     vi.mocked(apiClient.get).mockResolvedValue([]);
     await scheduleService.list(3);
-    expect(apiClient.get).toHaveBeenCalledWith('/schedule?curso_asignatura_id=3');
+    expect(apiClient.get).toHaveBeenCalledWith('/schedule?course_subject_id=3');
   });
 
   it('should fetch a single schedule by id', async () => {

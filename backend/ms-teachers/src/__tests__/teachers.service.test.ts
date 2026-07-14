@@ -19,6 +19,9 @@ mock.module('../common/utils.js', () => ({
     if (password === 'pass123') return '$2a$10$correct';
     return '$2a$10$wrong';
   }),
+  comparePassword: mock((plain: string, hashed: string) => {
+    return plain === 'pass123' && hashed === '$2a$10$correct';
+  }),
 }));
 
 const { TeachersService } = await import('../services/teachers.service.js');
@@ -63,7 +66,7 @@ describe('TeachersService', () => {
     });
     it('should throw on wrong password', async () => {
       mockRepo.findTeacherByEmail.mockResolvedValue({ email: 't@test.com', password: '$2a$10$correct' });
-      await expect(service.authenticateTeacher('t@test.com', 'wrong')).rejects.toThrow('Contraseña incorrecta');
+      await expect(service.authenticateTeacher('t@test.com', 'wrong')).rejects.toThrow('Invalid password');
     });
   });
 

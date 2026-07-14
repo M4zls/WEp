@@ -6,7 +6,7 @@
 
 vi.mock('../pages/notifications/notifications.service', () => ({
   default: {
-    getByUsuario: vi.fn(),
+    getByUser: vi.fn(),
     getUnreadCount: vi.fn(),
     markAsRead: vi.fn(),
   },
@@ -30,24 +30,24 @@ describe('useNotifications', () => {
     const mockNotis = [
       {
         id: 1,
-        titulo: 'Test',
-        mensaje: 'Hello',
-        tipo: 'info',
-        leida: false,
-        usuarioId: 123,
+        title: 'Test',
+        message: 'Hello',
+        type: 'info',
+        read: false,
+        userId: 123,
         url: null,
-        fechaCreacion: null,
-        fechaLectura: null,
+        createdAt: null,
+        readAt: null,
       },
     ];
-    vi.mocked(notificationsService.getByUsuario).mockResolvedValue(mockNotis);
+    vi.mocked(notificationsService.getByUser).mockResolvedValue(mockNotis);
 
     const { result } = renderHook(() => useNotifications());
 
     expect(result.current.loading).toBe(true);
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.notifications).toEqual(mockNotis);
-    expect(result.current.usuarioId).toBe(123);
+    expect(result.current.userId).toBe(123);
   });
 
   /**
@@ -58,7 +58,7 @@ describe('useNotifications', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.notifications).toEqual([]);
-    expect(result.current.usuarioId).toBeNull();
+    expect(result.current.userId).toBeNull();
   });
 
   /**
@@ -66,7 +66,7 @@ describe('useNotifications', () => {
    */
   it('should set error on fetch failure', async () => {
     sessionStorage.setItem('user', JSON.stringify({ id: 1 }));
-    vi.mocked(notificationsService.getByUsuario).mockRejectedValue(
+    vi.mocked(notificationsService.getByUser).mockRejectedValue(
       new Error('Network error'),
     );
 
@@ -93,7 +93,7 @@ describe('useNotifications', () => {
         fechaLectura: null,
       },
     ];
-    vi.mocked(notificationsService.getByUsuario).mockResolvedValue(mockNotis);
+    vi.mocked(notificationsService.getByUser).mockResolvedValue(mockNotis);
     vi.mocked(notificationsService.markAsRead).mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useNotifications());
@@ -102,7 +102,7 @@ describe('useNotifications', () => {
     await act(async () => {
       await result.current.markAsRead(1);
     });
-    expect(result.current.notifications[0].leida).toBe(true);
+    expect(result.current.notifications[0].read).toBe(true);
   });
 
   /**
@@ -110,22 +110,22 @@ describe('useNotifications', () => {
    */
   it('should reload', async () => {
     sessionStorage.setItem('user', JSON.stringify({ id: 1 }));
-    vi.mocked(notificationsService.getByUsuario).mockResolvedValue([]);
+    vi.mocked(notificationsService.getByUser).mockResolvedValue([]);
 
     const { result } = renderHook(() => useNotifications());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    vi.mocked(notificationsService.getByUsuario).mockResolvedValue([
+    vi.mocked(notificationsService.getByUser).mockResolvedValue([
       {
         id: 2,
-        titulo: 'New',
-        mensaje: 'New',
-        tipo: 'info',
-        leida: false,
-        usuarioId: 1,
+        title: 'New',
+        message: 'New',
+        type: 'info',
+        read: false,
+        userId: 1,
         url: null,
-        fechaCreacion: null,
-        fechaLectura: null,
+        createdAt: null,
+        readAt: null,
       },
     ]);
     await act(async () => {

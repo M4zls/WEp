@@ -10,7 +10,7 @@ vi.mock('../pages/auth/store', () => ({
 vi.mock('../pages/courses/courses.service', () => ({
   default: {
     getCourses: vi.fn(),
-    getSubjects: vi.fn(),
+    getSubjectsByCourse: vi.fn(),
   },
 }));
 
@@ -44,7 +44,7 @@ describe('StudentDashboard', () => {
 
     render(<StudentDashboard />);
 
-    expect(screen.getByText('My Subjects')).toBeInTheDocument();
+    expect(screen.getByText('Mis Asignaturas')).toBeInTheDocument();
     expect(screen.queryByText('You have no assigned subjects')).not.toBeInTheDocument();
     expect(document.querySelectorAll('.animate-pulse').length).toBe(3);
   });
@@ -53,10 +53,10 @@ describe('StudentDashboard', () => {
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('You have no assigned subjects')).toBeInTheDocument();
+      expect(screen.getByText('No tienes asignaturas asignadas')).toBeInTheDocument();
     });
-    expect(screen.getByText('Wait until you are assigned courses')).toBeInTheDocument();
-    expect(screen.getByText('Course not assigned')).toBeInTheDocument();
+    expect(screen.getByText('Espera a que te asignen un curso')).toBeInTheDocument();
+    expect(screen.getByText('Curso no asignado')).toBeInTheDocument();
   });
 
   it('should show empty state when user has no courses field', async () => {
@@ -65,7 +65,7 @@ describe('StudentDashboard', () => {
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('You have no assigned subjects')).toBeInTheDocument();
+      expect(screen.getByText('No tienes asignaturas asignadas')).toBeInTheDocument();
     });
   });
 
@@ -79,7 +79,7 @@ describe('StudentDashboard', () => {
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('You have no assigned subjects')).toBeInTheDocument();
+      expect(screen.getByText('No tienes asignaturas asignadas')).toBeInTheDocument();
     });
   });
 
@@ -88,12 +88,12 @@ describe('StudentDashboard', () => {
     vi.mocked(courseService.getCourses).mockResolvedValue([
       { id: 1, name: '3A', level: 'Tercero', letter: 'A' },
     ]);
-    vi.mocked(courseService.getSubjects).mockResolvedValue([]);
+    vi.mocked(courseService.getSubjectsByCourse).mockResolvedValue([]);
 
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('You have no assigned subjects')).toBeInTheDocument();
+      expect(screen.getByText('No tienes asignaturas asignadas')).toBeInTheDocument();
     });
   });
 
@@ -102,7 +102,7 @@ describe('StudentDashboard', () => {
     vi.mocked(courseService.getCourses).mockResolvedValue([
       { id: 1, name: '3A', level: 'Tercero', letter: 'A' },
     ]);
-    vi.mocked(courseService.getSubjects).mockResolvedValue([
+    vi.mocked(courseService.getSubjectsByCourse).mockResolvedValue([
       { id: 1, courseId: 1, subjectId: 10, professorId: 5, professorFirstName: 'María', professorLastName: 'López', subjectName: 'Matemáticas', subjectCode: 'MAT101' },
       { id: 2, courseId: 1, subjectId: 11, professorId: 6, professorFirstName: 'Carlos', subjectName: 'Lenguaje', subjectCode: 'LEN101' },
     ]);
@@ -117,7 +117,7 @@ describe('StudentDashboard', () => {
       expect(screen.getByText('LEN101')).toBeInTheDocument();
       expect(screen.getByText(/Carlos/)).toBeInTheDocument();
     });
-    expect(screen.getByText('Course: 3A')).toBeInTheDocument();
+    expect(screen.getByText('Curso: 3A')).toBeInTheDocument();
   });
 
   it('should render subject with no teacher when no teacher assigned', async () => {
@@ -125,14 +125,14 @@ describe('StudentDashboard', () => {
     vi.mocked(courseService.getCourses).mockResolvedValue([
       { id: 1, name: '3A', level: 'Tercero', letter: 'A' },
     ]);
-    vi.mocked(courseService.getSubjects).mockResolvedValue([
+    vi.mocked(courseService.getSubjectsByCourse).mockResolvedValue([
       { id: 1, courseId: 1, subjectId: 10, professorId: null, subjectName: 'Arte', subjectCode: 'ART101' },
     ]);
 
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('No teacher')).toBeInTheDocument();
+      expect(screen.getByText('Sin profesor')).toBeInTheDocument();
     });
   });
 
@@ -141,7 +141,7 @@ describe('StudentDashboard', () => {
     vi.mocked(courseService.getCourses).mockResolvedValue([
       { id: 1, name: '3A', level: 'Tercero', letter: 'A' },
     ]);
-    vi.mocked(courseService.getSubjects).mockResolvedValue([
+    vi.mocked(courseService.getSubjectsByCourse).mockResolvedValue([
       { id: 1, courseId: 1, subjectId: 10, professorId: 5, professorFirstName: 'María', subjectName: 'Matemáticas', subjectCode: 'MAT101' },
     ]);
 
@@ -167,7 +167,7 @@ describe('StudentDashboard', () => {
     render(<StudentDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('You have no assigned subjects')).toBeInTheDocument();
+      expect(screen.getByText('No tienes asignaturas asignadas')).toBeInTheDocument();
     });
   });
 

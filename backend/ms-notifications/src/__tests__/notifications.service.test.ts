@@ -1,5 +1,12 @@
 import { describe, it, expect, mock, beforeEach } from 'bun:test';
 
+const mockFetch = mock((url: string) => {
+  if (url.includes('/students/12345678')) return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 5 }) });
+  if (url.includes('/auth/users/87654321')) return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 3 }) });
+  return Promise.resolve({ ok: false });
+});
+globalThis.fetch = mockFetch;
+
 const mockTrigger = mock(() => undefined);
 const mockDb = {
   select: mock(() => ({
@@ -133,7 +140,7 @@ describe('NotificationsService', () => {
           })),
         })),
       });
-      const data = { recipientRut: '12345678', recipientRole: 'estudiante', senderName: 'Profe', senderLastName: 'Uno', contentPreview: 'Hola', conversationId: 1 };
+      const data = { recipientRut: '12345678', recipientRole: 'student', senderFirstName: 'Profe', senderLastName: 'Uno', contentPreview: 'Hola', conversationId: 1 };
       await service.sendMessageNotice(data);
       expect(mockDb.insert).toHaveBeenCalled();
     });
@@ -146,13 +153,13 @@ describe('NotificationsService', () => {
           })),
         })),
       });
-      const data = { recipientRut: '87654321', recipientRole: 'profesor', senderName: 'Alumno', senderLastName: 'Dos', contentPreview: 'Gracias', conversationId: 1 };
+      const data = { recipientRut: '87654321', recipientRole: 'teacher', senderFirstName: 'Alumno', senderLastName: 'Dos', contentPreview: 'Gracias', conversationId: 1 };
       await service.sendMessageNotice(data);
       expect(mockDb.insert).toHaveBeenCalled();
     });
 
     it('should skip notification when recipient not found', async () => {
-      const data = { recipientRut: '00000000', recipientRole: 'estudiante', senderName: 'Profe', senderLastName: 'Uno', contentPreview: 'Hola', conversationId: 1 };
+      const data = { recipientRut: '00000000', recipientRole: 'student', senderFirstName: 'Profe', senderLastName: 'Uno', contentPreview: 'Hola', conversationId: 1 };
       await service.sendMessageNotice(data);
       expect(mockDb.insert).not.toHaveBeenCalled();
     });

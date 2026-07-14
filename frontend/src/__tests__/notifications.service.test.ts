@@ -18,15 +18,15 @@ describe('NotificationsService', () => {
   /** Verifies that getByUsuario calls GET /notifications/usuario/:id */
   it('should getByUsuario', async () => {
     vi.mocked(apiClient.get).mockResolvedValue([]);
-    await notificationsService.getByUsuario(1);
-    expect(apiClient.get).toHaveBeenCalledWith('/notifications/usuario/1');
+    await notificationsService.getByUser(1);
+    expect(apiClient.get).toHaveBeenCalledWith('/notifications/user/1');
   });
 
   /** Verifies that getUnreadCount calls GET /notifications/usuario/:id/no-leidas and returns the count */
   it('should getUnreadCount', async () => {
     vi.mocked(apiClient.get).mockResolvedValue({ count: 3 });
     const result = await notificationsService.getUnreadCount(1);
-    expect(apiClient.get).toHaveBeenCalledWith('/notifications/usuario/1/no-leidas');
+    expect(apiClient.get).toHaveBeenCalledWith('/notifications/user/1/unread');
     expect(result.count).toBe(3);
   });
 
@@ -34,6 +34,6 @@ describe('NotificationsService', () => {
   it('should markAsRead', async () => {
     vi.mocked(apiClient.put).mockResolvedValue(undefined);
     await notificationsService.markAsRead(5);
-    expect(apiClient.put).toHaveBeenCalledWith('/notifications/5/leer', {});
+    expect(apiClient.put).toHaveBeenCalledWith('/notifications/5/read', {});
   });
 });
