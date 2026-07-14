@@ -32,6 +32,31 @@ spec:
             configMapKeyRef:
               name: wep-config
               key: DB_NOTIFICATIONS_URL
+        - name: MS_AUTH_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: MS_AUTH_SERVICE
+        - name: MS_STUDENTS_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: MS_STUDENTS_SERVICE
+        - name: SENTRY_DSN
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: SENTRY_DSN
+        - name: SENTRY_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: SENTRY_ENVIRONMENT
+        - name: SENTRY_TRACES_SAMPLE_RATE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: SENTRY_TRACES_SAMPLE_RATE
         livenessProbe:
           httpGet:
             path: /health

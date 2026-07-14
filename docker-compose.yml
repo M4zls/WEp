@@ -227,6 +227,16 @@ services:
     networks:
       - wep-network
 
+  ms-docs:
+    build:
+      context: ./backend/ms-docs
+      dockerfile: Dockerfile
+    container_name: ms-docs-service
+    ports:
+      - "3011:3011"
+    networks:
+      - wep-network
+
   krakend:
     build:
       context: ./backend/krakend
@@ -245,6 +255,7 @@ services:
       - ms-attendance
       - ms-messaging
       - ms-grades
+      - ms-docs
     networks:
       - wep-network
 

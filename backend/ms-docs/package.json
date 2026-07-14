@@ -1,0 +1,15 @@
+{
+  "name": "docs-microservice",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "hono": "^4.12.15"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

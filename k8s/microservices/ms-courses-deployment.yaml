@@ -32,6 +32,26 @@ spec:
             configMapKeyRef:
               name: wep-config
               key: DB_COURSES_URL
+        - name: SENTRY_DSN
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: SENTRY_DSN
+        - name: SENTRY_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: SENTRY_ENVIRONMENT
+        - name: SENTRY_TRACES_SAMPLE_RATE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: SENTRY_TRACES_SAMPLE_RATE
+        - name: MS_TEACHERS_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: wep-config
+              key: MS_TEACHERS_SERVICE
         livenessProbe:
           httpGet:
             path: /health
