@@ -35,7 +35,7 @@ const { AuthService } = await import('../services/AuthService.js');
 
 describe('AuthService', () => {
   let service: AuthService;
-  const mockUser = { id: 1, rut: '12345678', email: 'test@test.com', password: 'hashedpass', rol: 'profesor', name: 'Juan', lastName: 'Perez', activo: true };
+  const mockUser = { id: 1, rut: '12345678', email: 'test@test.com', password: 'hashedpass', rol: 'teacher', name: 'Juan', lastName: 'Perez', active: true };
 
   beforeEach(() => {
     service = new AuthService();
@@ -70,7 +70,7 @@ describe('AuthService', () => {
     });
 
     it('should throw on inactive user', async () => {
-      mockRepo.findByEmail.mockResolvedValue({ ...mockUser, activo: false });
+      mockRepo.findByEmail.mockResolvedValue({ ...mockUser, active: false });
       await expect(service.login('test@test.com', '123456')).rejects.toThrow('Usuario desactivado');
     });
   });

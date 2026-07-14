@@ -15,10 +15,17 @@ mock.module('../repositories/students.repository.js', () => ({
   StudentsRepository: function () { return mockRepo; },
 }));
 
+mock.module('hono/jwt', () => ({
+  sign: mock(() => 'mock-token'),
+}));
+
 mock.module('../common/utils.js', () => ({
   hashPassword: mock((password: string) => {
     if (password === 'pass123') return '$2a$10$correct';
     return '$2a$10$wrong';
+  }),
+  comparePassword: mock((plain: string, hashed: string) => {
+    return plain === 'pass123' && hashed === '$2a$10$correct';
   }),
 }));
 

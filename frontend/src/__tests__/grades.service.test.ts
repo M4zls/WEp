@@ -16,20 +16,20 @@ describe('GradesService', () => {
   it('should getStudentGrades', async () => {
     vi.mocked(apiClient.get).mockResolvedValue({ rut: '123-4', nombre: 'Juan', apellido: 'Perez', curso: '3A', asignaturas: [] });
     const result = await gradesService.getStudentGrades('123-4');
-    expect(apiClient.get).toHaveBeenCalledWith('/grades/estudiante/123-4');
+    expect(apiClient.get).toHaveBeenCalledWith('/grades/student/123-4');
     expect(result.rut).toBe('123-4');
   });
 
   it('should getCourseGrades', async () => {
     vi.mocked(apiClient.get).mockResolvedValue([]);
     await gradesService.getCourseGrades('3A', 'teacher-1');
-    expect(apiClient.get).toHaveBeenCalledWith('/grades/curso/3A?profesorRut=teacher-1');
+    expect(apiClient.get).toHaveBeenCalledWith('/grades/course/3A?professorRut=teacher-1');
   });
 
   it('should getTeacherGrades', async () => {
     vi.mocked(apiClient.get).mockResolvedValue([]);
     await gradesService.getTeacherGrades('teacher-1');
-    expect(apiClient.get).toHaveBeenCalledWith('/grades/profesor/teacher-1');
+    expect(apiClient.get).toHaveBeenCalledWith('/grades/professor/teacher-1');
   });
 
   it('should createGrade', async () => {
@@ -42,7 +42,7 @@ describe('GradesService', () => {
   it('should createGradesBatch', async () => {
     vi.mocked(apiClient.post).mockResolvedValue(undefined);
     await gradesService.createGradesBatch([]);
-    expect(apiClient.post).toHaveBeenCalledWith('/grades/batch', { notas: [] });
+    expect(apiClient.post).toHaveBeenCalledWith('/grades/batch', { grades: [] });
   });
 
   it('should updateGrade', async () => {

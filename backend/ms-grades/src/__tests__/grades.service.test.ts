@@ -31,14 +31,14 @@ describe('GradesService', () => {
   describe('getStudentGrades', () => {
     it('should return grouped grades', async () => {
       mockRepo.findByStudentRut.mockResolvedValue([
-        { id: 1, studentRut: '12345678', subject: 'Matemáticas', curso: '3°A', grade: '6.5', evaluationType: 'prueba', date: '2026-03-15', professorRut: '11111111' },
-        { id: 2, studentRut: '12345678', subject: 'Matemáticas', curso: '3°A', grade: '5.0', evaluationType: 'tarea', date: '2026-04-01', professorRut: '11111111' },
-        { id: 3, studentRut: '12345678', subject: 'Lenguaje', curso: '3°A', grade: '6.0', evaluationType: 'prueba', date: '2026-03-20', professorRut: '22222222' },
+        { id: 1, studentRut: '12345678', subject: 'Matemáticas', course: '3°A', grade: '6.5', evaluationType: 'prueba', date: '2026-03-15', professorRut: '11111111' },
+        { id: 2, studentRut: '12345678', subject: 'Matemáticas', course: '3°A', grade: '5.0', evaluationType: 'tarea', date: '2026-04-01', professorRut: '11111111' },
+        { id: 3, studentRut: '12345678', subject: 'Lenguaje', course: '3°A', grade: '6.0', evaluationType: 'prueba', date: '2026-03-20', professorRut: '22222222' },
       ]);
       const result = await service.getStudentGrades('12345678');
       expect(result).toBeDefined();
       expect(result!.subjects).toHaveLength(2);
-      expect(result!.curso).toBe('3°A');
+      expect(result!.course).toBe('3°A');
     });
 
     it('should throw error with empty RUT', async () => {
@@ -54,7 +54,7 @@ describe('GradesService', () => {
   describe('getCourseGrades', () => {
     it('should return course grades filtered by professor', async () => {
       mockRepo.findByCursoAndProfesor.mockResolvedValue([
-        { id: 1, studentRut: '23232323', subject: 'Matemáticas', curso: '3°A', grade: '6.5', evaluationType: 'prueba', date: '2026-03-15', professorRut: '11111111' },
+        { id: 1, studentRut: '23232323', subject: 'Matemáticas', course: '3°A', grade: '6.5', evaluationType: 'prueba', date: '2026-03-15', professorRut: '11111111' },
       ]);
       const result = await service.getCourseGrades('3°A', '11111111');
       expect(result).toHaveLength(1);
@@ -66,7 +66,7 @@ describe('GradesService', () => {
   });
 
   describe('createGrade', () => {
-    const valid = { studentRut: '12345678', subject: 'Matemáticas', curso: '3°A', grade: '6.5', evaluationType: 'prueba', date: '2026-03-15', professorRut: '11111111' };
+    const valid = { studentRut: '12345678', subject: 'Matemáticas', course: '3°A', grade: '6.5', evaluationType: 'prueba', date: '2026-03-15', professorRut: '11111111' };
 
     it('should create a valid grade', async () => {
       await service.createGrade(valid);
@@ -107,8 +107,8 @@ describe('GradesService', () => {
   describe('createGradesBatch', () => {
     it('should create multiple grades', async () => {
       const grades = [
-        { studentRut: '11111111', subject: 'Matemáticas', curso: '3°A', grade: '6.5', evaluationType: 'prueba', date: '2026-03-15', professorRut: '22222222' },
-        { studentRut: '33333333', subject: 'Lenguaje', curso: '3°A', grade: '5.0', evaluationType: 'tarea', date: '2026-04-01', professorRut: '22222222' },
+        { studentRut: '11111111', subject: 'Matemáticas', course: '3°A', grade: '6.5', evaluationType: 'prueba', date: '2026-03-15', professorRut: '22222222' },
+        { studentRut: '33333333', subject: 'Lenguaje', course: '3°A', grade: '5.0', evaluationType: 'tarea', date: '2026-04-01', professorRut: '22222222' },
       ];
       await service.createGradesBatch(grades);
       expect(mockRepo.create).toHaveBeenCalledTimes(2);

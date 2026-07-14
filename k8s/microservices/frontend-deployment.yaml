@@ -21,7 +21,7 @@ spec:
         - containerPort: 8080
         env:
         - name: REACT_APP_API_URL
-          value: "http://bff-service:3000"
+          value: "http://krakend-service:8080"
         livenessProbe:
           httpGet:
             path: /

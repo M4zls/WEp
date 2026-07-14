@@ -74,7 +74,7 @@ El frontend en `localhost:8081` se conecta automáticamente a KrakenD en `localh
 Los manifests se encuentran en `k8s/`. Para desplegar en un cluster (Minikube, kind, etc.):
 
 ```bash
-kubectl apply -f k8s/config/namespace.yaml
+kubectl apply -f k8s/config/00-namespace.yaml
 kubectl apply -f k8s/config/secret.yaml
 kubectl apply -f k8s/config/configmap.yaml
 kubectl apply -f k8s/database/
@@ -86,7 +86,7 @@ Esto crea:
 - ConfigMap con URLs de servicios internos
 - Secret con credenciales de DB
 - PostgreSQL 16 (1 réplica, ClusterIP)
-- 11 deployments con sus servicios (KrakenD como entrada, frontend como LoadBalancer, microservicios como ClusterIP)
+- 13 deployments (KrakenD como entrada, frontend como NodePort, microservicios + ms-docs como ClusterIP)
 
 > Las imágenes usan `imagePullPolicy: Never` — asumen que están cargadas localmente. Para producción, cambiá a `Always` y usá un registry.
 

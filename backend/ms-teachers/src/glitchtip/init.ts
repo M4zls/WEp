@@ -19,6 +19,7 @@ export function initGlitchtip(): void {
     dsn: normalizedDsn,
     environment: process.env.SENTRY_ENVIRONMENT || 'development',
     tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0.1'),
+    release: 'wep@1.0.0',
   })
   console.log('[glitchtip] initialized')
 }

@@ -5,6 +5,17 @@ declare const process: { env: { DATABASE_URL?: string } };
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) throw new Error('DATABASE_URL is required');
 
+const dbName = connectionString.split('/').pop();
+const adminUrl = connectionString.replace(/\/[^/]+$/, '/postgres');
+const adminSql = postgres(adminUrl, { max: 1 });
+try {
+  await adminSql.unsafe(`CREATE DATABASE "${dbName}"`);
+  console.log(`[db] Database "${dbName}" created`);
+} catch (err: any) {
+  if (err.code !== '42P04') throw err;
+}
+await adminSql.end();
+
 const sql = postgres(connectionString, { max: 1 });
 
 try {

@@ -11,7 +11,7 @@ describe('createGradeSchema', () => {
     const result = createGradeSchema.safeParse({
       studentRut: '12345678',
       subject: 'Matemáticas',
-      curso: '3°A',
+      course: '3°A',
       grade: '8.0',
       evaluationType: 'prueba',
       date: '2026-03-15',
@@ -24,7 +24,7 @@ describe('createGradeSchema', () => {
     const result = createGradeSchema.safeParse({
       studentRut: '12345678',
       subject: 'Matemáticas',
-      curso: '3°A',
+      course: '3°A',
       grade: '0.5',
       evaluationType: 'prueba',
       date: '2026-03-15',
@@ -37,7 +37,7 @@ describe('createGradeSchema', () => {
     const result = createGradeSchema.safeParse({
       studentRut: '12345678',
       subject: 'Matemáticas',
-      curso: '3°A',
+      course: '3°A',
       grade: '6.5',
       evaluationType: 'prueba',
       date: '2026-03-15',

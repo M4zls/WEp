@@ -17,320 +17,330 @@
     {
       "endpoint": "/health",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-students:3001"], "url_pattern": "/health" }]
+      "backend": [{ "host": ["http://ms-students-service:3001"], "url_pattern": "/health" }]
     },
     {
       "endpoint": "/api/auth/login",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-auth:3002"], "url_pattern": "/auth/login" }]
+      "backend": [{ "host": ["http://ms-auth-service:3002"], "url_pattern": "/auth/login" }]
     },
     {
       "endpoint": "/api/auth/register",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-auth:3002"], "url_pattern": "/auth/register" }]
+      "backend": [{ "host": ["http://ms-auth-service:3002"], "url_pattern": "/auth/register" }]
     },
     {
       "endpoint": "/api/auth/logout",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-auth:3002"], "url_pattern": "/auth/logout" }]
+      "backend": [{ "host": ["http://ms-auth-service:3002"], "url_pattern": "/auth/logout" }]
     },
     {
       "endpoint": "/api/auth/verify",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-auth:3002"], "url_pattern": "/auth/verify" }]
+      "backend": [{ "host": ["http://ms-auth-service:3002"], "url_pattern": "/auth/verify" }]
     },
     {
       "endpoint": "/api/students/login",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-students:3001"], "url_pattern": "/students/login" }]
+      "backend": [{ "host": ["http://ms-students-service:3001"], "url_pattern": "/students/login" }]
     },
     {
       "endpoint": "/api/students/",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-students:3001"], "url_pattern": "/students" }]
+      "backend": [{ "host": ["http://ms-students-service:3001"], "url_pattern": "/students" }]
     },
     {
       "endpoint": "/api/students/{id}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-students:3001"], "url_pattern": "/students/{id}" }]
+      "backend": [{ "host": ["http://ms-students-service:3001"], "url_pattern": "/students/{id}" }]
     },
     {
       "endpoint": "/api/students/",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-students:3001"], "url_pattern": "/students" }]
+      "backend": [{ "host": ["http://ms-students-service:3001"], "url_pattern": "/students" }]
     },
     {
       "endpoint": "/api/students/{id}",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-students:3001"], "url_pattern": "/students/{id}" }]
+      "backend": [{ "host": ["http://ms-students-service:3001"], "url_pattern": "/students/{id}" }]
     },
     {
       "endpoint": "/api/students/{id}",
       "method": "DELETE",
-      "backend": [{ "host": ["http://ms-students:3001"], "url_pattern": "/students/{id}" }]
+      "backend": [{ "host": ["http://ms-students-service:3001"], "url_pattern": "/students/{id}" }]
     },
     {
       "endpoint": "/api/students/course/{course}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-students:3001"], "url_pattern": "/students/course/{course}" }]
+      "backend": [{ "host": ["http://ms-students-service:3001"], "url_pattern": "/students/course/{course}" }]
     },
     {
       "endpoint": "/api/teachers/",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-teachers:3004"], "url_pattern": "/teachers" }]
+      "backend": [{ "host": ["http://ms-teachers-service:3004"], "url_pattern": "/teachers" }]
     },
     {
       "endpoint": "/api/teachers/{id}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-teachers:3004"], "url_pattern": "/teachers/{id}" }]
+      "backend": [{ "host": ["http://ms-teachers-service:3004"], "url_pattern": "/teachers/{id}" }]
     },
     {
       "endpoint": "/api/teachers/",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-teachers:3004"], "url_pattern": "/teachers" }]
+      "backend": [{ "host": ["http://ms-teachers-service:3004"], "url_pattern": "/teachers" }]
     },
     {
       "endpoint": "/api/teachers/{id}",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-teachers:3004"], "url_pattern": "/teachers/{id}" }]
+      "backend": [{ "host": ["http://ms-teachers-service:3004"], "url_pattern": "/teachers/{id}" }]
     },
     {
       "endpoint": "/api/teachers/{id}",
       "method": "DELETE",
-      "backend": [{ "host": ["http://ms-teachers:3004"], "url_pattern": "/teachers/{id}" }]
+      "backend": [{ "host": ["http://ms-teachers-service:3004"], "url_pattern": "/teachers/{id}" }]
     },
     {
       "endpoint": "/api/courses/",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses" }]
     },
     {
       "endpoint": "/api/courses/{id}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/{id}" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/{id}" }]
     },
     {
       "endpoint": "/api/courses/",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses" }]
     },
     {
       "endpoint": "/api/courses/{id}",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/{id}" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/{id}" }]
     },
     {
       "endpoint": "/api/courses/{id}",
       "method": "DELETE",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/{id}" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/{id}" }]
     },
     {
       "endpoint": "/api/courses/subjects",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/subjects" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/subjects" }]
     },
     {
       "endpoint": "/api/courses/subjects",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/subjects" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/subjects" }]
     },
     {
       "endpoint": "/api/courses/subjects/{id}",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/subjects/{id}" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/subjects/{id}" }]
     },
     {
       "endpoint": "/api/courses/subjects/{id}",
       "method": "DELETE",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/subjects/{id}" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/subjects/{id}" }]
     },
     {
       "endpoint": "/api/courses/{id}/subjects",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/{id}/subjects" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/{id}/subjects" }]
     },
     {
       "endpoint": "/api/courses/assign-subject",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/assign-subject" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/assign-subject" }]
     },
     {
       "endpoint": "/api/courses/assign-subject/{id}",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/assign-subject/{id}" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/assign-subject/{id}" }]
     },
     {
       "endpoint": "/api/courses/assign-subject/{id}",
       "method": "DELETE",
-      "backend": [{ "host": ["http://ms-courses:3005"], "url_pattern": "/courses/assign-subject/{id}" }]
+      "backend": [{ "host": ["http://ms-courses-service:3005"], "url_pattern": "/courses/assign-subject/{id}" }]
     },
     {
       "endpoint": "/api/classes/",
       "method": "GET",
       "input_query_strings": ["course_subject_id"],
-      "backend": [{ "host": ["http://ms-classes:3006"], "url_pattern": "/classes" }]
+      "backend": [{ "host": ["http://ms-classes-service:3006"], "url_pattern": "/classes" }]
     },
     {
       "endpoint": "/api/classes/{id}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-classes:3006"], "url_pattern": "/classes/{id}" }]
+      "backend": [{ "host": ["http://ms-classes-service:3006"], "url_pattern": "/classes/{id}" }]
     },
     {
       "endpoint": "/api/classes/",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-classes:3006"], "url_pattern": "/classes" }]
+      "backend": [{ "host": ["http://ms-classes-service:3006"], "url_pattern": "/classes" }]
     },
     {
       "endpoint": "/api/classes/{id}",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-classes:3006"], "url_pattern": "/classes/{id}" }]
+      "backend": [{ "host": ["http://ms-classes-service:3006"], "url_pattern": "/classes/{id}" }]
     },
     {
       "endpoint": "/api/classes/{id}",
       "method": "DELETE",
-      "backend": [{ "host": ["http://ms-classes:3006"], "url_pattern": "/classes/{id}" }]
+      "backend": [{ "host": ["http://ms-classes-service:3006"], "url_pattern": "/classes/{id}" }]
     },
     {
       "endpoint": "/api/schedule/",
       "method": "GET",
       "input_query_strings": ["course_subject_id"],
-      "backend": [{ "host": ["http://ms-schedule:3007"], "url_pattern": "/schedules" }]
+      "backend": [{ "host": ["http://ms-schedule-service:3007"], "url_pattern": "/schedules" }]
     },
     {
       "endpoint": "/api/schedule/{id}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-schedule:3007"], "url_pattern": "/schedules/{id}" }]
+      "backend": [{ "host": ["http://ms-schedule-service:3007"], "url_pattern": "/schedules/{id}" }]
     },
     {
       "endpoint": "/api/schedule/",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-schedule:3007"], "url_pattern": "/schedules" }]
+      "backend": [{ "host": ["http://ms-schedule-service:3007"], "url_pattern": "/schedules" }]
     },
     {
       "endpoint": "/api/schedule/{id}",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-schedule:3007"], "url_pattern": "/schedules/{id}" }]
+      "backend": [{ "host": ["http://ms-schedule-service:3007"], "url_pattern": "/schedules/{id}" }]
     },
     {
       "endpoint": "/api/schedule/{id}",
       "method": "DELETE",
-      "backend": [{ "host": ["http://ms-schedule:3007"], "url_pattern": "/schedules/{id}" }]
+      "backend": [{ "host": ["http://ms-schedule-service:3007"], "url_pattern": "/schedules/{id}" }]
     },
     {
       "endpoint": "/api/attendance/class/{classId}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-attendance:3008"], "url_pattern": "/attendance/class/{classId}" }]
+      "backend": [{ "host": ["http://ms-attendance-service:3008"], "url_pattern": "/attendance/class/{classId}" }]
     },
     {
       "endpoint": "/api/attendance/student/{rut}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-attendance:3008"], "url_pattern": "/attendance/student/{rut}" }]
+      "backend": [{ "host": ["http://ms-attendance-service:3008"], "url_pattern": "/attendance/student/{rut}" }]
     },
     {
       "endpoint": "/api/attendance/course-subject/{id}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-attendance:3008"], "url_pattern": "/attendance/course-subject/{id}" }]
+      "backend": [{ "host": ["http://ms-attendance-service:3008"], "url_pattern": "/attendance/course-subject/{id}" }]
     },
     {
       "endpoint": "/api/attendance/mark",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-attendance:3008"], "url_pattern": "/attendance/mark" }]
+      "backend": [{ "host": ["http://ms-attendance-service:3008"], "url_pattern": "/attendance/mark" }]
     },
     {
       "endpoint": "/api/attendance/{id}",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-attendance:3008"], "url_pattern": "/attendance/{id}" }]
+      "backend": [{ "host": ["http://ms-attendance-service:3008"], "url_pattern": "/attendance/{id}" }]
     },
     {
       "endpoint": "/api/messaging/conversations",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-messaging:3009"], "url_pattern": "/messaging/conversations" }]
+      "backend": [{ "host": ["http://ms-messaging-service:3009"], "url_pattern": "/messaging/conversations" }]
     },
     {
       "endpoint": "/api/messaging/conversations/{userId}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-messaging:3009"], "url_pattern": "/messaging/conversations/{userId}" }]
+      "backend": [{ "host": ["http://ms-messaging-service:3009"], "url_pattern": "/messaging/conversations/{userId}" }]
     },
     {
       "endpoint": "/api/messaging/messages",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-messaging:3009"], "url_pattern": "/messaging/messages" }]
+      "backend": [{ "host": ["http://ms-messaging-service:3009"], "url_pattern": "/messaging/messages" }]
     },
     {
       "endpoint": "/api/messaging/messages/{conversationId}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-messaging:3009"], "url_pattern": "/messaging/messages/{conversationId}" }]
+      "backend": [{ "host": ["http://ms-messaging-service:3009"], "url_pattern": "/messaging/messages/{conversationId}" }]
     },
     {
       "endpoint": "/api/messaging/messages/read/{conversationId}/{userId}",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-messaging:3009"], "url_pattern": "/messaging/messages/read/{conversationId}/{userId}" }]
+      "backend": [{ "host": ["http://ms-messaging-service:3009"], "url_pattern": "/messaging/messages/read/{conversationId}/{userId}" }]
     },
     {
       "endpoint": "/api/grades/student/{rut}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-grades:3010"], "url_pattern": "/grades/student/{rut}" }]
+      "backend": [{ "host": ["http://ms-grades-service:3010"], "url_pattern": "/grades/student/{rut}" }]
     },
     {
       "endpoint": "/api/grades/course/{course}",
       "method": "GET",
       "input_query_strings": ["professorRut"],
-      "backend": [{ "host": ["http://ms-grades:3010"], "url_pattern": "/grades/course/{course}" }]
+      "backend": [{ "host": ["http://ms-grades-service:3010"], "url_pattern": "/grades/course/{course}" }]
     },
     {
       "endpoint": "/api/grades/professor/{rut}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-grades:3010"], "url_pattern": "/grades/professor/{rut}" }]
+      "backend": [{ "host": ["http://ms-grades-service:3010"], "url_pattern": "/grades/professor/{rut}" }]
     },
     {
       "endpoint": "/api/grades/",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-grades:3010"], "url_pattern": "/grades" }]
+      "backend": [{ "host": ["http://ms-grades-service:3010"], "url_pattern": "/grades" }]
     },
     {
       "endpoint": "/api/grades/batch",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-grades:3010"], "url_pattern": "/grades/batch" }]
+      "backend": [{ "host": ["http://ms-grades-service:3010"], "url_pattern": "/grades/batch" }]
     },
     {
       "endpoint": "/api/grades/{id}",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-grades:3010"], "url_pattern": "/grades/{id}" }]
+      "backend": [{ "host": ["http://ms-grades-service:3010"], "url_pattern": "/grades/{id}" }]
     },
     {
       "endpoint": "/api/grades/{id}",
       "method": "DELETE",
-      "backend": [{ "host": ["http://ms-grades:3010"], "url_pattern": "/grades/{id}" }]
+      "backend": [{ "host": ["http://ms-grades-service:3010"], "url_pattern": "/grades/{id}" }]
     },
     {
       "endpoint": "/api/notifications/absence-notice",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-notifications:3003"], "url_pattern": "/notifications/absence-notice" }]
+      "backend": [{ "host": ["http://ms-notifications-service:3003"], "url_pattern": "/notifications/absence-notice" }]
     },
     {
       "endpoint": "/api/notifications/grade-notice",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-notifications:3003"], "url_pattern": "/notifications/grade-notice" }]
+      "backend": [{ "host": ["http://ms-notifications-service:3003"], "url_pattern": "/notifications/grade-notice" }]
     },
     {
       "endpoint": "/api/notifications/user/{userId}",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-notifications:3003"], "url_pattern": "/notifications/user/{userId}" }]
+      "backend": [{ "host": ["http://ms-notifications-service:3003"], "url_pattern": "/notifications/user/{userId}" }]
     },
     {
       "endpoint": "/api/notifications/user/{userId}/unread",
       "method": "GET",
-      "backend": [{ "host": ["http://ms-notifications:3003"], "url_pattern": "/notifications/user/{userId}/unread" }]
+      "backend": [{ "host": ["http://ms-notifications-service:3003"], "url_pattern": "/notifications/user/{userId}/unread" }]
     },
     {
       "endpoint": "/api/notifications/message-notice",
       "method": "POST",
-      "backend": [{ "host": ["http://ms-notifications:3003"], "url_pattern": "/notifications/message-notice" }]
+      "backend": [{ "host": ["http://ms-notifications-service:3003"], "url_pattern": "/notifications/message-notice" }]
     },
     {
       "endpoint": "/api/notifications/{id}/read",
       "method": "PUT",
-      "backend": [{ "host": ["http://ms-notifications:3003"], "url_pattern": "/notifications/{id}/read" }]
+      "backend": [{ "host": ["http://ms-notifications-service:3003"], "url_pattern": "/notifications/{id}/read" }]
+    },
+    {
+      "endpoint": "/api/docs",
+      "method": "GET",
+      "backend": [{ "host": ["http://ms-docs-service:3011"], "url_pattern": "/docs" }]
+    },
+    {
+      "endpoint": "/api/openapi.json",
+      "method": "GET",
+      "backend": [{ "host": ["http://ms-docs-service:3011"], "url_pattern": "/openapi.json" }]
     }
   ]
 }

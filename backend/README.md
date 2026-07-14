@@ -204,7 +204,7 @@ Los manifests en `k8s/` despliegan cada microservicio como un Deployment + Clust
 docker compose build
 
 # Desplegar todo
-kubectl apply -f k8s/config/namespace.yaml
+kubectl apply -f k8s/config/00-namespace.yaml
 kubectl apply -f k8s/config/secret.yaml
 kubectl apply -f k8s/config/configmap.yaml
 kubectl apply -f k8s/database/

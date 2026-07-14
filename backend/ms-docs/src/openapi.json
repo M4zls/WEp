@@ -1,0 +1,2663 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Portal Educativo — API",
+    "description": "API del Colegio Bernardo O'Higgins. Gateway: KrakenD en `http://localhost:3100`. Autenticación via JWT (`Authorization: Bearer <token>`).",
+    "version": "1.0.0",
+    "contact": {
+      "email": "max.palma@duocuc.cl"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3100",
+      "description": "KrakenD API Gateway (desarrollo)"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Autenticación"],
+        "summary": "Iniciar sesión (admin/profesor)",
+        "operationId": "authLogin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginAuthRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login exitoso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginAuthResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Autenticación"],
+        "summary": "Registrar usuario (admin/profesor)",
+        "operationId": "authRegister",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterAuthRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginAuthResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Autenticación"],
+        "summary": "Cerrar sesión",
+        "operationId": "authLogout",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Sesión cerrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Sesión cerrada correctamente" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token inválido",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/verify": {
+      "get": {
+        "tags": ["Autenticación"],
+        "summary": "Verificar token JWT",
+        "operationId": "authVerify",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Token válido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": { "type": "boolean", "example": true },
+                    "payload": {
+                      "type": "object",
+                      "properties": {
+                        "sub": { "type": "integer" },
+                        "email": { "type": "string" },
+                        "rut": { "type": "string" },
+                        "role": { "type": "string" },
+                        "firstName": { "type": "string" },
+                        "lastName": { "type": "string" },
+                        "exp": { "type": "integer" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token inválido o expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": { "type": "boolean", "example": false },
+                    "error": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/students/login": {
+      "post": {
+        "tags": ["Estudiantes"],
+        "summary": "Iniciar sesión (estudiante)",
+        "operationId": "studentLogin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginStudentRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login exitoso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StudentLoginResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/students/": {
+      "get": {
+        "tags": ["Estudiantes"],
+        "summary": "Listar todos los estudiantes",
+        "operationId": "listStudents",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de estudiantes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Student" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Estudiantes"],
+        "summary": "Crear estudiante",
+        "operationId": "createStudent",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateStudentRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Estudiante creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Student created successfully" },
+                    "data": { "$ref": "#/components/schemas/CreateStudentRequest" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/students/{rut}": {
+      "get": {
+        "tags": ["Estudiantes"],
+        "summary": "Obtener estudiante por RUT",
+        "operationId": "getStudent",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "rut", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datos del estudiante",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Student" }
+              }
+            }
+          },
+          "404": {
+            "description": "No encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Estudiantes"],
+        "summary": "Actualizar estudiante por RUT",
+        "operationId": "updateStudent",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "rut", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateStudentRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estudiante actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Student updated successfully" },
+                    "data": { "$ref": "#/components/schemas/UpdateStudentRequest" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Estudiantes"],
+        "summary": "Eliminar estudiante por RUT",
+        "operationId": "deleteStudent",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "rut", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estudiante eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Student deleted successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/students/course/{course}": {
+      "get": {
+        "tags": ["Estudiantes"],
+        "summary": "Listar estudiantes por curso",
+        "operationId": "listStudentsByCourse",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "course", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de estudiantes del curso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Student" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/teachers/": {
+      "get": {
+        "tags": ["Profesores"],
+        "summary": "Listar todos los profesores",
+        "operationId": "listTeachers",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de profesores",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Teacher" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Profesores"],
+        "summary": "Crear profesor",
+        "operationId": "createTeacher",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateTeacherRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Profesor creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Teacher created successfully" },
+                    "data": { "$ref": "#/components/schemas/CreateTeacherRequest" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/teachers/{rut}": {
+      "get": {
+        "tags": ["Profesores"],
+        "summary": "Obtener profesor por RUT",
+        "operationId": "getTeacher",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "rut", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datos del profesor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Teacher" }
+              }
+            }
+          },
+          "404": {
+            "description": "No encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Profesores"],
+        "summary": "Actualizar profesor por RUT",
+        "operationId": "updateTeacher",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "rut", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateTeacherRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profesor actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Teacher updated successfully" },
+                    "data": { "$ref": "#/components/schemas/UpdateTeacherRequest" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Profesores"],
+        "summary": "Eliminar profesor por RUT",
+        "operationId": "deleteTeacher",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "rut", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profesor eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Teacher deleted successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/": {
+      "get": {
+        "tags": ["Cursos"],
+        "summary": "Listar todos los cursos",
+        "operationId": "listCourses",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de cursos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Course" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Cursos"],
+        "summary": "Crear curso",
+        "operationId": "createCourse",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateCourseRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Curso creado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Course" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/{id}": {
+      "get": {
+        "tags": ["Cursos"],
+        "summary": "Obtener curso por ID",
+        "operationId": "getCourse",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datos del curso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Course" }
+              }
+            }
+          },
+          "404": {
+            "description": "No encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Cursos"],
+        "summary": "Actualizar curso",
+        "operationId": "updateCourse",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateCourseRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Curso actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Course updated successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Cursos"],
+        "summary": "Eliminar curso",
+        "operationId": "deleteCourse",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Curso eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Course deleted successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/subjects": {
+      "get": {
+        "tags": ["Cursos"],
+        "summary": "Listar todas las asignaturas",
+        "operationId": "listSubjects",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de asignaturas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Subject" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Cursos"],
+        "summary": "Crear asignatura",
+        "operationId": "createSubject",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateSubjectRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Asignatura creada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Subject" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/subjects/{id}": {
+      "put": {
+        "tags": ["Cursos"],
+        "summary": "Actualizar asignatura",
+        "operationId": "updateSubject",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSubjectRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Asignatura actualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Subject updated successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Cursos"],
+        "summary": "Eliminar asignatura",
+        "operationId": "deleteSubject",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Asignatura eliminada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Subject deleted successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/{id}/subjects": {
+      "get": {
+        "tags": ["Cursos"],
+        "summary": "Listar asignaturas de un curso",
+        "operationId": "listCourseSubjects",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Asignaturas del curso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/CourseSubjectAssignment" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/assign-subject": {
+      "post": {
+        "tags": ["Cursos"],
+        "summary": "Asignar asignatura a un curso",
+        "operationId": "assignSubjectToCourse",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AssignSubjectRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Asignatura asignada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CourseSubjectAssignment" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/assign-subject/{id}": {
+      "put": {
+        "tags": ["Cursos"],
+        "summary": "Actualizar asignación de asignatura",
+        "operationId": "updateAssignment",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateAssignSubjectRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Asignación actualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Assignment updated successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Cursos"],
+        "summary": "Eliminar asignación de asignatura",
+        "operationId": "deleteAssignment",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Asignación eliminada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Assignment deleted successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/classes/": {
+      "get": {
+        "tags": ["Clases"],
+        "summary": "Listar clases",
+        "operationId": "listClasses",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "course_subject_id", "in": "query", "required": false, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de clases",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Class" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Clases"],
+        "summary": "Crear clase",
+        "operationId": "createClass",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateClassRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Clase creada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Class" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/classes/{id}": {
+      "get": {
+        "tags": ["Clases"],
+        "summary": "Obtener clase por ID",
+        "operationId": "getClass",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datos de la clase",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Class" }
+              }
+            }
+          },
+          "404": {
+            "description": "No encontrada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Clases"],
+        "summary": "Actualizar clase",
+        "operationId": "updateClass",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateClassRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Clase actualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Class updated successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Clases"],
+        "summary": "Eliminar clase",
+        "operationId": "deleteClass",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Clase eliminada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Class deleted successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/schedule/": {
+      "get": {
+        "tags": ["Horario"],
+        "summary": "Listar bloques horarios",
+        "operationId": "listSchedules",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "course_subject_id", "in": "query", "required": false, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de bloques horarios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Schedule" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Horario"],
+        "summary": "Crear bloque horario",
+        "operationId": "createSchedule",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateScheduleRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Bloque horario creado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Schedule" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/schedule/{id}": {
+      "get": {
+        "tags": ["Horario"],
+        "summary": "Obtener bloque horario por ID",
+        "operationId": "getSchedule",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bloque horario",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Schedule" }
+              }
+            }
+          },
+          "404": {
+            "description": "No encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Horario"],
+        "summary": "Actualizar bloque horario",
+        "operationId": "updateSchedule",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateScheduleRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bloque horario actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Schedule updated successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Horario"],
+        "summary": "Eliminar bloque horario",
+        "operationId": "deleteSchedule",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bloque horario eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Schedule deleted successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attendance/class/{classId}": {
+      "get": {
+        "tags": ["Asistencia"],
+        "summary": "Listar asistencia por clase",
+        "operationId": "listAttendanceByClass",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "classId", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registros de asistencia",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AttendanceRecord" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attendance/student/{rut}": {
+      "get": {
+        "tags": ["Asistencia"],
+        "summary": "Listar asistencia por estudiante",
+        "operationId": "listAttendanceByStudent",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "rut", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registros de asistencia",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AttendanceRecord" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attendance/course-subject/{id}": {
+      "get": {
+        "tags": ["Asistencia"],
+        "summary": "Listar asistencia por asignatura de curso",
+        "operationId": "listAttendanceByCourseSubject",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registros de asistencia",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AttendanceRecord" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attendance/mark": {
+      "post": {
+        "tags": ["Asistencia"],
+        "summary": "Registrar asistencia (batch)",
+        "operationId": "markAttendance",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MarkAttendanceRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Asistencia registrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/AttendanceRecord" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attendance/{id}": {
+      "put": {
+        "tags": ["Asistencia"],
+        "summary": "Actualizar registro de asistencia",
+        "operationId": "updateAttendance",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateAttendanceRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registro actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Attendance updated successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/grades/student/{rut}": {
+      "get": {
+        "tags": ["Notas"],
+        "summary": "Obtener notas de un estudiante",
+        "operationId": "getStudentGrades",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "rut", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notas del estudiante agrupadas por asignatura",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StudentGrades" }
+              }
+            }
+          },
+          "404": {
+            "description": "Estudiante no encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/grades/course/{course}": {
+      "get": {
+        "tags": ["Notas"],
+        "summary": "Obtener notas de un curso",
+        "operationId": "getCourseGrades",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "course", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "professorRut", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notas del curso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Grade" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/grades/professor/{rut}": {
+      "get": {
+        "tags": ["Notas"],
+        "summary": "Obtener notas registradas por un profesor",
+        "operationId": "getProfessorGrades",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "rut", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notas del profesor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Grade" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/grades/": {
+      "post": {
+        "tags": ["Notas"],
+        "summary": "Crear nota",
+        "operationId": "createGrade",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateGradeRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Nota creada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Grade created successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/grades/batch": {
+      "post": {
+        "tags": ["Notas"],
+        "summary": "Crear notas en batch",
+        "operationId": "createGradesBatch",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateGradesBatchRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Notas creadas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Grades created successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/grades/{id}": {
+      "put": {
+        "tags": ["Notas"],
+        "summary": "Actualizar nota",
+        "operationId": "updateGrade",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateGradeRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Nota actualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Grade updated successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Notas"],
+        "summary": "Eliminar nota",
+        "operationId": "deleteGrade",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nota eliminada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Grade deleted successfully" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messaging/conversations": {
+      "post": {
+        "tags": ["Mensajería"],
+        "summary": "Crear u obtener conversación",
+        "operationId": "createConversation",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateConversationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Conversación creada/obtenida",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Conversation" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messaging/conversations/{userId}": {
+      "get": {
+        "tags": ["Mensajería"],
+        "summary": "Listar conversaciones de un usuario",
+        "operationId": "listConversations",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "userId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de conversaciones",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ConversationListEntry" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messaging/messages": {
+      "post": {
+        "tags": ["Mensajería"],
+        "summary": "Enviar mensaje",
+        "operationId": "sendMessage",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SendMessageRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Mensaje enviado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Message" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messaging/messages/{conversationId}": {
+      "get": {
+        "tags": ["Mensajería"],
+        "summary": "Obtener mensajes de una conversación",
+        "operationId": "getMessages",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "conversationId", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mensajes de la conversación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Message" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messaging/messages/read/{conversationId}/{userId}": {
+      "put": {
+        "tags": ["Mensajería"],
+        "summary": "Marcar mensajes como leídos",
+        "operationId": "markMessagesAsRead",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "conversationId", "in": "path", "required": true, "schema": { "type": "integer" } },
+          { "name": "userId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mensajes marcados como leídos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Messages marked as read" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/user/{userId}": {
+      "get": {
+        "tags": ["Notificaciones"],
+        "summary": "Listar notificaciones de un usuario",
+        "operationId": "listNotifications",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "userId", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notificaciones del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Notification" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/user/{userId}/unread": {
+      "get": {
+        "tags": ["Notificaciones"],
+        "summary": "Contar notificaciones no leídas",
+        "operationId": "countUnreadNotifications",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "userId", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cantidad de no leídas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": { "type": "integer", "example": 3 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/{id}/read": {
+      "put": {
+        "tags": ["Notificaciones"],
+        "summary": "Marcar notificación como leída",
+        "operationId": "markNotificationRead",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notificación marcada como leída",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Notification marked as read" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/absence-notice": {
+      "post": {
+        "tags": ["Notificaciones"],
+        "summary": "Enviar notificación de ausencia",
+        "operationId": "sendAbsenceNotice",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AbsenceAlertRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notificación enviada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Notification sent" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/grade-notice": {
+      "post": {
+        "tags": ["Notificaciones"],
+        "summary": "Enviar notificación de nota",
+        "operationId": "sendGradeNotice",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GradeAlertRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notificación enviada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Grade notification sent" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/message-notice": {
+      "post": {
+        "tags": ["Notificaciones"],
+        "summary": "Enviar notificación de mensaje nuevo",
+        "operationId": "sendMessageNotice",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MessageAlertRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notificación enviada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Message notification sent" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" }
+        }
+      },
+      "LoginAuthRequest": {
+        "type": "object",
+        "required": ["identifier", "password"],
+        "properties": {
+          "identifier": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 6 }
+        }
+      },
+      "LoginAuthResponse": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string" },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "rut": { "type": "string" },
+              "firstName": { "type": "string" },
+              "lastName": { "type": "string" },
+              "email": { "type": "string", "format": "email" },
+              "role": { "type": "string", "enum": ["admin", "teacher"] }
+            }
+          }
+        }
+      },
+      "RegisterAuthRequest": {
+        "type": "object",
+        "required": ["rut", "dv", "firstName", "lastName", "email", "password", "role"],
+        "properties": {
+          "rut": { "type": "string", "pattern": "^\\d{7,8}$" },
+          "dv": { "type": "string", "minLength": 1, "maxLength": 1 },
+          "firstName": { "type": "string", "minLength": 1 },
+          "lastName": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 6 },
+          "role": { "type": "string", "enum": ["admin", "teacher"] }
+        }
+      },
+      "LoginStudentRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 6 }
+        }
+      },
+      "StudentLoginResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "rut": { "type": "string" },
+          "dv": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "courses": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string" },
+          "guardian": { "type": "string" },
+          "guardianEmail": { "type": "string", "format": "email" },
+          "registrationDate": { "type": "string" },
+          "token": { "type": "string" }
+        }
+      },
+      "Student": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "rut": { "type": "string" },
+          "dv": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "courses": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string" },
+          "guardian": { "type": "string" },
+          "guardianEmail": { "type": "string", "format": "email" },
+          "registrationDate": { "type": "string" }
+        }
+      },
+      "CreateStudentRequest": {
+        "type": "object",
+        "required": ["rut", "dv", "firstName", "lastName", "courses", "email", "password"],
+        "properties": {
+          "rut": { "type": "string", "pattern": "^\\d{7,8}$" },
+          "dv": { "type": "string", "minLength": 1, "maxLength": 1 },
+          "firstName": { "type": "string", "minLength": 1 },
+          "lastName": { "type": "string", "minLength": 1 },
+          "courses": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 6 },
+          "phone": { "type": "string" },
+          "guardian": { "type": "string" }
+        }
+      },
+      "UpdateStudentRequest": {
+        "type": "object",
+        "properties": {
+          "rut": { "type": "string", "pattern": "^\\d{7,8}$" },
+          "dv": { "type": "string", "minLength": 1, "maxLength": 1 },
+          "firstName": { "type": "string", "minLength": 1 },
+          "lastName": { "type": "string", "minLength": 1 },
+          "courses": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 6 },
+          "phone": { "type": "string" },
+          "guardian": { "type": "string" }
+        }
+      },
+      "Teacher": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "rut": { "type": "string" },
+          "dv": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string" },
+          "subject": { "type": "string" },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "CreateTeacherRequest": {
+        "type": "object",
+        "required": ["rut", "dv", "firstName", "lastName", "email", "password", "subject"],
+        "properties": {
+          "rut": { "type": "string", "pattern": "^\\d{7,8}$" },
+          "dv": { "type": "string", "minLength": 1, "maxLength": 1 },
+          "firstName": { "type": "string", "minLength": 1 },
+          "lastName": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 6 },
+          "phone": { "type": "string" },
+          "subject": { "type": "string", "minLength": 1 }
+        }
+      },
+      "UpdateTeacherRequest": {
+        "type": "object",
+        "properties": {
+          "rut": { "type": "string", "pattern": "^\\d{7,8}$" },
+          "dv": { "type": "string", "minLength": 1, "maxLength": 1 },
+          "firstName": { "type": "string", "minLength": 1 },
+          "lastName": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 6 },
+          "phone": { "type": "string" },
+          "subject": { "type": "string", "minLength": 1 }
+        }
+      },
+      "Course": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "level": { "type": "string" },
+          "letter": { "type": "string" },
+          "year": { "type": "string" },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "CreateCourseRequest": {
+        "type": "object",
+        "required": ["name", "level", "letter"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "level": { "type": "string", "minLength": 1 },
+          "letter": { "type": "string", "minLength": 1, "maxLength": 1 },
+          "year": { "type": "string" }
+        }
+      },
+      "UpdateCourseRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "level": { "type": "string", "minLength": 1 },
+          "letter": { "type": "string", "minLength": 1, "maxLength": 1 },
+          "year": { "type": "string" }
+        }
+      },
+      "Subject": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "code": { "type": "string" },
+          "description": { "type": "string" },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "CreateSubjectRequest": {
+        "type": "object",
+        "required": ["name", "code"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "code": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" }
+        }
+      },
+      "UpdateSubjectRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "code": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" }
+        }
+      },
+      "CourseSubjectAssignment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "courseId": { "type": "integer" },
+          "subjectId": { "type": "integer" },
+          "professorId": { "type": "integer" },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "AssignSubjectRequest": {
+        "type": "object",
+        "required": ["courseId", "subjectId"],
+        "properties": {
+          "courseId": { "type": "integer" },
+          "subjectId": { "type": "integer" },
+          "professorId": { "type": "integer" }
+        }
+      },
+      "UpdateAssignSubjectRequest": {
+        "type": "object",
+        "properties": {
+          "courseId": { "type": "integer" },
+          "subjectId": { "type": "integer" },
+          "professorId": { "type": "integer" }
+        }
+      },
+      "Class": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "courseSubjectId": { "type": "integer" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "date": { "type": "string" },
+          "startTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+          "endTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+          "status": { "type": "string", "enum": ["pending", "completed", "cancelled"] },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "CreateClassRequest": {
+        "type": "object",
+        "required": ["courseSubjectId", "title", "date", "startTime", "endTime"],
+        "properties": {
+          "courseSubjectId": { "type": "integer" },
+          "title": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" },
+          "date": { "type": "string", "minLength": 1 },
+          "startTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+          "endTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+          "status": { "type": "string", "enum": ["pending", "completed", "cancelled"] }
+        }
+      },
+      "UpdateClassRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" },
+          "date": { "type": "string", "minLength": 1 },
+          "startTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+          "endTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+          "status": { "type": "string", "enum": ["pending", "completed", "cancelled"] }
+        }
+      },
+      "Schedule": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "courseSubjectId": { "type": "integer" },
+          "weekDay": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "startTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+          "endTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "CreateScheduleRequest": {
+        "type": "object",
+        "required": ["courseSubjectId", "weekDay", "startTime", "endTime"],
+        "properties": {
+          "courseSubjectId": { "type": "integer" },
+          "weekDay": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "startTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+          "endTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" }
+        }
+      },
+      "UpdateScheduleRequest": {
+        "type": "object",
+        "properties": {
+          "courseSubjectId": { "type": "integer" },
+          "weekDay": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "startTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+          "endTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" }
+        }
+      },
+      "AttendanceRecord": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "classId": { "type": "integer" },
+          "courseSubjectId": { "type": "integer" },
+          "studentRut": { "type": "string" },
+          "studentName": { "type": "string" },
+          "present": { "type": "boolean" },
+          "justification": { "type": "string" },
+          "date": { "type": "string" },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "MarkAttendanceRequest": {
+        "type": "object",
+        "required": ["classId", "courseSubjectId", "records"],
+        "properties": {
+          "classId": { "type": "integer" },
+          "courseSubjectId": { "type": "integer" },
+          "records": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["studentRut", "studentFirstName", "present"],
+              "properties": {
+                "studentRut": { "type": "string" },
+                "studentFirstName": { "type": "string" },
+                "present": { "type": "boolean" },
+                "justification": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "UpdateAttendanceRequest": {
+        "type": "object",
+        "properties": {
+          "present": { "type": "boolean" },
+          "justification": { "type": "string" }
+        }
+      },
+      "Grade": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "studentRut": { "type": "string" },
+          "subject": { "type": "string" },
+          "course": { "type": "string" },
+          "grade": { "type": "string" },
+          "evaluationType": { "type": "string" },
+          "date": { "type": "string" },
+          "professorRut": { "type": "string" },
+          "coefficient": { "type": "integer", "enum": [1, 2] }
+        }
+      },
+      "CreateGradeRequest": {
+        "type": "object",
+        "required": ["studentRut", "subject", "course", "grade", "evaluationType", "date", "professorRut"],
+        "properties": {
+          "studentRut": { "type": "string" },
+          "subject": { "type": "string" },
+          "course": { "type": "string" },
+          "grade": { "type": "string" },
+          "evaluationType": { "type": "string" },
+          "date": { "type": "string" },
+          "professorRut": { "type": "string" },
+          "coefficient": { "type": "integer", "enum": [1, 2] }
+        }
+      },
+      "UpdateGradeRequest": {
+        "type": "object",
+        "properties": {
+          "studentRut": { "type": "string" },
+          "subject": { "type": "string" },
+          "course": { "type": "string" },
+          "grade": { "type": "string" },
+          "evaluationType": { "type": "string" },
+          "date": { "type": "string" },
+          "professorRut": { "type": "string" },
+          "coefficient": { "type": "integer", "enum": [1, 2] }
+        }
+      },
+      "CreateGradesBatchRequest": {
+        "type": "object",
+        "required": ["grades"],
+        "properties": {
+          "grades": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/components/schemas/CreateGradeRequest" }
+          }
+        }
+      },
+      "StudentGrades": {
+        "type": "object",
+        "properties": {
+          "rut": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "course": { "type": "string" },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "subject": { "type": "string" },
+                "grades": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Grade" }
+                },
+                "average": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "Conversation": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "ConversationListEntry": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "otherParticipant": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "userId": { "type": "string" },
+              "userFirstName": { "type": "string" },
+              "userLastName": { "type": "string" },
+              "userRole": { "type": "string" }
+            }
+          },
+          "lastMessage": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "conversationId": { "type": "integer" },
+              "senderId": { "type": "string" },
+              "senderFirstName": { "type": "string" },
+              "senderLastName": { "type": "string" },
+              "senderRole": { "type": "string" },
+              "content": { "type": "string" },
+              "read": { "type": "boolean" },
+              "createdAt": { "type": "string" }
+            }
+          },
+          "unreadCount": { "type": "integer" },
+          "createdAt": { "type": "string" },
+          "participants": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ConversationParticipant" }
+          }
+        }
+      },
+      "ConversationParticipant": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "conversationId": { "type": "integer" },
+          "userId": { "type": "string" },
+          "userFirstName": { "type": "string" },
+          "userLastName": { "type": "string" },
+          "userRole": { "type": "string" }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "conversationId": { "type": "integer" },
+          "senderId": { "type": "string" },
+          "senderFirstName": { "type": "string" },
+          "senderLastName": { "type": "string" },
+          "senderRole": { "type": "string" },
+          "content": { "type": "string" },
+          "read": { "type": "boolean" },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "CreateConversationRequest": {
+        "type": "object",
+        "required": ["participantIds", "participantFirstNames", "participantLastNames", "participantRoles"],
+        "properties": {
+          "participantIds": {
+            "type": "array",
+            "minItems": 2,
+            "items": { "type": "string" }
+          },
+          "participantFirstNames": {
+            "type": "array",
+            "minItems": 2,
+            "items": { "type": "string" }
+          },
+          "participantLastNames": {
+            "type": "array",
+            "minItems": 2,
+            "items": { "type": "string" }
+          },
+          "participantRoles": {
+            "type": "array",
+            "minItems": 2,
+            "items": { "type": "string", "enum": ["student", "professor"] }
+          }
+        }
+      },
+      "SendMessageRequest": {
+        "type": "object",
+        "required": ["conversationId", "senderId", "senderFirstName", "senderLastName", "senderRole", "content"],
+        "properties": {
+          "conversationId": { "type": "integer" },
+          "senderId": { "type": "string" },
+          "senderFirstName": { "type": "string" },
+          "senderLastName": { "type": "string" },
+          "senderRole": { "type": "string", "enum": ["student", "professor"] },
+          "content": { "type": "string", "minLength": 1 }
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "userId": { "type": "integer" },
+          "title": { "type": "string" },
+          "message": { "type": "string" },
+          "type": { "type": "string" },
+          "read": { "type": "boolean" },
+          "url": { "type": "string" },
+          "createdAt": { "type": "string" },
+          "readAt": { "type": "string" }
+        }
+      },
+      "AbsenceAlertRequest": {
+        "type": "object",
+        "required": ["subscriberId", "studentName", "course", "date"],
+        "properties": {
+          "subscriberId": { "type": "string" },
+          "guardianName": { "type": "string" },
+          "studentName": { "type": "string" },
+          "studentRut": { "type": "string" },
+          "course": { "type": "string" },
+          "date": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "email": { "type": "string", "format": "email" }
+        }
+      },
+      "GradeAlertRequest": {
+        "type": "object",
+        "required": ["subscriberId", "studentRut", "studentName", "studentEmail", "subject", "grade", "evaluationType", "professorName", "course"],
+        "properties": {
+          "subscriberId": { "type": "string" },
+          "studentRut": { "type": "string" },
+          "studentName": { "type": "string" },
+          "studentEmail": { "type": "string", "format": "email" },
+          "guardianName": { "type": "string" },
+          "guardianEmail": { "type": "string", "format": "email" },
+          "subject": { "type": "string" },
+          "grade": { "type": "string" },
+          "evaluationType": { "type": "string" },
+          "professorName": { "type": "string" },
+          "course": { "type": "string" }
+        }
+      },
+      "MessageAlertRequest": {
+        "type": "object",
+        "required": ["recipientRut", "recipientRole", "senderFirstName", "senderLastName", "contentPreview", "conversationId"],
+        "properties": {
+          "recipientRut": { "type": "string" },
+          "recipientRole": { "type": "string", "enum": ["student", "professor"] },
+          "senderFirstName": { "type": "string" },
+          "senderLastName": { "type": "string" },
+          "contentPreview": { "type": "string" },
+          "conversationId": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

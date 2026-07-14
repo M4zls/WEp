@@ -32,7 +32,7 @@ describe('useMessaging', () => {
 
     const { result } = renderHook(() => useMessaging());
     await waitFor(() => expect(result.current.loadingConvs).toBe(false));
-    expect(result.current.error).toBe('Error loading conversations');
+    expect(result.current.error).toBe('Error al cargar conversaciones');
   });
 
   it('should set newMessage', async () => {
@@ -65,7 +65,7 @@ describe('useMessaging', () => {
     vi.mocked(apiClient.get).mockRejectedValue(new Error('err'));
 
     const { result } = renderHook(() => useMessaging());
-    await waitFor(() => expect(result.current.error).toBe('Error loading conversations'));
+    await waitFor(() => expect(result.current.error).toBe('Error al cargar conversaciones'));
 
     act(() => { result.current.setError(null); });
     expect(result.current.error).toBeNull();

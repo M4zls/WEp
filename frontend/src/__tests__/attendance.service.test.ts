@@ -15,26 +15,26 @@ describe('AttendanceService', () => {
   it('should listByClass', async () => {
     vi.mocked(apiClient.get).mockResolvedValue([]);
     await attendanceService.listByClass(1);
-    expect(apiClient.get).toHaveBeenCalledWith('/attendance/clase/1');
+    expect(apiClient.get).toHaveBeenCalledWith('/attendance/class/1');
   });
 
   it('should listByStudent', async () => {
     vi.mocked(apiClient.get).mockResolvedValue([]);
     await attendanceService.listByStudent('123-4');
-    expect(apiClient.get).toHaveBeenCalledWith('/attendance/estudiante/123-4');
+    expect(apiClient.get).toHaveBeenCalledWith('/attendance/student/123-4');
   });
 
   it('should listByCourseSubject', async () => {
     vi.mocked(apiClient.get).mockResolvedValue([]);
     await attendanceService.listBySubject(5);
-    expect(apiClient.get).toHaveBeenCalledWith('/attendance/curso-asignatura/5');
+    expect(apiClient.get).toHaveBeenCalledWith('/attendance/course-subject/5');
   });
 
   it('should mark attendance', async () => {
     const dto = { classId: 1, courseSubjectId: 5, registros: [{ studentRut: '123-4', studentName: 'Juan Perez', present: true }] };
     vi.mocked(apiClient.post).mockResolvedValue([]);
     await attendanceService.mark(dto);
-    expect(apiClient.post).toHaveBeenCalledWith('/attendance/marcar', dto);
+    expect(apiClient.post).toHaveBeenCalledWith('/attendance/mark', dto);
   });
 
   it('should update attendance', async () => {

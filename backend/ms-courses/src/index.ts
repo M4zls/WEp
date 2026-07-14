@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { lifecycle, initGlitchtip, glitchtipErrorHandler, glitchtipMiddleware } from './glitchtip/index.js'
+import { lifecycle, initGlitchtip, glitchtipErrorHandler, glitchtipMiddleware, initGlitchtipLogger } from './glitchtip/index.js'
 import { tracingMiddleware } from './tracing/index.js'
 import { coursesController } from './controllers/courses.controller.js';
 import { subjectsController } from './controllers/subjects.controller.js';
@@ -11,6 +11,7 @@ await import('../drizzle/seed.js');
 const app = new Hono();
 lifecycle()
 initGlitchtip()
+initGlitchtipLogger('ms-courses')
 app.use('*', tracingMiddleware())
 app.use('*', glitchtipMiddleware())
 app.onError(glitchtipErrorHandler)

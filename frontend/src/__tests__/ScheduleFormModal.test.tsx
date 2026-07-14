@@ -30,8 +30,8 @@ describe('ScheduleFormModal', () => {
    */
   it('should render modal when isOpen is true', () => {
     render(<ScheduleFormModal isOpen={true} onClose={mockOnClose} onSave={mockOnSave} />);
-    expect(screen.getByText('Agregar Bloque Horario')).toBeInTheDocument();
-    expect(screen.getByText('Agregar')).toBeInTheDocument();
+    expect(screen.getByText('Add Schedule Block')).toBeInTheDocument();
+    expect(screen.getByText('Add')).toBeInTheDocument();
     expect(screen.getByText('Lunes')).toBeInTheDocument();
   });
 
@@ -43,9 +43,9 @@ describe('ScheduleFormModal', () => {
     const timeInputs = document.querySelectorAll('input[type="time"]');
     fireEvent.change(timeInputs[0], { target: { value: '' } });
     fireEvent.change(timeInputs[1], { target: { value: '' } });
-    fireEvent.click(screen.getByText('Agregar'));
+    fireEvent.click(screen.getByText('Add'));
     await waitFor(() => {
-      expect(screen.getByText('Completa todos los campos')).toBeInTheDocument();
+      expect(screen.getByText('Complete all fields')).toBeInTheDocument();
     });
   });
 
@@ -55,7 +55,7 @@ describe('ScheduleFormModal', () => {
   it('should show error when onSave throws', async () => {
     const saveWithError = vi.fn().mockRejectedValue(new Error('Save failed'));
     render(<ScheduleFormModal isOpen={true} onClose={mockOnClose} onSave={saveWithError} />);
-    fireEvent.click(screen.getByText('Agregar'));
+    fireEvent.click(screen.getByText('Add'));
     await waitFor(() => {
       expect(screen.getByText('Save failed')).toBeInTheDocument();
     });
@@ -69,12 +69,12 @@ describe('ScheduleFormModal', () => {
     const timeInputs = document.querySelectorAll('input[type="time"]');
     fireEvent.change(timeInputs[0], { target: { value: '08:00' } });
     fireEvent.change(timeInputs[1], { target: { value: '09:30' } });
-    fireEvent.click(screen.getByText('Agregar'));
+    fireEvent.click(screen.getByText('Add'));
     await waitFor(() => {
       expect(mockOnSave).toHaveBeenCalledWith(expect.objectContaining({
-        diaSemana: 1,
-        horaInicio: '08:00',
-        horaTermino: '09:30',
+        weekDay: 1,
+        startTime: '08:00',
+        endTime: '09:30',
       }));
     });
     expect(mockOnClose).toHaveBeenCalled();
@@ -83,12 +83,12 @@ describe('ScheduleFormModal', () => {
   /**
    * Should pre-fill form fields when editingHorario is provided.
    */
-  it('should pre-fill fields when editingHorario is provided', () => {
-    const editingHorario = {
-      id: 1, courseSubjectId: 5, diaSemana: 3, horaInicio: '10:00', horaTermino: '11:30',
+  it('should pre-fill fields when editingSchedule is provided', () => {
+    const editingSchedule = {
+      id: 1, courseSubjectId: 5, weekDay: 3, startTime: '10:00', endTime: '11:30',
     };
-    render(<ScheduleFormModal isOpen={true} onClose={mockOnClose} onSave={mockOnSave} editingHorario={editingHorario} />);
-    expect(screen.getByText('Editar Bloque Horario')).toBeInTheDocument();
-    expect(screen.getByText('Guardar Cambios')).toBeInTheDocument();
+    render(<ScheduleFormModal isOpen={true} onClose={mockOnClose} onSave={mockOnSave} editingSchedule={editingSchedule} />);
+    expect(screen.getByText('Edit Schedule Block')).toBeInTheDocument();
+    expect(screen.getByText('Save Changes')).toBeInTheDocument();
   });
 });

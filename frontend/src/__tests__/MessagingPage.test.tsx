@@ -100,7 +100,7 @@ describe('MessagingPage', () => {
   it('should show empty state when there are no conversations', () => {
     mockUseMessaging.mockReturnValue(defaultMessagingState());
     render(<MessagingPage />);
-    expect(screen.getByText('No conversations')).toBeInTheDocument();
+    expect(screen.getByText('No hay conversaciones')).toBeInTheDocument();
   });
 
   it('should render conversation list', () => {
@@ -157,12 +157,12 @@ describe('MessagingPage', () => {
     const setError = vi.fn();
     mockUseMessaging.mockReturnValue({
       ...defaultMessagingState(),
-      error: 'Error loading conversations',
+      error: 'Error al cargar conversaciones',
       setError,
     });
     render(<MessagingPage />);
-    expect(screen.getByText('Error loading conversations')).toBeInTheDocument();
-    const retryBtn = screen.getByText('Retry');
+    expect(screen.getByText('Error al cargar conversaciones')).toBeInTheDocument();
+    const retryBtn = screen.getByText('Reintentar');
     fireEvent.click(retryBtn);
     expect(setError).toHaveBeenCalledWith(null);
   });
@@ -175,8 +175,8 @@ describe('MessagingPage', () => {
     });
     render(<MessagingPage />);
     expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Write a message...')).toBeInTheDocument();
-    expect(screen.getByText('Send')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Escribe un mensaje...')).toBeInTheDocument();
+    expect(screen.getByText('Enviar')).toBeInTheDocument();
   });
 
   it('should show loading spinner for messages while fetching them', () => {
@@ -199,7 +199,7 @@ describe('MessagingPage', () => {
       messages: [],
     });
     render(<MessagingPage />);
-    expect(screen.getByText('No messages. Write something to start the conversation.')).toBeInTheDocument();
+    expect(screen.getByText('No hay mensajes. Escribe algo para iniciar la conversación.')).toBeInTheDocument();
   });
 
   it('should render messages in chat panel', () => {
@@ -236,7 +236,7 @@ describe('MessagingPage', () => {
       handleSend,
     });
     render(<MessagingPage />);
-    fireEvent.click(screen.getByText('Send'));
+    fireEvent.click(screen.getByText('Enviar'));
     expect(handleSend).toHaveBeenCalled();
   });
 
@@ -248,7 +248,7 @@ describe('MessagingPage', () => {
       newMessage: '',
     });
     render(<MessagingPage />);
-    expect(screen.getByText('Send')).toBeDisabled();
+    expect(screen.getByText('Enviar')).toBeDisabled();
   });
 
   it('should show "Sending..." when sending', () => {
@@ -260,7 +260,7 @@ describe('MessagingPage', () => {
       sending: true,
     });
     render(<MessagingPage />);
-    expect(screen.getByText('Sending...')).toBeInTheDocument();
+    expect(screen.getByText('Enviando...')).toBeInTheDocument();
   });
 
   it('should call setNewMessage when typing in input', () => {
@@ -273,7 +273,7 @@ describe('MessagingPage', () => {
       setNewMessage,
     });
     render(<MessagingPage />);
-    const input = screen.getByPlaceholderText('Write a message...');
+    const input = screen.getByPlaceholderText('Escribe un mensaje...');
     fireEvent.change(input, { target: { value: 'Nuevo texto' } });
     expect(setNewMessage).toHaveBeenCalledWith('Nuevo texto');
   });
@@ -285,7 +285,7 @@ describe('MessagingPage', () => {
       openNew,
     });
     render(<MessagingPage />);
-    fireEvent.click(screen.getByText('+ New'));
+    fireEvent.click(screen.getByText('+ Nueva'));
     expect(openNew).toHaveBeenCalled();
   });
 
@@ -300,7 +300,7 @@ describe('MessagingPage', () => {
       contacts,
     });
     render(<MessagingPage />);
-    expect(screen.getByText('New Conversation')).toBeInTheDocument();
+    expect(screen.getByText('Nueva conversación')).toBeInTheDocument();
     expect(screen.getByText('Carlos Díaz')).toBeInTheDocument();
     expect(screen.getByText('Sofía Rivas')).toBeInTheDocument();
   });
@@ -317,7 +317,7 @@ describe('MessagingPage', () => {
     });
     render(<MessagingPage />);
     expect(screen.getByText('Prof')).toBeInTheDocument();
-    expect(screen.getByText('Std')).toBeInTheDocument();
+    expect(screen.getByText('Est')).toBeInTheDocument();
   });
 
   it('should call startConversation when clicking a contact', () => {
@@ -351,7 +351,7 @@ describe('MessagingPage', () => {
       contacts: [],
     });
     render(<MessagingPage />);
-    expect(screen.getByText('No contacts available')).toBeInTheDocument();
+    expect(screen.getByText('No hay contactos disponibles')).toBeInTheDocument();
   });
 
   it('should show "Back" button in new view', () => {
@@ -362,7 +362,7 @@ describe('MessagingPage', () => {
       setView,
     });
     render(<MessagingPage />);
-    const back = screen.getByText('Back');
+    const back = screen.getByText('Volver');
     fireEvent.click(back);
     expect(setView).toHaveBeenCalledWith('conversations');
   });
@@ -370,7 +370,7 @@ describe('MessagingPage', () => {
   it('should show selection hint when no active conversation', () => {
     mockUseMessaging.mockReturnValue(defaultMessagingState());
     render(<MessagingPage />);
-    expect(screen.getByText('Select a conversation')).toBeInTheDocument();
+    expect(screen.getByText('Seleccionar una conversación')).toBeInTheDocument();
   });
 
   it('should show selection hint in new view', () => {
@@ -379,7 +379,7 @@ describe('MessagingPage', () => {
       view: 'new',
     });
     render(<MessagingPage />);
-    expect(screen.getByText('Select a contact')).toBeInTheDocument();
+    expect(screen.getByText('Seleccionar un contacto')).toBeInTheDocument();
   });
 
   it('should render last message preview text', () => {

@@ -19,7 +19,7 @@ describe('CourseService - obtenerEstudiantesPorCurso', () => {
     const mockStudents = [{ rut: '1', nombre: 'Juan' }];
     vi.mocked(apiClient.get).mockResolvedValue(mockStudents);
     const result = await courseService.getStudentsByCourse('3A');
-    expect(apiClient.get).toHaveBeenCalledWith('/students/curso/3A');
+    expect(apiClient.get).toHaveBeenCalledWith('/students/course/3A');
     expect(result).toEqual(mockStudents);
   });
 
@@ -27,6 +27,6 @@ describe('CourseService - obtenerEstudiantesPorCurso', () => {
   it('should encode course name with special characters', async () => {
     vi.mocked(apiClient.get).mockResolvedValue([]);
     await courseService.getStudentsByCourse('3° A');
-    expect(apiClient.get).toHaveBeenCalledWith('/students/curso/3%C2%B0%20A');
+    expect(apiClient.get).toHaveBeenCalledWith('/students/course/3%C2%B0%20A');
   });
 });

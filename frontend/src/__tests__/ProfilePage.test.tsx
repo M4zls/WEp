@@ -62,7 +62,7 @@ describe('ProfilePage', () => {
   it('should show error state when profile is null', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({ profile: null }));
     renderProfilePage();
-    expect(screen.getByText('Could not load profile information.')).toBeInTheDocument();
+    expect(screen.getByText('No se pudo cargar la información del perfil.')).toBeInTheDocument();
   });
 
   it('should display profile name and initials', () => {
@@ -75,7 +75,7 @@ describe('ProfilePage', () => {
   it('should display role badge for student', () => {
     mockUseProfile.mockReturnValue(defaultProfileState());
     renderProfilePage();
-    expect(screen.getByText('Student')).toBeInTheDocument();
+    expect(screen.getByText('Estudiante')).toBeInTheDocument();
   });
 
   it('should display role badge for professor', () => {
@@ -86,7 +86,7 @@ describe('ProfilePage', () => {
         role="professor"
       />
     );
-    expect(screen.getByText('Professor')).toBeInTheDocument();
+    expect(screen.getByText('Profesor')).toBeInTheDocument();
   });
 
   it('should display profile fields', () => {
@@ -103,7 +103,7 @@ describe('ProfilePage', () => {
   it('should show registration date for student', () => {
     mockUseProfile.mockReturnValue(defaultProfileState());
     renderProfilePage();
-    expect(screen.getByText(/Registered:/)).toBeInTheDocument();
+    expect(screen.getByText(/Registrado:/)).toBeInTheDocument();
   });
 
   it('should show started date for professor', () => {
@@ -115,14 +115,14 @@ describe('ProfilePage', () => {
         role="professor"
       />
     );
-    expect(screen.getByText(/Started:/)).toBeInTheDocument();
+    expect(screen.getByText(/Inicio:/)).toBeInTheDocument();
   });
 
   it('should render "Not registered" for empty optional fields', () => {
     const profile = { ...defaultProfile, phone: null, guardian: null };
     mockUseProfile.mockReturnValue(defaultProfileState({ profile }));
     renderProfilePage();
-    const notRegistered = screen.getAllByText('Not registered');
+    const notRegistered = screen.getAllByText('No registrado');
     expect(notRegistered.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -130,7 +130,7 @@ describe('ProfilePage', () => {
     const setEditing = vi.fn();
     mockUseProfile.mockReturnValue(defaultProfileState({ setEditing }));
     renderProfilePage();
-    const btn = screen.getByText('Edit Profile');
+    const btn = screen.getByText('Editar Perfil');
     fireEvent.click(btn);
     expect(setEditing).toHaveBeenCalledWith(true);
   });
@@ -145,15 +145,15 @@ describe('ProfilePage', () => {
   it('should show Save Changes and Cancel buttons when editing', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: true }));
     renderProfilePage();
-    expect(screen.getByText('Save Changes')).toBeInTheDocument();
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
+    expect(screen.getByText('Guardar Cambios')).toBeInTheDocument();
+    expect(screen.getByText('Cancelar')).toBeInTheDocument();
   });
 
   it('should call handleSave when clicking Save Changes', () => {
     const handleSave = vi.fn();
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: true, handleSave }));
     renderProfilePage();
-    fireEvent.click(screen.getByText('Save Changes'));
+    fireEvent.click(screen.getByText('Guardar Cambios'));
     expect(handleSave).toHaveBeenCalled();
   });
 
@@ -161,14 +161,14 @@ describe('ProfilePage', () => {
     const handleCancel = vi.fn();
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: true, handleCancel }));
     renderProfilePage();
-    fireEvent.click(screen.getByText('Cancel'));
+    fireEvent.click(screen.getByText('Cancelar'));
     expect(handleCancel).toHaveBeenCalled();
   });
 
   it('should disable Save Changes when saving', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: true, saving: true }));
     renderProfilePage();
-    const btn = screen.getByText('Saving...');
+    const btn = screen.getByText('Guardando...');
     expect(btn).toBeDisabled();
   });
 
@@ -183,26 +183,26 @@ describe('ProfilePage', () => {
 
   it('should show success message', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({
-      message: { type: 'ok', text: 'Profile updated successfully' },
+      message: { type: 'ok', text: 'Perfil actualizado exitosamente' },
     }));
     renderProfilePage();
-    expect(screen.getByText('Profile updated successfully')).toBeInTheDocument();
+    expect(screen.getByText('Perfil actualizado exitosamente')).toBeInTheDocument();
   });
 
   it('should show error message', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({
-      message: { type: 'error', text: 'Error saving changes' },
+      message: { type: 'error', text: 'Error al guardar los cambios' },
     }));
     renderProfilePage();
-    expect(screen.getByText('Error saving changes')).toBeInTheDocument();
+    expect(screen.getByText('Error al guardar los cambios')).toBeInTheDocument();
   });
 
   it('should show password change section when editing', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: true }));
     renderProfilePage();
-    expect(screen.getByText('Change Password')).toBeInTheDocument();
-    expect(screen.getByText('New Password')).toBeInTheDocument();
-    expect(screen.getByText('Confirm Password')).toBeInTheDocument();
+    expect(screen.getByText('Cambiar Contraseña')).toBeInTheDocument();
+    expect(screen.getByText('Nueva Contraseña')).toBeInTheDocument();
+    expect(screen.getByText('Confirmar Contraseña')).toBeInTheDocument();
   });
 
   it('should call setNewPassword when typing in password field', () => {
@@ -232,7 +232,7 @@ describe('ProfilePage', () => {
   it('should hide password section when not editing', () => {
     mockUseProfile.mockReturnValue(defaultProfileState({ editing: false }));
     renderProfilePage();
-    expect(screen.queryByText('Change Password')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cambiar Contraseña')).not.toBeInTheDocument();
   });
 
   it('should display subject for professor role', () => {

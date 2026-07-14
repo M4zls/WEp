@@ -46,7 +46,7 @@ describe('SubjectDetail', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     sessionStorage.clear();
-    (useParams as any).mockReturnValue({ cursoAsignaturaId: '5' });
+    (useParams as any).mockReturnValue({ courseSubjectId: '5' });
     (useLocation as any).mockReturnValue({
       state: { subjectName: 'Matemáticas', subjectCode: 'MAT101', courseName: '3A', colorIdx: 0 },
     });
@@ -102,7 +102,7 @@ describe('SubjectDetail', () => {
   it('should show empty horario state', async () => {
     render(<SubjectDetail />);
     await waitFor(() => {
-      expect(screen.getByText('No schedule defined')).toBeInTheDocument();
+      expect(screen.getByText('Horario no definido')).toBeInTheDocument();
     });
   });
 
@@ -113,7 +113,7 @@ describe('SubjectDetail', () => {
     render(<SubjectDetail />);
     fireEvent.click(screen.getByText('Clases'));
     await waitFor(() => {
-      expect(screen.getByText('No classes registered')).toBeInTheDocument();
+      expect(screen.getByText('No hay clases registradas')).toBeInTheDocument();
     });
   });
 
@@ -123,9 +123,9 @@ describe('SubjectDetail', () => {
   it('should navigate back', async () => {
     render(<SubjectDetail />);
     await waitFor(() => {
-      expect(screen.getByText('Back to dashboard')).toBeInTheDocument();
+      expect(screen.getByText('Volver al inicio')).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByText('Back to dashboard'));
+    fireEvent.click(screen.getByText('Volver al inicio'));
     expect(mockNavigate).toHaveBeenCalled();
   });
 });
