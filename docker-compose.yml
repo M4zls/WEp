@@ -36,7 +36,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-auth-service
 
   ms-students:
     build:
@@ -56,7 +58,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-students-service
 
   ms-teachers:
     build:
@@ -76,7 +80,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-teachers-service
 
   ms-notifications:
     build:
@@ -89,8 +95,8 @@ services:
       - NODE_ENV=production
       - PORT=3003
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_notifications
-      - MS_STUDENTS_SERVICE=http://ms-students:3001
-      - MS_AUTH_SERVICE=http://ms-auth:3002
+      - MS_STUDENTS_SERVICE=http://ms-students-service:3001
+      - MS_AUTH_SERVICE=http://ms-auth-service:3002
       - NOVU_SECRET_KEY=${NOVU_SECRET_KEY}
       - SENTRY_DSN=${SENTRY_DSN:-}
       - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
@@ -99,7 +105,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-notifications-service
 
   ms-courses:
     build:
@@ -112,7 +120,7 @@ services:
       - NODE_ENV=production
       - PORT=3005
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_courses
-      - MS_TEACHERS_SERVICE=http://ms-teachers:3004
+      - MS_TEACHERS_SERVICE=http://ms-teachers-service:3004
       - SENTRY_DSN=${SENTRY_DSN:-}
       - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
       - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
@@ -120,7 +128,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-courses-service
 
   ms-classes:
     build:
@@ -140,7 +150,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-classes-service
 
   ms-schedule:
     build:
@@ -160,7 +172,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-schedule-service
 
   ms-attendance:
     build:
@@ -173,7 +187,7 @@ services:
       - NODE_ENV=production
       - PORT=3008
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_attendance
-      - MS_NOTIFICATIONS_SERVICE=http://ms-notifications:3003
+      - MS_NOTIFICATIONS_SERVICE=http://ms-notifications-service:3003
       - SENTRY_DSN=${SENTRY_DSN:-}
       - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
       - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
@@ -181,7 +195,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-attendance-service
 
   ms-messaging:
     build:
@@ -194,7 +210,7 @@ services:
       - NODE_ENV=production
       - PORT=3009
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_messaging
-      - MS_NOTIFICATIONS_SERVICE=http://ms-notifications:3003
+      - MS_NOTIFICATIONS_SERVICE=http://ms-notifications-service:3003
       - SENTRY_DSN=${SENTRY_DSN:-}
       - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
       - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
@@ -202,7 +218,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-messaging-service
 
   ms-grades:
     build:
@@ -215,9 +233,9 @@ services:
       - NODE_ENV=production
       - PORT=3010
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/wep_grades
-      - MS_STUDENTS_SERVICE=http://ms-students:3001
-      - MS_TEACHERS_SERVICE=http://ms-teachers:3004
-      - MS_NOTIFICATIONS_SERVICE=http://ms-notifications:3003
+      - MS_STUDENTS_SERVICE=http://ms-students-service:3001
+      - MS_TEACHERS_SERVICE=http://ms-teachers-service:3004
+      - MS_NOTIFICATIONS_SERVICE=http://ms-notifications-service:3003
       - SENTRY_DSN=${SENTRY_DSN:-}
       - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
       - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0.1}
@@ -225,7 +243,9 @@ services:
       db:
         condition: service_healthy
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-grades-service
 
   ms-docs:
     build:
@@ -235,7 +255,9 @@ services:
     ports:
       - "3011:3011"
     networks:
-      - wep-network
+      wep-network:
+        aliases:
+          - ms-docs-service
 
   krakend:
     build:
