@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { lifecycle, initGlitchtip, glitchtipErrorHandler, glitchtipMiddleware } from './glitchtip/index.js'
+import { lifecycle, initGlitchtip, glitchtipErrorHandler, glitchtipMiddleware, initGlitchtipLogger } from './glitchtip/index.js'
 import { tracingMiddleware } from './tracing/index.js'
 import { messagingController } from './controllers/messaging.controller.js';
 
@@ -9,6 +9,7 @@ await import('../drizzle/seed.js');
 const app = new Hono();
 lifecycle()
 initGlitchtip()
+initGlitchtipLogger('ms-messaging')
 app.use('*', tracingMiddleware())
 app.use('*', glitchtipMiddleware())
 app.onError(glitchtipErrorHandler)
